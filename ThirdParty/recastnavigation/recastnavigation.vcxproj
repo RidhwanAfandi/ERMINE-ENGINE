@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Editor-Debug|x64">
+      <Configuration>Editor-Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Editor-Release|x64">
+      <Configuration>Editor-Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Game-Debug|x64">
+      <Configuration>Game-Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Game-Release|x64">
+      <Configuration>Game-Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>recastnavigation</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game-Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game-Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Editor-Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Editor-Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Game-Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Game-Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Debug|x64'">
+    <OutDir>..\..\Build\bin\Editor-Debug-windows-x86_64\recastnavigation\</OutDir>
+    <IntDir>..\..\Build\obj\Editor-Debug-windows-x86_64\recastnavigation\</IntDir>
+    <TargetName>recastnavigationD</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Release|x64'">
+    <OutDir>..\..\Build\bin\Editor-Release-windows-x86_64\recastnavigation\</OutDir>
+    <IntDir>..\..\Build\obj\Editor-Release-windows-x86_64\recastnavigation\</IntDir>
+    <TargetName>recastnavigation</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game-Debug|x64'">
+    <OutDir>..\..\Build\bin\Game-Debug-windows-x86_64\recastnavigation\</OutDir>
+    <IntDir>..\..\Build\obj\Game-Debug-windows-x86_64\recastnavigation\</IntDir>
+    <TargetName>recastnavigationD</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Game-Release|x64'">
+    <OutDir>..\..\Build\bin\Game-Release-windows-x86_64\recastnavigation\</OutDir>
+    <IntDir>..\..\Build\obj\Game-Release-windows-x86_64\recastnavigation\</IntDir>
+    <TargetName>recastnavigation</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>Recast\Include;Detour\Include;DetourCrowd\Include;DetourTileCache\Include;DebugUtils\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor-Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>Recast\Include;Detour\Include;DetourCrowd\Include;DetourTileCache\Include;DebugUtils\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Game-Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>Recast\Include;Detour\Include;DetourCrowd\Include;DetourTileCache\Include;DebugUtils\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Game-Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>Recast\Include;Detour\Include;DetourCrowd\Include;DetourTileCache\Include;DebugUtils\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="DebugUtils\Include\DebugDraw.h" />
+    <ClInclude Include="DebugUtils\Include\DetourDebugDraw.h" />
+    <ClInclude Include="DebugUtils\Include\RecastDebugDraw.h" />
+    <ClInclude Include="DebugUtils\Include\RecastDump.h" />
+    <ClInclude Include="Detour\Include\DetourAlloc.h" />
+    <ClInclude Include="Detour\Include\DetourAssert.h" />
+    <ClInclude Include="Detour\Include\DetourCommon.h" />
+    <ClInclude Include="Detour\Include\DetourMath.h" />
+    <ClInclude Include="Detour\Include\DetourNavMesh.h" />
+    <ClInclude Include="Detour\Include\DetourNavMeshBuilder.h" />
+    <ClInclude Include="Detour\Include\DetourNavMeshQuery.h" />
+    <ClInclude Include="Detour\Include\DetourNode.h" />
+    <ClInclude Include="Detour\Include\DetourStatus.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourCrowd.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourLocalBoundary.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourObstacleAvoidance.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourPathCorridor.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourPathQueue.h" />
+    <ClInclude Include="DetourCrowd\Include\DetourProximityGrid.h" />
+    <ClInclude Include="DetourTileCache\Include\DetourTileCache.h" />
+    <ClInclude Include="DetourTileCache\Include\DetourTileCacheBuilder.h" />
+    <ClInclude Include="Recast\Include\Recast.h" />
+    <ClInclude Include="Recast\Include\RecastAlloc.h" />
+    <ClInclude Include="Recast\Include\RecastAssert.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DebugUtils\Source\DebugDraw.cpp" />
+    <ClCompile Include="DebugUtils\Source\DetourDebugDraw.cpp" />
+    <ClCompile Include="DebugUtils\Source\RecastDebugDraw.cpp" />
+    <ClCompile Include="DebugUtils\Source\RecastDump.cpp" />
+    <ClCompile Include="Detour\Source\DetourAlloc.cpp" />
+    <ClCompile Include="Detour\Source\DetourAssert.cpp" />
+    <ClCompile Include="Detour\Source\DetourCommon.cpp" />
+    <ClCompile Include="Detour\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="Detour\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="Detour\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourCrowd.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourLocalBoundary.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourPathCorridor.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourPathQueue.cpp" />
+    <ClCompile Include="DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="DetourTileCache\Source\DetourTileCache.cpp" />
+    <ClCompile Include="DetourTileCache\Source\DetourTileCacheBuilder.cpp" />
+    <ClCompile Include="Recast\Source\Recast.cpp" />
+    <ClCompile Include="Recast\Source\RecastAlloc.cpp" />
+    <ClCompile Include="Recast\Source\RecastArea.cpp" />
+    <ClCompile Include="Recast\Source\RecastAssert.cpp" />
+    <ClCompile Include="Recast\Source\RecastContour.cpp" />
+    <ClCompile Include="Recast\Source\RecastFilter.cpp" />
+    <ClCompile Include="Recast\Source\RecastLayers.cpp" />
+    <ClCompile Include="Recast\Source\RecastMesh.cpp" />
+    <ClCompile Include="Recast\Source\RecastMeshDetail.cpp" />
+    <ClCompile Include="Recast\Source\RecastRasterization.cpp" />
+    <ClCompile Include="Recast\Source\RecastRegion.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

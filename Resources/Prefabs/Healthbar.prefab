@@ -1,0 +1,81 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1f1ec619564cc745a1fd2b1142f5ddbb"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Healthbar",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "UIHealthbarComponent": {
+          "showHealthbar": true,
+          "healthbarColor": [
+            0.8500000238418579,
+            0.15000000596046449,
+            0.15000000596046449
+          ],
+          "healthbarLowColor": [
+            0.8500000238418579,
+            0.44999998807907107,
+            0.15000000596046449
+          ],
+          "healthbarCriticalColor": [
+            0.75,
+            0.20000000298023225,
+            0.10000000149011612
+          ],
+          "healthbarBgColor": [
+            0.20000000298023225,
+            0.20000000298023225,
+            0.20000000298023225
+          ],
+          "healthbarWidth": 0.3400000035762787,
+          "healthbarHeight": 0.12999999523162843,
+          "healthbarPosition": [
+            0.019999999552965165,
+            0.8100000023841858,
+            0.0
+          ],
+          "healthbarBgTexture": "./Resources/Textures/UI/Health_Bar_Backing.png",
+          "healthbarFillTexture": "./Resources/Textures/UI/Health_Bar_Fill.png",
+          "healthbarFrameTexture": "./Resources/Textures/UI/Health_Bar_GearBar.png",
+          "healthbarShineColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "healthbarShineAlpha": 0.30000001192092898,
+          "currentHealth": 50.0,
+          "maxHealth": 50.0,
+          "healthRegenRate": 5.0,
+          "healthRegenDelay": 3.0
+        }
+      }
+    }
+  ]
+}

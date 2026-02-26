@@ -1,0 +1,51 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2ac8b42b83ef834bad9a1f1a56cb4ddb"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Crosshair",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "UICrosshairComponent": {
+          "showCrosshair": true,
+          "crosshairTexturePath": "./Resources/Textures/UI/crosshair.png",
+          "crosshairColor": [
+            0.949999988079071,
+            0.949999988079071,
+            0.949999988079071
+          ],
+          "crosshairSize": 0.06300000101327896,
+          "crosshairThickness": 0.0010000000474974514,
+          "crosshairStyle": 0,
+          "crosshairGap": 0.0
+        }
+      }
+    }
+  ]
+}

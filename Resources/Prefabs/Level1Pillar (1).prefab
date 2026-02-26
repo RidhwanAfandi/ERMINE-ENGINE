@@ -1,0 +1,119 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6861a00dd43f1b49bfdfa1ba2ed7eedd"
+        },
+        "Transform": {
+          "position": [
+            -2.7281553745269777,
+            -5.706825256347656,
+            -16.662229537963868
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.07000000029802323,
+            0.059060756117105487,
+            0.07000000029802323
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Level1Pillar (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_pillar_withchain.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "7eaab91798495543b79cad6d7cefba2e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "78f32ca13db1bb47a18f2605ea02c1f9"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_pillar_withchain.fbx_polySurface35_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7d20250efdaa6542b97dd4dae2727bdc"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6861a00dd43f1b49bfdfa1ba2ed7eedd",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d5a047379540274ab65eda885cef10a5"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_pillar_withchain.fbx_polySurface35_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "9507a22d7a888b4290dc1a14086ed713"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6861a00dd43f1b49bfdfa1ba2ed7eedd",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                1.0,
+                1.0,
+                1.0,
+                0.5709999799728394
+            ]
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": false
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

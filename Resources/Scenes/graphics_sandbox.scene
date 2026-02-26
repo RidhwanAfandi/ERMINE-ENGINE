@@ -1,0 +1,1793 @@
+{
+  "entities": [
+    {
+      "id": 1,
+      "components": {
+        "IDComponent": {
+          "guid": "f1a1d3fe71d8884a9885b802fdaf0830"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.30000001192092898,
+            0.10000000149011612,
+            0.10000000149011612
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 2,
+      "components": {
+        "IDComponent": {
+          "guid": "5bdc8a78d04a874d8f10b2dcc5b03383"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f1a1d3fe71d8884a9885b802fdaf0830",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 3,
+      "components": {
+        "IDComponent": {
+          "guid": "84ce69117ab7eb4a8c65618bcab44292"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.7071067690849304,
+            0.0,
+            0.7071067690849304
+          ],
+          "scale": [
+            0.30000001192092898,
+            0.10000000149011612,
+            0.10000000149011612
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 4,
+      "components": {
+        "IDComponent": {
+          "guid": "8b75673ad1a3db4c9155a51b9be85a10"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "84ce69117ab7eb4a8c65618bcab44292",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 5,
+      "components": {
+        "IDComponent": {
+          "guid": "5c57da286f52ff4180b006f9a34cb9db"
+        },
+        "Transform": {
+          "position": [
+            -120.19999694824219,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.7071067690849304,
+            0.0,
+            0.7071067690849304
+          ],
+          "scale": [
+            0.30000001192092898,
+            0.10000000149011612,
+            0.10000000149011612
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 6,
+      "components": {
+        "IDComponent": {
+          "guid": "adeb0d837b0a69409a5fdc50566a95ec"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "5c57da286f52ff4180b006f9a34cb9db",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 7,
+      "components": {
+        "IDComponent": {
+          "guid": "0d0f21514638774199f1ea4f7ef9769c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            120.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.30000001192092898,
+            0.10000000149011612,
+            0.10000000149011612
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (3)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 8,
+      "components": {
+        "IDComponent": {
+          "guid": "255574b9e3adcf4da576b248cbeaea9b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "0d0f21514638774199f1ea4f7ef9769c",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 9,
+      "components": {
+        "IDComponent": {
+          "guid": "6786d8e3a8c7b24e89bbf16794e6db25"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.4000000059604645,
+            0.10000000149011612,
+            0.4000000059604645
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (4)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_floor_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 10,
+      "components": {
+        "IDComponent": {
+          "guid": "dfb70930556ab946a4d9486039241a22"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_floor_low.fbx_floor_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6786d8e3a8c7b24e89bbf16794e6db25",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 11,
+      "components": {
+        "IDComponent": {
+          "guid": "032f112829df014cb6bf2665ae955f2c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            37.20000076293945,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.4000000059604645,
+            0.10000000149011612,
+            0.4000000059604645
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (5)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_floor_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 12,
+      "components": {
+        "IDComponent": {
+          "guid": "3b39f63d5d798a4fa3ea70e175bc26cd"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_floor_low.fbx_floor_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "032f112829df014cb6bf2665ae955f2c",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 13,
+      "components": {
+        "IDComponent": {
+          "guid": "975d7edc1a80a044a4548cade3654425"
+        },
+        "Transform": {
+          "position": [
+            -70.0,
+            36.5,
+            70.0
+          ],
+          "rotation": [
+            0.713250458240509,
+            0.0,
+            0.0,
+            0.7009092569351196
+          ],
+          "scale": [
+            1.000001072883606,
+            1.000001072883606,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.9390138387680054,
+            0.7696078419685364
+          ],
+          "intensity": 9.973999977111817,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 90.0,
+          "outerAngle": 120.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "New Entity",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.0,
+            "materialRoughness": 0.5,
+            "materialEmissive": [
+              1.0,
+              0.9372549057006836,
+              0.7686274647712708
+            ],
+            "materialEmissiveIntensity": 10.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 14,
+      "components": {
+        "IDComponent": {
+          "guid": "79b2f2d9ab65b14698db28e7a040eaf9"
+        },
+        "Transform": {
+          "position": [
+            -90.0,
+            5.0,
+            70.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.0,
+            "materialRoughness": 0.10000000149011612,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 15,
+      "components": {
+        "IDComponent": {
+          "guid": "c26dd8a3807846ec9d15c49137dea4ac"
+        },
+        "Transform": {
+          "position": [
+            -80.0,
+            5.0,
+            70.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 2",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.25,
+            "materialRoughness": 0.25,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 16,
+      "components": {
+        "IDComponent": {
+          "guid": "b9afe2ec963d4c99bf996942999466ed"
+        },
+        "Transform": {
+          "position": [
+            -70.0,
+            5.0,
+            70.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 3",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.5,
+            "materialRoughness": 0.4000000059604645,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 17,
+      "components": {
+        "IDComponent": {
+          "guid": "399b47dab6ab4dfbab3838334acf2225"
+        },
+        "Transform": {
+          "position": [
+            -60.0,
+            5.0,
+            70.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 4",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.75,
+            "materialRoughness": 0.550000011920929,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 18,
+      "components": {
+        "IDComponent": {
+          "guid": "ec3c8f7560c2467ba77977e2f7c3725b"
+        },
+        "Transform": {
+          "position": [
+            -50.0,
+            5.0,
+            70.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 5",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 1.0,
+            "materialRoughness": 0.699999988079071,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 19,
+      "components": {
+        "IDComponent": {
+          "guid": "afa6545b0ebe490ea3e4e8c0b5f98ba8"
+        },
+        "Transform": {
+          "position": [
+            -90.0,
+            5.0,
+            82.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 6",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.10000000149011612,
+            "materialRoughness": 0.8999999761581421,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 20,
+      "components": {
+        "IDComponent": {
+          "guid": "54383432b178405d90506bfd4b6a4c00"
+        },
+        "Transform": {
+          "position": [
+            -80.0,
+            5.0,
+            82.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 7",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.30000001192092898,
+            "materialRoughness": 0.75,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 21,
+      "components": {
+        "IDComponent": {
+          "guid": "683aaa74983048f388441364e23ab164"
+        },
+        "Transform": {
+          "position": [
+            -70.0,
+            5.0,
+            82.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 8",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.6000000238418579,
+            "materialRoughness": 0.6000000238418579,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 22,
+      "components": {
+        "IDComponent": {
+          "guid": "0f68077b6bbe4712a5327ec131380bac"
+        },
+        "Transform": {
+          "position": [
+            -60.0,
+            5.0,
+            82.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 9",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.800000011920929,
+            "materialRoughness": 0.44999998807907107,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 23,
+      "components": {
+        "IDComponent": {
+          "guid": "fa2e8f8d00f34c8783a2243153d7509d"
+        },
+        "Transform": {
+          "position": [
+            -50.0,
+            5.0,
+            82.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 10",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.949999988079071,
+            "materialRoughness": 0.30000001192092898,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 24,
+      "components": {
+        "IDComponent": {
+          "guid": "6bb602d2f6950e4f9adbe70d2fa23dc3"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            20.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.10000000149011612,
+            0.10000000149011612,
+            0.10000000149011612
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (6)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_floor_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 25,
+      "components": {
+        "IDComponent": {
+          "guid": "3bc0738c71adac4e987658d11398045f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_floor_low.fbx_floor_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {},
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6bb602d2f6950e4f9adbe70d2fa23dc3",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 26,
+      "components": {
+        "IDComponent": {
+          "guid": "755ae6db5a456a46b85a848634098797"
+        },
+        "Transform": {
+          "position": [
+            -9.348694801330567,
+            20.42470359802246,
+            15.056640625
+          ],
+          "rotation": [
+            0.7071068286895752,
+            0.0,
+            0.0,
+            0.7071067094802856
+          ],
+          "scale": [
+            2.0,
+            0.9999881982803345,
+            1.0999788045883179
+          ]
+        },
+        "Light": {
+          "color": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "intensity": 4.882999897003174,
+          "type": "Spot",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": 30.0,
+          "outerAngle": 40.0,
+          "radius": 30.0
+        },
+        "ObjectMetaData": {
+          "name": "New Entity",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.0,
+            "materialRoughness": 0.5,
+            "materialEmissive": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 10.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 30,
+      "components": {
+        "IDComponent": {
+          "guid": "01c863408efcc645bdeffcfa039d9e0c"
+        },
+        "Transform": {
+          "position": [
+            -23.278654098510743,
+            20.42470359802246,
+            15.056640625
+          ],
+          "rotation": [
+            0.7071068286895752,
+            0.0,
+            0.0,
+            0.7071067094802856
+          ],
+          "scale": [
+            2.0,
+            0.9999956488609314,
+            1.0999937057495118
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "intensity": 4.882999897003174,
+          "type": "Spot",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": 30.0,
+          "outerAngle": 40.0,
+          "radius": 30.0
+        },
+        "ObjectMetaData": {
+          "name": "New Entity (7)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.0,
+            "materialRoughness": 0.5,
+            "materialEmissive": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 10.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "id": 31,
+      "components": {
+        "IDComponent": {
+          "guid": "122d459e308c5547b0887f2c15657a77"
+        },
+        "Transform": {
+          "position": [
+            -18.81633758544922,
+            5.0,
+            21.899999618530275
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            5.0,
+            5.0,
+            5.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cube PBR 10 (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Cube",
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "materialAlpha": 1.0,
+            "materialTransparency": 0.0,
+            "materialMetallic": 0.949999988079071,
+            "materialRoughness": 0.30000001192092898,
+            "materialEmissive": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "materialEmissiveIntensity": 1.0
+          },
+          "textures": [],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "castsShadows": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ],
+  "globalGraphics": {
+    "ssaoEnabled": true,
+    "ssaoSamples": 16,
+    "ssaoRadius": 3.815999984741211,
+    "ssaoBias": 0.0,
+    "ssaoIntensity": 1.409999966621399,
+    "ssaoFadeout": 0.0,
+    "ssaoMaxDistance": 500.0,
+    "fogEnabled": false,
+    "fogMode": 0,
+    "fogColor": [
+      0.5,
+      0.6000000238418579,
+      0.699999988079071
+    ],
+    "fogDensity": 0.019999999552965165,
+    "fogStart": 50.0,
+    "fogEnd": 200.0,
+    "fogHeightCoefficient": 0.10000000149011612,
+    "fogHeightFalloff": 10.0,
+    "vignetteEnabled": false,
+    "fxaaEnabled": true,
+    "toneMappingEnabled": true,
+    "gammaCorrectionEnabled": true,
+    "bloomEnabled": true,
+    "skyboxIsHDR": false,
+    "exposure": 1.0,
+    "contrast": 1.0,
+    "saturation": 1.0,
+    "gamma": 2.200000047683716,
+    "vignetteIntensity": 0.30000001192092898,
+    "vignetteRadius": 0.800000011920929,
+    "bloomStrength": 0.03999999910593033,
+    "fxaaSpanMax": 8.0,
+    "fxaaReduceMin": 0.0078125,
+    "fxaaReduceMul": 0.125,
+    "bloomThreshold": 1.0,
+    "bloomIntensity": 2.0,
+    "bloomRadius": 1.0,
+    "spotlightRaysEnabled": true,
+    "spotlightRayIntensity": 0.30000001192092898,
+    "spotlightRayFalloff": 2.0,
+    "motionBlurEnabled": true,
+    "motionBlurStrength": 1.0,
+    "motionBlurSamples": 8
+  }
+}

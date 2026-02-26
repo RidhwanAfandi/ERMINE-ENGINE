@@ -1,0 +1,50 @@
+{
+    "parameters": {
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialAlbedoMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Resources\\Textures\\C_Table_BaseColor.png"
+        },
+        "materialRoughnessMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Resources\\Textures\\C_Table_Roughness.png"
+        },
+        "materialAoMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Resources\\Textures\\C_Table_Height.png"
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

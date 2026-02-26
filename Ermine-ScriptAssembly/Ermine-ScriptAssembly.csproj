@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Editor-Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{E76B644C-53D8-1F47-1CCC-B7A488F741AF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Ermine.ScriptAssembly</RootNamespace>
+    <AssemblyName>Ermine-ScriptAssembly</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Editor-Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Build\bin\Editor-Debug-windows-x86_64\Ermine-ScriptAssembly\</OutputPath>
+    <BaseIntermediateOutputPath>..\Build\obj\Editor-Debug-windows-x86_64\Ermine-ScriptAssembly\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Editor-Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Build\bin\Editor-Release-windows-x86_64\Ermine-ScriptAssembly\</OutputPath>
+    <BaseIntermediateOutputPath>..\Build\obj\Editor-Release-windows-x86_64\Ermine-ScriptAssembly\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>NDEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Game-Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Build\bin\Game-Debug-windows-x86_64\Ermine-ScriptAssembly\</OutputPath>
+    <BaseIntermediateOutputPath>..\Build\obj\Game-Debug-windows-x86_64\Ermine-ScriptAssembly\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Game-Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Build\bin\Game-Release-windows-x86_64\Ermine-ScriptAssembly\</OutputPath>
+    <BaseIntermediateOutputPath>..\Build\obj\Game-Release-windows-x86_64\Ermine-ScriptAssembly\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants>NDEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Editor-Debug|x64' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Editor-Release|x64' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Game-Debug|x64' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Game-Release|x64' ">
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Behaviour.cs" />
+    <Compile Include="Component.cs" />
+    <Compile Include="CoreModule\Animator.cs" />
+    <Compile Include="CoreModule\Application.cs" />
+    <Compile Include="CoreModule\AudioComponent.cs" />
+    <Compile Include="CoreModule\AudioListener.cs" />
+    <Compile Include="CoreModule\Cursor.cs" />
+    <Compile Include="CoreModule\Debug.cs" />
+    <Compile Include="CoreModule\GameObject.cs" />
+    <Compile Include="CoreModule\GlobalAudio.cs" />
+    <Compile Include="CoreModule\Input.cs" />
+    <Compile Include="CoreModule\Mathf.cs" />
+    <Compile Include="CoreModule\Matrix4x4.cs" />
+    <Compile Include="CoreModule\Prefab.cs" />
+    <Compile Include="CoreModule\Quaternion.cs" />
+    <Compile Include="CoreModule\Rigidbody.cs" />
+    <Compile Include="CoreModule\SceneManager.cs" />
+    <Compile Include="CoreModule\Time.cs" />
+    <Compile Include="CoreModule\Transform.cs" />
+    <Compile Include="CoreModule\UIBookCounter.cs" />
+    <Compile Include="CoreModule\UIHealthbar.cs" />
+    <Compile Include="CoreModule\UISystem.cs" />
+    <Compile Include="CoreModule\Vector2.cs" />
+    <Compile Include="CoreModule\Vector3.cs" />
+    <Compile Include="CoreModule\VideoManager.cs" />
+    <Compile Include="GameplayHUD.cs" />
+    <Compile Include="MonoBehaviour.cs" />
+    <Compile Include="NavAgent.cs" />
+    <Compile Include="Object.cs" />
+    <Compile Include="PhysicsModule\Collider.cs" />
+    <Compile Include="PhysicsModule\Physics.cs" />
+    <Compile Include="StateMachine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

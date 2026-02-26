@@ -1,0 +1,192 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a6d84a84f63a244789a0768fc4a91c73"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            9.233607292175293,
+            0.000049326416046824309
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ClockWallPrefab",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "cadcee5a228b1e4d930be4151837754a"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clock",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_clock_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a6d84a84f63a244789a0768fc4a91c73",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "210a7080cbf6744da12f2f0b1deabeea"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            20.0,
+            20.0,
+            20.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_clock_low.fbx_pCube82_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b82a3bdefc40d943a7e663e05d025877"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "cadcee5a228b1e4d930be4151837754a",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a3336367511feb438b793c3e559c2532"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.6359028816223145
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clock (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_clock_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a6d84a84f63a244789a0768fc4a91c73",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "14f4469531d93b48b80ca1e1c98ff830"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_clock_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "e7a44247d1b4b443ac66198d556c8b89"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a3336367511feb438b793c3e559c2532",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

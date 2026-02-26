@@ -1,0 +1,108 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "da5de46cb182f34b92dd983b39a0be4e"
+        },
+        "Transform": {
+          "position": [
+            5.71125602722168,
+            2.0643179416656496,
+            12.233524322509766
+          ],
+          "rotation": [
+            0.7071068286895752,
+            0.0,
+            0.0,
+            0.7071067094802856
+          ],
+          "scale": [
+            0.029999999329447748,
+            0.02999856509268284,
+            0.06624053418636322
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "pipes (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "Capsule",
+          "colliderpivot": [
+            0.05000000074505806,
+            7.199999809265137,
+            0.4000000059604645
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            90.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            30.0,
+            450.0,
+            5.0
+          ]
+        },
+        "ModelComponent": {
+          "model": "ART1_pipe_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "283c8ee70f3f224894c267e7dde72575",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4687d61462b7674bac6559f1c9289b59"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            100.0,
+            100.0,
+            100.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_pipe_low.fbx_Pipe_low_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "82e89f3e477a6e468bb911e6a4cf96da"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "da5de46cb182f34b92dd983b39a0be4e",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

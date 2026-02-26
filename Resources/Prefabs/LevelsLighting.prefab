@@ -1,0 +1,283 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "82ac19993a9b754a94ba5b5e774c71d8"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "LevelsLighting",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6ce70f24a9155e47a4f56dbb627cb7ae"
+        },
+        "Transform": {
+          "position": [
+            40.0,
+            24.0,
+            -200.0
+          ],
+          "rotation": [
+            0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "intensity": 1.0,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 70.0,
+          "outerAngle": 80.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "Level4 Main Light",
+          "tag": "Light",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "82ac19993a9b754a94ba5b5e774c71d8",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6c7d59f01084304e9034b2247dedb6f1"
+        },
+        "Transform": {
+          "position": [
+            9.0,
+            17.0,
+            -130.0
+          ],
+          "rotation": [
+            0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "intensity": 1.0,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 70.0,
+          "outerAngle": 80.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "Level3 Main Light",
+          "tag": "Light",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "82ac19993a9b754a94ba5b5e774c71d8",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "303e228ab8bfc64f8065f622efdecd94"
+        },
+        "Transform": {
+          "position": [
+            3.0,
+            14.0,
+            -83.55000305175781
+          ],
+          "rotation": [
+            0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "intensity": 1.0,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 70.0,
+          "outerAngle": 80.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "Level2 Main Light",
+          "tag": "Light",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "82ac19993a9b754a94ba5b5e774c71d8",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "250015a842e54845af4efe933b627e97"
+        },
+        "Transform": {
+          "position": [
+            6.0,
+            12.0,
+            -16.0
+          ],
+          "rotation": [
+            0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "intensity": 1.0,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 70.0,
+          "outerAngle": 80.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "Level1 Main Light",
+          "tag": "Light",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "82ac19993a9b754a94ba5b5e774c71d8",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a2fe56e0852b844f9a210021d5607c46"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            9.0,
+            23.0
+          ],
+          "rotation": [
+            0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "intensity": 1.0,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": false,
+          "innerAngle": 70.0,
+          "outerAngle": 80.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "Level0 Main Light",
+          "tag": "Light",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "82ac19993a9b754a94ba5b5e774c71d8",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

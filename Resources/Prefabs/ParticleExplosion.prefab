@@ -1,0 +1,110 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "70e5c3414d69574490fb5d918cc3f6a5"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "GPUParticleEmitter": {
+          "active": true,
+          "maxParticles": 1024,
+          "emissionShape": 1,
+          "localPositionOffset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overallScale": 1.0,
+          "spawnBoxExtents": [
+            0.1,
+            0.1,
+            0.1
+          ],
+          "spawnRadius": 0.5,
+          "spawnRadiusInner": 0.0,
+          "spawnRate": 0.0,
+          "burstCountMin": 50,
+          "burstCountMax": 100,
+          "burstInterval": 0.0,
+          "burstOnStart": true,
+          "directionMode": 0,
+          "direction": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "coneAngle": 180.0,
+          "coneInnerAngle": 0.0,
+          "speedMin": 5.0,
+          "speedMax": 10.0,
+          "gravity": [
+            0.0,
+            -9.8,
+            0.0
+          ],
+          "drag": 0.5,
+          "turbulenceStrength": 0.0,
+          "turbulenceScale": 1.0,
+          "boundsMode": 0,
+          "renderMode": 0,
+          "colorStart": [
+            0.0,
+            0.56,
+            1.0
+          ],
+          "colorEnd": [
+            0.0,
+            0.2,
+            0.5
+          ],
+          "alphaStart": 1.0,
+          "alphaEnd": 0.0,
+          "sizeStartMin": 0.2,
+          "sizeStartMax": 0.4,
+          "sizeEndMin": 0.05,
+          "sizeEndMax": 0.1,
+          "lifetimeMin": 0.5,
+          "lifetimeMax": 1.0,
+          "sparkleShape": 0
+        },
+        "ObjectMetaData": {
+          "name": "OrbExplosion",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "TimedDestroy",
+              "enabled": true,
+              "fields": {
+                "duration": {
+                  "t": 0,
+                  "v": 1.5
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e4f3ee481d33954a8d3e920a7ba11999"
+        },
+        "Transform": {
+          "position": [
+            10.755964279174805,
+            2.1499440670013429,
+            -8.56491756439209
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.02800000086426735,
+            0.026000000536441804,
+            0.009999999776482582
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "gate (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "Box",
+          "colliderpivot": [
+            -5.150000095367432,
+            4.449999809265137,
+            0.5
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            360.0,
+            330.0,
+            15.0
+          ]
+        },
+        "ModelComponent": {
+          "model": "ART1_door_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "283c8ee70f3f224894c267e7dde72575",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "644cbd426d1df94d912c0df881319b6e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_door_low.fbx_pCylinder23_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "ff451c6729efe74396832a82f3149b43"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e4f3ee481d33954a8d3e920a7ba11999",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

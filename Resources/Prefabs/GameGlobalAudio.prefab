@@ -1,0 +1,83 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "618b3fbaca931742b5b675ff1871c7e6"
+        },
+        "GlobalAudioComponent": {
+          "masterVolume": 1.0,
+          "musicVolume": 0.25200000405311587,
+          "sfxVolume": 1.0,
+          "ambienceVolume": 0.052000001072883609,
+          "autoPlay": true,
+          "music": [
+            {
+              "name": "test_music",
+              "path": "../Resources/Audio/NewBGM.wav",
+              "volume": 1.0
+            }
+          ],
+          "sfx": [
+            {
+              "name": "Shoot",
+              "path": "../Resources/Audio/NewShootOrb.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Teleport",
+              "path": "../Resources/Audio/Teleport.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Jump",
+              "path": "../Resources/Audio/jump1.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "BookPickUp",
+              "path": "../Resources/Audio/Pickup_Book.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "UIClick",
+              "path": "../Resources/Audio/UI_Confirm.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "UIHover",
+              "path": "../Resources/Audio/UI_Hover 5.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "SwitchOn",
+              "path": "../Resources/Audio/Switch_On.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "SwitchOff",
+              "path": "../Resources/Audio/Switch_Off.wav",
+              "volume": 1.0
+            }
+          ],
+          "ambience": [
+            {
+              "name": "Steampunk",
+              "path": "../Resources/Audio/futuristic-factory-noise-002-311136.mp3",
+              "volume": 1.0
+            }
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "GameGlobalAudio",
+          "tag": "Audio",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

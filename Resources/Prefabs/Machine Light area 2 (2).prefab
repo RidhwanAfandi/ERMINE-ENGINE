@@ -1,0 +1,52 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6f42626c75c4e64a9d364df1fad7923e"
+        },
+        "Transform": {
+          "position": [
+            16.066598892211915,
+            12.087839126586914,
+            -105.98181915283203
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.3796616494655609,
+            0.7745097875595093,
+            0.7512834072113037
+          ],
+          "intensity": 1.1979999542236329,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 10.9399995803833
+        },
+        "ObjectMetaData": {
+          "name": "Machine Light area 2 (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

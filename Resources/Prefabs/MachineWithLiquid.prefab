@@ -1,0 +1,230 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "56440dce3f8c2848b9f6d4b19e6ea312"
+        },
+        "Transform": {
+          "position": [
+            1.8565778732299805,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "MachineWithLiquid",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "27d699481fbbfd48b2204d7b5388774e"
+        },
+        "Transform": {
+          "position": [
+            3.700000047683716,
+            7.034999847412109,
+            -3.7980000972747804
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.23633231222629548,
+            0.32679054141044619,
+            0.23633231222629548
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cylinder",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "CylinderPrimitive.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "56440dce3f8c2848b9f6d4b19e6ea312",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8704757b36545f47a10c6316bc85d72e"
+        },
+        "Transform": {
+          "position": [
+            849.7122192382813,
+            -131.140380859375,
+            1485.00244140625
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_CylinderPrimitive.fbx_Cylinder.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "c4d5398cbeb8f04084a211005a7eaece"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "27d699481fbbfd48b2204d7b5388774e",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b850c537a2fbb44fa893a382bde78fa4"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.6259733438491821,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "machine",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_machine_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "56440dce3f8c2848b9f6d4b19e6ea312",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "047fdd1525bdd14ba6b66a680586fe94"
+        },
+        "Transform": {
+          "position": [
+            716.4374389648438,
+            -0.0012224119855090976,
+            -1359.504638671875
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            20.0,
+            20.0,
+            20.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_machine_low.fbx_Machine_1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "d1390df6197190429507c752b4df35b6"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "b850c537a2fbb44fa893a382bde78fa4",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "82f2c03e0c8bb94e8676bae45c6c1987"
+        },
+        "Transform": {
+          "position": [
+            716.4374389648438,
+            -0.0012224119855090976,
+            -1359.504638671875
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            20.0,
+            20.0,
+            20.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_machine_low.fbx_Machine_1_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "54ff6cef95c39b46a02f7feaf309b2da"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "b850c537a2fbb44fa893a382bde78fa4",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

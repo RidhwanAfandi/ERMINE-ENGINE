@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="xresource_pipeline_v2-main">
+      <UniqueIdentifier>{B338FF53-9F48-AB24-0802-1043F4309ABD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xresource_pipeline_v2-main\dependencies">
+      <UniqueIdentifier>{492B52A7-B5BA-1392-BEB6-F4A92AC54E9E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xresource_pipeline_v2-main\dependencies\xtextfile">
+      <UniqueIdentifier>{B587DFF4-214E-3C11-6AA9-CA73D6AEAA75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xresource_pipeline_v2-main\dependencies\xtextfile\source">
+      <UniqueIdentifier>{354C1ADC-2121-628F-4AD0-A18B360470A6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="xresource_pipeline_v2-main\dependencies\xtextfile\source\xtextfile.h">
+      <Filter>xresource_pipeline_v2-main\dependencies\xtextfile\source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Ermine-ResourcePipeline.cpp" />
+    <ClCompile Include="xresource_pipeline_v2-main\dependencies\xtextfile\source\xtextfile.cpp">
+      <Filter>xresource_pipeline_v2-main\dependencies\xtextfile\source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

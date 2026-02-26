@@ -1,0 +1,605 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "bd4951e66e56af4d9d55308f90b19dca"
+        },
+        "Transform": {
+          "position": [
+            17.5,
+            2.4000000953674318,
+            36.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.009999999776482582,
+            0.009999999776482582,
+            0.009999999776482582
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "PlayerAnimated",
+          "tag": "Model",
+          "selfActive": true
+        },
+        "AudioComponent": {
+          "soundName": "",
+          "eventName": "",
+          "useRandomVariation": true,
+          "is3D": false,
+          "isLooping": false,
+          "isStreaming": false,
+          "volume": 1.0,
+          "followTransform": false,
+          "minDistance": 1.0,
+          "maxDistance": 100.0,
+          "playOnStart": false,
+          "soundVariations": [
+            "../Resources/Audio/1.wav",
+            "../Resources/Audio/2.wav",
+            "../Resources/Audio/3.wav",
+            "../Resources/Audio/4.wav",
+            "../Resources/Audio/5.wav",
+            "../Resources/Audio/6.wav"
+          ]
+        },
+        "Mesh": {
+          "kind": "None"
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Dynamic",
+          "mass": 1.0,
+          "shapeType": "Capsule",
+          "colliderpivot": [
+            0.0,
+            1.5,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": true,
+          "roty": true,
+          "rotz": true,
+          "collidersize": [
+            50.0,
+            360.0,
+            50.0
+          ]
+        },
+        "Material": {
+          "guid": "e9e56fa412a7da44a00a730e7f3ebc30"
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "PlayerController2"
+            },
+            {
+              "class": "OrbTeleport"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "13f669d2cc91cd4ea336b5ffccd0e3d6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            100.0,
+            100.0,
+            100.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Main Camera",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "bd4951e66e56af4d9d55308f90b19dca",
+          "depth": 1
+        },
+        "GlobalTransform": {},
+        "CameraComponent": {
+          "fov": 70.0,
+          "aspect": 1.7777777910232545,
+          "near": 0.10000000149011612,
+          "far": 1000.0,
+          "primary": false,
+          "isGameCamera": false
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "01f59f123c811045aef64c6abdd12394"
+        },
+        "Transform": {
+          "position": [
+            -0.0797882080078125,
+            0.0,
+            15.648200988769532
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.029999999329447748,
+            0.029999999329447748,
+            0.029999999329447748
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "PlayerAnim",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "DavidArmswCamera_ALL.fbx",
+          "isSkinFile": false
+        },
+        "AnimationComponent": {
+          "model": "DavidArmswCamera_ALL.fbx",
+          "graph": {
+            "playbackSpeed": 1.0,
+            "playing": true,
+            "currentTime": 0.0,
+            "states": [
+              {
+                "id": 1,
+                "name": "Idle",
+                "clipName": "Idle0",
+                "isStartState": true,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  -63.7642822265625,
+                  -80.72259521484375
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Idle2",
+                "clipName": "Idle1",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  -818.7642822265625,
+                  -83.72259521484375
+                ]
+              },
+              {
+                "id": 3,
+                "name": "walk",
+                "clipName": "Walk",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  416.2357177734375,
+                  -70.72259521484375
+                ]
+              },
+              {
+                "id": 4,
+                "name": "jump",
+                "clipName": "Jump",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  285.8602294921875,
+                  296.56524658203127
+                ]
+              },
+              {
+                "id": 5,
+                "name": "land",
+                "clipName": "Land",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  -113.7642822265625,
+                  287.27740478515627
+                ]
+              },
+              {
+                "id": 6,
+                "name": "shoot",
+                "clipName": "",
+                "isStartState": false,
+                "isAttached": false,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "editorPos": [
+                  -473.7642822265625,
+                  -56.72259521484375
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "fromNodeId": 1,
+                "toNodeId": 3,
+                "exitTime": 0.0,
+                "duration": 1.0,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.10000000149011612,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 3,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 1.0,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.05000000074505806,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 1,
+                "toNodeId": 4,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsGrounded",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 4,
+                "toNodeId": 5,
+                "exitTime": 0.0,
+                "duration": 0.05000000074505806,
+                "conditions": [
+                  {
+                    "parameterName": "IsGrounded",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 5,
+                "toNodeId": 1,
+                "exitTime": 0.009999999776482582,
+                "duration": 0.25,
+                "conditions": []
+              },
+              {
+                "fromNodeId": 1,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": []
+              },
+              {
+                "fromNodeId": 6,
+                "toNodeId": 1,
+                "exitTime": 0.05000000074505806,
+                "duration": 0.25,
+                "conditions": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "shoot",
+                "type": 3,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              },
+              {
+                "name": "IsGrounded",
+                "type": 0,
+                "boolValue": true,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              },
+              {
+                "name": "IsMoving",
+                "type": 0,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              }
+            ]
+          }
+        },
+        "HierarchyComponent": {
+          "parentGuid": "13f669d2cc91cd4ea336b5ffccd0e3d6",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7bb6cd8878986045afa9a93e2e16e55b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:Syringe_Meter_geo_mesh5",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "af50ab1703de0b41b018a55bc92ba0ee"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "06f2f5ebbb77204991da5925fb5f047b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:Syringe_Trigger_geo_mesh4",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "e553fc96cf19d74f956c56862fde64b3"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "eb1c18267ba8314aac019c0b4e46be72"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:Syringe_Body_geo_mesh3",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "3b84364634ccea40851dd71aaeabe207"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "455750f4149be04b80eaa9098c98a60b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:David_Cuffs_geo_mesh2",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "9b640f817bd17345a744e0a6dd944b96"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a2b6d8629bee2d43ab4aa3122a94769b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:David_Sleeves_geo_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "a51daeb893a81e46acfea6426477e134"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3cc800e70d0cb6418b4008ec45e9d29d"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_DavidArmswCamera_ALL.fbx_DavidArms:David_Arms_geo_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2ef19cbfeecfde409aeea8caef50d0e5"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "01f59f123c811045aef64c6abdd12394",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

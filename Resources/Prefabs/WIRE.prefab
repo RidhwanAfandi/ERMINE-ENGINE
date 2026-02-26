@@ -1,0 +1,81 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7290b074c8879f4595463700828729e9"
+        },
+        "Transform": {
+          "position": [
+            14.389431953430176,
+            2.459775447845459,
+            -4.382450103759766
+          ],
+          "rotation": [
+            0.965925931930542,
+            6.434383408304711e-7,
+            -0.2588190734386444,
+            -6.434418082790216e-7
+          ],
+          "scale": [
+            0.050000011920928958,
+            0.049998048692941669,
+            0.05000004544854164
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "WIRE",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_wire_1_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "283c8ee70f3f224894c267e7dde72575",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "193917f98ed4ea479ae7f753a215f0fc"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_wire_1_low.fbx_wire1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2838af5dcef59443874a3603bff661d1"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "7290b074c8879f4595463700828729e9",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

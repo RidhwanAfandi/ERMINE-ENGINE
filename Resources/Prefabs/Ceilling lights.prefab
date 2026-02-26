@@ -1,0 +1,119 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a18add0bcd5cf840a311734715f07745"
+        },
+        "Transform": {
+          "position": [
+            24.22100067138672,
+            16.95199966430664,
+            -188.98500061035157
+          ],
+          "rotation": [
+            -9.09962807327247e-7,
+            -1.0,
+            -9.09962807327247e-7,
+            -4.371221606902509e-8
+          ],
+          "scale": [
+            0.03999999910593033,
+            0.03999999910593033,
+            0.03999999910593033
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Ceilling lights",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_CeilingLight.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "321b3e7c1d89db4498257e775f32e9d1",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1747c0fd749eab409ae1fa21243f9bef"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_CeilingLight.fbx_pCylinder3_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "96fba8f71323ba4aa5d617b0cffe8d5d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a18add0bcd5cf840a311734715f07745",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6cd928a0e48aa245adf3b772f6dbd07f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_CeilingLight.fbx_pCylinder3_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "9951b3d68d7ee04a9141ac9287fc7944"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a18add0bcd5cf840a311734715f07745",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

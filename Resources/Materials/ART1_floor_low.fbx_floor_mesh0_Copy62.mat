@@ -1,0 +1,22 @@
+{
+    "parameters": {
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

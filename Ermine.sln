@@ -1,0 +1,171 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ermine-Editor", "Ermine-Editor\Ermine-Editor.vcxproj", "{397C7682-A53C-F2B8-6E77-3B36DAF63695}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC} = {D010C24B-3C48-0AE3-4552-6E06B10831DC}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{53E47842-3FC8-3998-A828-34EB942B241A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fmod", "ThirdParty\Fmod\Fmod.vcxproj", "{6B50857C-5787-860D-0074-6C10EC89020F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLFW", "ThirdParty\GLFW\GLFW.vcxproj", "{154B857C-0182-860D-AA6E-6C109684020F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glad", "ThirdParty\Glad\Glad.vcxproj", "{BDD6857C-A90D-870D-52FA-6C103E10030F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGui", "ThirdParty\imgui\ImGui.vcxproj", "{C0FF640D-2C14-8DBE-F595-301E616989EF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Jolt", "ThirdParty\Jolt\Jolt.vcxproj", "{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mono", "ThirdParty\Mono\Mono.vcxproj", "{7E2F897C-6A66-8A0D-1353-7010FF68060F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imnodes", "ThirdParty\imnodes\imnodes.vcxproj", "{74F1A99C-E0D0-2838-E9E8-B30E55478F99}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "recastnavigation", "ThirdParty\recastnavigation\recastnavigation.vcxproj", "{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ermine-Engine", "Ermine-Engine\Ermine-Engine.vcxproj", "{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ermine-Game", "Ermine-Game\Ermine-Game.vcxproj", "{ECBB8D2C-5871-0622-E165-00F94D1AFD25}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ermine-ResourcePipeline", "Ermine-ResourcePipeline\Ermine-ResourcePipeline.vcxproj", "{D010C24B-3C48-0AE3-4552-6E06B10831DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ermine-ScriptAssembly", "Ermine-ScriptAssembly\Ermine-ScriptAssembly.csproj", "{E76B644C-53D8-1F47-1CCC-B7A488F741AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ermine-ScriptSandbox", "Ermine-ScriptSandbox\Ermine-ScriptSandbox.csproj", "{F6EBEDB5-E27A-777F-8B99-8B7A77078825}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Editor-Debug|x64 = Editor-Debug|x64
+		Editor-Release|x64 = Editor-Release|x64
+		Game-Debug|x64 = Game-Debug|x64
+		Game-Release|x64 = Game-Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{397C7682-A53C-F2B8-6E77-3B36DAF63695}.Game-Release|x64.Build.0 = Game-Release|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{6B50857C-5787-860D-0074-6C10EC89020F}.Game-Release|x64.Build.0 = Game-Release|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{154B857C-0182-860D-AA6E-6C109684020F}.Game-Release|x64.Build.0 = Game-Release|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{BDD6857C-A90D-870D-52FA-6C103E10030F}.Game-Release|x64.Build.0 = Game-Release|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Game-Release|x64.Build.0 = Game-Release|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F}.Game-Release|x64.Build.0 = Game-Release|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F}.Game-Release|x64.Build.0 = Game-Release|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99}.Game-Release|x64.Build.0 = Game-Release|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE}.Game-Release|x64.Build.0 = Game-Release|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{88292A83-F4E9-A5B9-BD24-EF3629A4EA95}.Game-Release|x64.Build.0 = Game-Release|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{ECBB8D2C-5871-0622-E165-00F94D1AFD25}.Game-Release|x64.Build.0 = Game-Release|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{D010C24B-3C48-0AE3-4552-6E06B10831DC}.Game-Release|x64.Build.0 = Game-Release|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{E76B644C-53D8-1F47-1CCC-B7A488F741AF}.Game-Release|x64.Build.0 = Game-Release|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Editor-Debug|x64.ActiveCfg = Editor-Debug|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Editor-Debug|x64.Build.0 = Editor-Debug|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Editor-Release|x64.ActiveCfg = Editor-Release|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Editor-Release|x64.Build.0 = Editor-Release|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Game-Debug|x64.ActiveCfg = Game-Debug|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Game-Debug|x64.Build.0 = Game-Debug|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Game-Release|x64.ActiveCfg = Game-Release|x64
+		{F6EBEDB5-E27A-777F-8B99-8B7A77078825}.Game-Release|x64.Build.0 = Game-Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6B50857C-5787-860D-0074-6C10EC89020F} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{154B857C-0182-860D-AA6E-6C109684020F} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{BDD6857C-A90D-870D-52FA-6C103E10030F} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{C0FF640D-2C14-8DBE-F595-301E616989EF} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{1E8A877C-0AC1-880D-B3AD-6E109FC3040F} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{7E2F897C-6A66-8A0D-1353-7010FF68060F} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{74F1A99C-E0D0-2838-E9E8-B30E55478F99} = {53E47842-3FC8-3998-A828-34EB942B241A}
+		{F7E4DE50-E3DD-FDA2-0C10-E327F867DDAE} = {53E47842-3FC8-3998-A828-34EB942B241A}
+	EndGlobalSection
+EndGlobal

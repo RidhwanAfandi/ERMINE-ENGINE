@@ -1,0 +1,81 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9f1a3508ccb29748bc4f9a6de26b301c"
+        },
+        "Transform": {
+          "position": [
+            9.214143753051758,
+            2.1581997871398927,
+            18.961830139160158
+          ],
+          "rotation": [
+            0.0,
+            -0.7071068286895752,
+            0.0,
+            0.7071067094802856
+          ],
+          "scale": [
+            0.10169309377670288,
+            0.10000000149011612,
+            0.05965185537934303
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "drain",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_drain_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "283c8ee70f3f224894c267e7dde72575",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d4ef9caf84fc8144875b92ffe11dbb03"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_drain_low.fbx_drain_low_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7535a612c62b16419f6944f872f7bff0"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "9f1a3508ccb29748bc4f9a6de26b301c",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

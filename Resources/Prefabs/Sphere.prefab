@@ -1,0 +1,140 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "60e5c3414d69574490fb5d918cc3f6a4"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.25,
+            0.25,
+            0.25
+          ]
+        },
+        "Light": {
+          "color": [
+            0.0,
+            0.5590777397155762,
+            1.0
+          ],
+          "intensity": 5.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 3.0
+        },
+        "ObjectMetaData": {
+          "name": "Sphere",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Mesh": {
+          "kind": "Primitive",
+          "primitive": {
+            "type": "Sphere",
+            "size": [
+              5.0,
+              5.0,
+              5.0
+            ]
+          }
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Dynamic",
+          "mass": 1.0,
+          "shapeType": "Sphere",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": true,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "Material": {
+          "hasMaterial": true,
+          "params": {
+            "materialAlbedo": [
+              1.0,
+              1.0,
+              1.0,
+              0.0
+            ],
+            "materialAlpha": 0.0,
+            "materialTransparency": 1.0,
+            "materialMetallic": 0.0,
+            "materialRoughness": 0.5,
+            "materialEmissive": [
+              0.0,
+              0.5607843399047852,
+              1.0
+            ],
+            "materialEmissiveIntensity": 0.0,
+            "materialHasAlbedoMap": true,
+            "materialHasEmissiveMap": false
+          },
+          "textures": [
+            {
+              "slot": "materialAlbedoMap",
+              "path": "../Resources/Textures/Icons/refresh.png"
+            },
+            {
+              "slot": "material.albedoMap",
+              "path": "../Resources/Textures/Icons/refresh.png"
+            }
+          ],
+          "uvScale": [
+            1.0,
+            1.0
+          ],
+          "uvOffset": [
+            0.0,
+            0.0
+          ],
+          "customFragmentShader": "../Resources/Shaders/volumetric_orb_fragment.glsl",
+          "castsShadows": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "Sphere"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

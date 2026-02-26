@@ -1,0 +1,375 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c1192ffa1d3d9f4d920db860ee9cadc7"
+        },
+        "Transform": {
+          "position": [
+            17.5,
+            2.4000000953674318,
+            36.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.009999999776482582,
+            0.009999999776482582,
+            0.009999999776482582
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Player",
+          "tag": "Model",
+          "selfActive": true
+        },
+        "AudioComponent": {
+          "soundName": "",
+          "eventName": "",
+          "useRandomVariation": true,
+          "is3D": false,
+          "isLooping": false,
+          "isStreaming": false,
+          "volume": 1.0,
+          "followTransform": false,
+          "minDistance": 1.0,
+          "maxDistance": 100.0,
+          "playOnStart": false,
+          "soundVariations": [
+            "../Resources/Audio/1.wav",
+            "../Resources/Audio/2.wav",
+            "../Resources/Audio/3.wav",
+            "../Resources/Audio/4.wav",
+            "../Resources/Audio/5.wav",
+            "../Resources/Audio/6.wav"
+          ]
+        },
+        "Mesh": {
+          "kind": "None"
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Dynamic",
+          "mass": 1.0,
+          "shapeType": "Capsule",
+          "colliderpivot": [
+            0.0,
+            1.5,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": true,
+          "roty": true,
+          "rotz": true,
+          "collidersize": [
+            50.0,
+            360.0,
+            50.0
+          ]
+        },
+        "Material": {
+          "guid": "2aab0feda01ee94db5e388316f7fca2e"
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "PlayerController2"
+            },
+            {
+              "class": "OrbTeleport"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "601d153e2a045547a51fd93c52ce5278"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            100.0,
+            100.0,
+            100.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Main Camera",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "c1192ffa1d3d9f4d920db860ee9cadc7",
+          "depth": 1
+        },
+        "GlobalTransform": {},
+        "CameraComponent": {
+          "fov": 70.0,
+          "aspect": 1.7777777910232545,
+          "near": 0.10000000149011612,
+          "far": 1000.0,
+          "primary": false,
+          "isGameCamera": false
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f71b466d90f9354fb76fc6241b65322e"
+        },
+        "Transform": {
+          "position": [
+            0.02500000037252903,
+            -1.399999976158142,
+            0.0
+          ],
+          "rotation": [
+            -0.7071066498756409,
+            0.0,
+            0.0,
+            0.70710688829422
+          ],
+          "scale": [
+            1.0,
+            0.9999998211860657,
+            0.9999998211860657
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Player Arms",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ArmsOnly.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "601d153e2a045547a51fd93c52ce5278",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2099807abe82a04c9c4c1cfa54dbb51c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ArmsOnly.fbx_base.002_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "63dc22862500b64b96f4d4666718d928"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f71b466d90f9354fb76fc6241b65322e",
+          "depth": 3
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "eb684a706892a1409683d4563db2aed8"
+        },
+        "Transform": {
+          "position": [
+            -0.1599999964237213,
+            -0.2999999523162842,
+            1.2500001192092896
+          ],
+          "rotation": [
+            -0.7071061730384827,
+            0.0,
+            0.0,
+            0.7071074843406677
+          ],
+          "scale": [
+            0.00009999999747378752,
+            0.00010000001202570274,
+            0.00010000001202570274
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Syringe",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_Syringe.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f71b466d90f9354fb76fc6241b65322e",
+          "depth": 3
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0757cb7b821dbc47a1636ea2514677a1"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_Syringe.fbx_Mesh.014_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "91c75f45c7040a4a9be8068b806c8af2"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "eb684a706892a1409683d4563db2aed8",
+          "depth": 4
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "af27cf5e88a35c42ae773d8c1798ba66"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_Syringe.fbx_Mesh.016_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "1fa23093e313c14ba64971608eb749e3"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "eb684a706892a1409683d4563db2aed8",
+          "depth": 4
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a2d74f34a67ab84cb1de0d8463c2aad9"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_Syringe.fbx_Mesh.015_mesh2",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "1ce5dc9f467d20459e838c9e3379ed3b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "eb684a706892a1409683d4563db2aed8",
+          "depth": 4
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3270d41b9859544797ca36601f57fd83"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            7.264822006225586,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "LanternHanging",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "70b43f536b28384696385336f16d36f4"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            1.7999999523162842,
+            0.0
+          ],
+          "rotation": [
+            -4.371138828673793e-8,
+            1.0,
+            -4.371138828673793e-8,
+            1.910685253406468e-15
+          ],
+          "scale": [
+            0.0205003060400486,
+            0.020500002428889276,
+            0.07022986561059952
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear Connect 2 (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Gear_connect_2.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "3270d41b9859544797ca36601f57fd83",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ec26400c8a0e574f81b7ae6e60b40695"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Gear_connect_2.fbx_polySurface47_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "75fb2ac02e47a048ac96c0e693ad1756"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "70b43f536b28384696385336f16d36f4",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c7f067aee9037340be772744d7f2994e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            1.7999999523162842,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.020500002428889276,
+            0.020500002428889276,
+            0.051932189613580707
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear Connect 2 (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Gear_connect_2.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "3270d41b9859544797ca36601f57fd83",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "bd699b993e6c75418c5a57114a95bbe7"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Gear_connect_2.fbx_polySurface47_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2c38937302a346489ea6df2d52747992"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "c7f067aee9037340be772744d7f2994e",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "fe22a019880da143835484224034d967"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            1.899999976158142,
+            -0.4000000059604645
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Lantern",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_lantern_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "3270d41b9859544797ca36601f57fd83",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d5df7d12d73f154083217665c7d3e322"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_lantern_low.fbx_lantern1_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "3f34107762bf264495c473ca62acb725"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "fe22a019880da143835484224034d967",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9b94b4cf10d64b4082219d5a7cf88999"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_lantern_low.fbx_lantern1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6980d1166593274f95b480524d3b90af"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "fe22a019880da143835484224034d967",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

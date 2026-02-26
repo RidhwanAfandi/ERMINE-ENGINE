@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{107145F9-FC28-8746-6530-60A251072237}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\xresource_pipeline_v2-main">
+      <UniqueIdentifier>{6D7B93CA-D93F-92BA-A2A5-C2840E292EF0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\xresource_pipeline_v2-main\dependencies">
+      <UniqueIdentifier>{438CEBC9-2F20-E171-98E4-3A2684971B64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile">
+      <UniqueIdentifier>{2FE939EB-1B54-FAF6-C46F-5F5CB0B9BDD9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile\source">
+      <UniqueIdentifier>{6F003D72-DB69-D2D4-64AD-807FD0158319}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile\source\xtextfile.h">
+      <Filter>ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile\source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile\source\xtextfile.cpp">
+      <Filter>ThirdParty\xresource_pipeline_v2-main\dependencies\xtextfile\source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

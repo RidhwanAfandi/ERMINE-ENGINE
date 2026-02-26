@@ -1,0 +1,596 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e1ad4e7cd329b54eaee4afa8033358b2"
+        },
+        "Transform": {
+          "position": [
+            -30.67063331604004,
+            6.0781049728393559,
+            40.68724060058594
+          ],
+          "rotation": [
+            0.0,
+            -0.7121087908744812,
+            0.0,
+            0.7020691633224487
+          ],
+          "scale": [
+            1.0000009536743165,
+            1.0,
+            1.000002145767212
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorParent",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Trigger",
+          "motionType": "Kinematic",
+          "mass": 0.0,
+          "shapeType": "Box",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            10.0,
+            10.0,
+            10.0
+          ]
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "EndElevator"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6d418ea9ecf4244b82f11843726c8532"
+        },
+        "Transform": {
+          "position": [
+            8.314050674438477,
+            10.611340522766114,
+            -6.598274230957031
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorFloor (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_floor_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7b897317949383409e8322a3dfad222a"
+        },
+        "Transform": {
+          "position": [
+            -23.57988166809082,
+            0.0,
+            34.19743728637695
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_floor_low.fbx_floor_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "09bedbcf1f780b41a2b642af90d65e0d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d418ea9ecf4244b82f11843726c8532",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8168725fde61fc4a982b247ec72a069e"
+        },
+        "Transform": {
+          "position": [
+            9.378055572509766,
+            -6.01298189163208,
+            8.368698120117188
+          ],
+          "rotation": [
+            0.0,
+            -0.7077754139900208,
+            0.0,
+            0.7064375281333923
+          ],
+          "scale": [
+            0.041393768042325976,
+            0.05000000074505806,
+            0.050000376999378207
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorWall (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_bars_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f83ccb144a91f74f86c0ed6eb721c69f"
+        },
+        "Transform": {
+          "position": [
+            -24.747726440429689,
+            0.0,
+            30.66478157043457
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_bars_low.fbx_pCylinder1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "42698273f1db5b47b3ad5395812ec36b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "8168725fde61fc4a982b247ec72a069e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "10df17821c6caa42a2ec10978b94bf66"
+        },
+        "Transform": {
+          "position": [
+            8.34263801574707,
+            -6.0129218101501469,
+            7.9548187255859379
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.0413937084376812,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorWall (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_bars_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "94a2678ea8e75c47a61ff0894ba786c8"
+        },
+        "Transform": {
+          "position": [
+            -24.747726440429689,
+            0.0,
+            30.66478157043457
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_bars_low.fbx_pCylinder1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "42698273f1db5b47b3ad5395812ec36b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "10df17821c6caa42a2ec10978b94bf66",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4140aef9398bb7449ad966965403ed80"
+        },
+        "Transform": {
+          "position": [
+            -6.689592361450195,
+            -6.01298189163208,
+            8.33829116821289
+          ],
+          "rotation": [
+            0.0,
+            -0.7077754139900208,
+            0.0,
+            0.7064375281333923
+          ],
+          "scale": [
+            0.041393768042325976,
+            0.05000000074505806,
+            0.050000376999378207
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorWall",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_bars_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "cc93b7c86c0bd146a4a31f9f8e54675d"
+        },
+        "Transform": {
+          "position": [
+            -24.747726440429689,
+            0.0,
+            30.66478157043457
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_bars_low.fbx_pCylinder1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "42698273f1db5b47b3ad5395812ec36b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "4140aef9398bb7449ad966965403ed80",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3bf93a54032f564caf870bbb96c3ec22"
+        },
+        "Transform": {
+          "position": [
+            -0.5058212280273438,
+            -6.141461372375488,
+            1.1328926086425782
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Empty Entity",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Kinematic",
+          "mass": 0.0,
+          "shapeType": "Box",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            17.950000762939454,
+            1.0,
+            13.899999618530274
+          ]
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dc179a4a755ad042a48b79c2694cc8cc"
+        },
+        "Transform": {
+          "position": [
+            -6.574999809265137,
+            -5.9631147384643559,
+            -8.15411376953125
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.0413937084376812,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorDoor",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_bars_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ba6f39fe6e9a3645b8dfda237788e581"
+        },
+        "Transform": {
+          "position": [
+            -24.747726440429689,
+            0.0,
+            30.66478157043457
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_bars_low.fbx_pCylinder1_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "42698273f1db5b47b3ad5395812ec36b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "dc179a4a755ad042a48b79c2694cc8cc",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8549fcf68e7b9040b7f63707ab650ae8"
+        },
+        "Transform": {
+          "position": [
+            8.388662338256836,
+            -5.56846284866333,
+            -7.1313934326171879
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ElevatorFloor",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_floor_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "e1ad4e7cd329b54eaee4afa8033358b2",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e507353afc3df24c853a4ddcdf797261"
+        },
+        "Transform": {
+          "position": [
+            -23.57988166809082,
+            0.0,
+            34.19743728637695
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_floor_low.fbx_floor_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "09bedbcf1f780b41a2b642af90d65e0d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "8549fcf68e7b9040b7f63707ab650ae8",
+          "depth": 2
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

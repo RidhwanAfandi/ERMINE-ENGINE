@@ -1,0 +1,122 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "09ec421eb030ec42bfc2a80d4e4f67dc"
+        },
+        "Transform": {
+          "position": [
+            0.06053733825683594,
+            -8.11653995513916,
+            -0.1057586669921875
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "NewJailFloating",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Floating_Jail_Cell.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "feff02cde6cdfd4aa3b29781033e0321",
+          "depth": 2
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": []
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "cd910b46583e234a936d510841df3879"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Floating_Jail_Cell.fbx_chains_group_chainedlink_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "ea7d607601f5b24f86f562df41539ca0"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "09ec421eb030ec42bfc2a80d4e4f67dc",
+          "depth": 3
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9fd796e895944b48a558f2ee0fa99bc1"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Floating_Jail_Cell.fbx_chains_group_chainedlink_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "5db40fc50a18944e9cdd1c7af82a9586"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "09ec421eb030ec42bfc2a80d4e4f67dc",
+          "depth": 3
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

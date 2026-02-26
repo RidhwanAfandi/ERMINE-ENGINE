@@ -1,0 +1,46 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2fbf4acd4437944ba916ea6558baaf91"
+        },
+        "Transform": {
+          "position": [
+            0.14314889907836915,
+            9.253503799438477,
+            20.892799377441408
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.017955034971237184,
+            0.02004174143075943,
+            0.006028742529451847
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "clock",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "369cdd416b6bc9489dfd7c5bf80ab00b"
+        },
+        "ModelComponent": {
+          "model": "ART1_clock_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "283c8ee70f3f224894c267e7dde72575",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

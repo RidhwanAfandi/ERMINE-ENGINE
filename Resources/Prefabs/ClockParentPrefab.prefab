@@ -1,0 +1,192 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dd06387797926041a52b9206f9592584"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ClockParentPrefab",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4e374d60759af74fa4a55a5fbbb1a8db"
+        },
+        "Transform": {
+          "position": [
+            35.26044464111328,
+            10.027045249938965,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.029999999329447748,
+            0.029999999329447748,
+            0.029999999329447748
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clock wall",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_clock_wall_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "dd06387797926041a52b9206f9592584",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e6716a2986592f49b9906a7e4d5061be"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_clock_wall_low.fbx_Jail_wall_old_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "e7a44247d1b4b443ac66198d556c8b89"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "4e374d60759af74fa4a55a5fbbb1a8db",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "5ea9dbd5a1cace46a1e14b728cb8300c"
+        },
+        "Transform": {
+          "position": [
+            35.421142578125,
+            10.09822940826416,
+            2.3402912616729738
+          ],
+          "rotation": [
+            -9.099629210140847e-7,
+            1.0,
+            -0.0000010291722674082849,
+            9.365085746823598e-13
+          ],
+          "scale": [
+            0.030000369995832444,
+            0.029999999329447748,
+            0.030000369995832444
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clock",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_clock_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "dd06387797926041a52b9206f9592584",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1086c5879c210e43bf55ccae2b1354b9"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_clock_low.fbx_pCube82_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b82a3bdefc40d943a7e663e05d025877"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "5ea9dbd5a1cace46a1e14b728cb8300c",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

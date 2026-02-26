@@ -1,0 +1,67 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                1.0,
+                1.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialMetallic": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialRoughness": {
+            "type": "float",
+            "value": 0.5
+        },
+        "materialEmissive": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "materialEmissiveIntensity": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": false
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

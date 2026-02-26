@@ -1,0 +1,65 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e35b3131e00f0e4991e7c9cb075d8ebb"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "GlobalAudioComponent": {
+          "masterVolume": 1.0,
+          "musicVolume": 0.5099999904632568,
+          "sfxVolume": 0.800000011920929,
+          "ambienceVolume": 1.0,
+          "autoPlay": true,
+          "music": [
+            {
+              "name": "Main_MenuBGM",
+              "path": "../Resources/Audio/Machina - Menu_Music_1_Vers1.wav",
+              "volume": 1.0
+            }
+          ],
+          "sfx": [
+            {
+              "name": "Hover",
+              "path": "../Resources/Audio/UI_Hover 5.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Click",
+              "path": "../Resources/Audio/UI_Confirm.wav",
+              "volume": 1.0
+            }
+          ],
+          "ambience": []
+        },
+        "ObjectMetaData": {
+          "name": "MainMenuGlobalAudio",
+          "tag": "Audio",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

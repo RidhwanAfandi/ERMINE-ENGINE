@@ -1,0 +1,118 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "59b69c36e741f84b97ae13cb589401aa"
+        },
+        "Transform": {
+          "position": [
+            2.5757734775543215,
+            4.126755714416504,
+            21.625593185424806
+          ],
+          "rotation": [
+            0.0,
+            0.7804048657417297,
+            0.0,
+            0.6252745389938355
+          ],
+          "scale": [
+            0.05000009015202522,
+            0.05000000074505806,
+            0.05000009015202522
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Wall lights",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_WallLight.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "5b537b1282d74d48a58539d9bbf5470d"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_WallLight.fbx_Bulb4_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "fe22843a2c58ea40a252cc3610a3105a"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "59b69c36e741f84b97ae13cb589401aa",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e1d49ce6e6dd334cac932a29dea8395a"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_WallLight.fbx_Bulb4_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "426b02d82252624b9aa1e4c0b1d633ae"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "59b69c36e741f84b97ae13cb589401aa",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}
