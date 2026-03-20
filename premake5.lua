@@ -33,6 +33,18 @@ IncludeDir["imnodes"] = "ThirdParty/imnodes"
 IncludeDir["recastnavigation"] = "ThirdParty/recastnavigation"
 IncludeDir["pl_mpeg"] = "ThirdParty/pl_mpeg"
 
+-- Vulkan SDK (resolved from VULKAN_SDK environment variable set by the installer)
+local vulkanSDK = os.getenv("VULKAN_SDK")
+if vulkanSDK then
+    IncludeDir["Vulkan"] = vulkanSDK .. "/Include"
+    LibraryDir_Vulkan    = vulkanSDK .. "/Lib"
+else
+    -- Fallback: assume Vulkan headers are on the system include path (Linux / vcpkg)
+    IncludeDir["Vulkan"] = ""
+    LibraryDir_Vulkan    = ""
+    print("WARNING: VULKAN_SDK environment variable not set. Vulkan include/lib paths will be empty.")
+end
+
 -- Libraries
 LibraryDir = {}
 LibraryDir["Fmod"] = "ThirdParty/Fmod/lib"
@@ -103,15 +115,17 @@ project "Ermine-Engine"
         "ThirdParty/xresource_pipeline_v2-main/dependencies/xtextfile/source",
         "ThirdParty/xresource_pipeline_v2-main/dependencies/xerr/source",
         "%{IncludeDir.imnodes}",
-        "%{IncludeDir.pl_mpeg}"
+        "%{IncludeDir.pl_mpeg}",
+        "%{IncludeDir.Vulkan}"
     }
 
     libdirs
     {
         "%{LibraryDir.Fmod}",
         "%{LibraryDir.Mono}",
-        "%{LibraryDir.assimp}"
+        "%{LibraryDir.assimp}",
         -- "%{LibraryDir.DirectXTex}"
+        (LibraryDir_Vulkan or "")
     }
 
     links
@@ -128,7 +142,8 @@ project "Ermine-Engine"
         "Jolt",
         "assimp-vc143-mt.lib",
         "imnodes",
-        "recastnavigation"
+        "recastnavigation",
+        "vulkan-1.lib"
         --"DirectXTex.lib"
     }
 
@@ -200,7 +215,11 @@ project "Ermine-Engine"
             "GLM_ENABLE_EXPERIMENTAL",
             "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING", -- To slience the warnings from Rapidjson
             "JPH_USE_SUBMERGENCE",
-            "JPH_DEBUG_RENDERER"
+            "JPH_DEBUG_RENDERER",
+            -- Vulkan backend
+            "EE_VULKAN",
+            "VK_USE_PLATFORM_WIN32_KHR",
+            "NOMINMAX"
         }
 
     -- Editor vs Game feature flags for the engine build
