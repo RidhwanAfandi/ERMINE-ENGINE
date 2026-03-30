@@ -4,13 +4,64 @@
             "type": "bool",
             "value": true
         },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                1.0
+            ]
+        },
         "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAoMap": {
             "type": "bool",
             "value": true
         },
         "materialAlbedoMap": {
             "type": "texture2d",
-            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Resources\\Textures\\ART1_Miscellaneous_BC.png"
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_1_BC.png"
+        },
+        "materialNormalMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_1_NRM.png"
+        },
+        "materialRoughnessMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_1_Roughness.png"
+        },
+        "materialMetallicMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Metallic.png"
+        },
+        "materialAoMap": {
+            "type": "texture2d",
+            "value": "C:\\Users\\lum_k\\OneDrive\\Desktop\\SEP6_csd3451\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_1_AO.png"
         }
     },
     "uvTransform": {

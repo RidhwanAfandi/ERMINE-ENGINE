@@ -24,6 +24,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "FrameController.h"
 #include "AssetManager.h"
 #include "GISystem.h"
+#include <array>
+#include <cstdio>
 
 using namespace Ermine::editor;
 using namespace Ermine::graphics;
@@ -117,6 +119,7 @@ void GraphicsDebugGUI::Render()
     DrawLightingControls();
     DrawPerformanceMetrics();
     DrawShaderControls();
+    DrawGBufferViewer();
 
     ImGui::End();
 }
@@ -279,6 +282,19 @@ void GraphicsDebugGUI::DrawPostProcessingControls()
                         "Add film grain noise effect");
         DrawToggleButton("Chromatic Aberration", &renderer->m_ChromaticAberrationEnabled,
                         "Color fringing effect at screen edges");
+        DrawToggleButton("Radial Blur", &renderer->m_RadialBlurEnabled,
+                        "Screen-space zoom blur from a configurable center");
+        DrawToggleButton("Motion Blur", &renderer->m_MotionBlurEnabled,
+                        "Per-pixel velocity-based motion blur (camera-attached objects are never blurred)");
+
+        if (renderer->m_MotionBlurEnabled && ImGui::TreeNode("Motion Blur Settings"))
+        {
+            DrawFloatSlider("Strength", &renderer->m_MotionBlurStrength, 0.0f, 5.0f,
+                           "Scale applied to the velocity vector");
+            ImGui::SliderInt("Samples", &renderer->m_MotionBlurSamples, 2, 24);
+            DrawTooltip("Number of samples along the velocity vector (higher = smoother but slower)");
+            ImGui::TreePop();
+        }
 
         ImGui::Separator();
         
@@ -315,6 +331,56 @@ void GraphicsDebugGUI::DrawPostProcessingControls()
                            "Strength of vignette darkening");
             DrawFloatSlider("Vignette Radius", &renderer->m_VignetteRadius, 0.1f, 1.0f,
                            "Size of vignette effect");
+            DrawFloatSlider("Vignette Coverage", &renderer->m_VignetteCoverage, 0.0f, 1.0f,
+                           "Coverage across entire screen (1.0 affects full frame)");
+            DrawFloatSlider("Vignette Falloff", &renderer->m_VignetteFalloff, 0.01f, 1.0f,
+                           "Edge transition softness for vignette");
+            DrawFloatSlider("Vignette Map Strength", &renderer->m_VignetteMapStrength, 0.0f, 1.0f,
+                           "How much the vignette map influences the mask");
+            ImGui::SliderFloat3("Vignette Map RGB Modifier", &renderer->m_VignetteMapRGBModifier.x, 0.0f, 2.0f, "%.3f");
+            DrawTooltip("Vignette tint color (0,0,0 = classic black vignette)");
+
+            static std::array<char, 512> vignetteMapPathBuffer{};
+            static bool vignetteMapPathInitialized = false;
+            if (!vignetteMapPathInitialized)
+            {
+                std::snprintf(vignetteMapPathBuffer.data(), vignetteMapPathBuffer.size(), "%s",
+                    renderer->m_VignetteMapPath.c_str());
+                vignetteMapPathInitialized = true;
+            }
+
+            if (ImGui::InputText("Vignette Map Path", vignetteMapPathBuffer.data(), vignetteMapPathBuffer.size()))
+            {
+                renderer->m_VignetteMapPath = vignetteMapPathBuffer.data();
+            }
+            DrawTooltip("Texture path for optional vignette mask map");
+
+            if (ImGui::Button("Load Vignette Map"))
+            {
+                renderer->m_VignetteMapPath = vignetteMapPathBuffer.data();
+                if (!renderer->m_VignetteMapPath.empty())
+                {
+                    auto tex = AssetManager::GetInstance().LoadTexture(renderer->m_VignetteMapPath);
+                    if (tex && tex->IsValid())
+                    {
+                        renderer->SetVignetteMapTexture(tex, renderer->m_VignetteMapPath);
+                    }
+                    else
+                    {
+                        renderer->SetVignetteMapTexture(nullptr, renderer->m_VignetteMapPath);
+                        EE_CORE_WARN("Failed to load vignette map texture: {}", renderer->m_VignetteMapPath);
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Clear Vignette Map"))
+            {
+                renderer->ClearVignetteMapTexture();
+                vignetteMapPathBuffer[0] = '\0';
+            }
+
+            const bool hasVignetteMap = renderer->HasVignetteMapTexture();
+            ImGui::Text("Vignette Map: %s", hasVignetteMap ? "Loaded" : "None");
             ImGui::TreePop();
         }
 
@@ -333,6 +399,18 @@ void GraphicsDebugGUI::DrawPostProcessingControls()
         {
             DrawFloatSlider("Aberration Amount", &renderer->m_ChromaticAmount, 0.0f, 0.02f,
                            "Strength of color separation at edges");
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Radial Blur Settings"))
+        {
+            DrawFloatSlider("Radial Blur Strength", &renderer->m_RadialBlurStrength, 0.0f, 0.35f,
+                           "Zoom blur intensity");
+            ImGui::SliderInt("Radial Blur Samples", &renderer->m_RadialBlurSamples, 4, 24);
+            DrawTooltip("Sample count for radial blur quality/performance");
+            ImGui::SliderFloat("Radial Blur Center X", &renderer->m_RadialBlurCenter.x, 0.0f, 1.0f, "%.3f");
+            ImGui::SliderFloat("Radial Blur Center Y", &renderer->m_RadialBlurCenter.y, 0.0f, 1.0f, "%.3f");
+            DrawTooltip("Screen-space blur center in UV space");
             ImGui::TreePop();
         }
 
@@ -396,8 +474,13 @@ void GraphicsDebugGUI::DrawLightingControls()
     {
         ImGui::Indent(10.0f);
         
-        ImGui::Text("Maximum Lights: %d", MAX_LIGHTS);
-        DrawTooltip("Maximum number of lights that can be processed simultaneously");
+        auto renderer = ECS::GetInstance().GetSystem<Renderer>();
+        const int uploadedLights = renderer ? static_cast<int>(renderer->GetUploadedLightCount()) : 0;
+        const int lightCapacity = renderer ? static_cast<int>(renderer->GetLightSSBOCapacity()) : 0;
+        ImGui::Text("Uploaded Lights: %d", uploadedLights);
+        DrawTooltip("Number of lights uploaded to the light SSBO for the current frame");
+        ImGui::Text("Light SSBO Capacity: %d", lightCapacity);
+        DrawTooltip("Current light SSBO capacity in light entries before a resize is required");
         
         // Count active lights
         auto lightSystem = ECS::GetInstance().GetSystem<LightSystem>();
@@ -433,7 +516,6 @@ void GraphicsDebugGUI::DrawLightingControls()
         ImGui::Separator();
 
         // Volumetric Spotlight Rays
-        auto renderer = ECS::GetInstance().GetSystem<Renderer>();
         if (renderer) {
             if (DrawToggleButton("Volumetric Spotlight Rays", &renderer->m_SpotlightRaysEnabled,
                                 "Enable volumetric god rays for spotlights")) {
@@ -602,4 +684,62 @@ void GraphicsDebugGUI::DrawShaderControls()
     }
     DrawTooltip("Recompile all cached shaders from disk");
     ImGui::Unindent(10.0f);
+}
+
+void GraphicsDebugGUI::DrawGBufferViewer()
+{
+    if (!ImGui::CollapsingHeader("GBuffer Viewer"))
+        return;
+
+    auto renderer = ECS::GetInstance().GetSystem<Renderer>();
+    if (!renderer) return;
+
+    auto gbuffer    = renderer->GetGBuffer();
+    auto ppBuffer   = renderer->GetPostProcessBuffer();
+    auto mbBuffer   = renderer->GetMotionBlurBuffer();
+
+    // Thumbnail size: 2 columns filling available width
+    const float panelWidth = ImGui::GetContentRegionAvail().x;
+    const float thumbW = (panelWidth - ImGui::GetStyle().ItemSpacing.x) * 0.5f;
+    const float thumbH = thumbW * (9.0f / 16.0f);  // 16:9 aspect
+
+    // Helper lambda: draw one texture thumbnail with a label
+    // ImGui::Image expects UV (0,1)→(1,0) to flip OpenGL bottom-left origin to top-left
+    auto DrawThumb = [&](const char* label, unsigned int texID)
+    {
+        ImGui::BeginGroup();
+        ImGui::TextUnformatted(label);
+        if (texID != 0)
+            ImGui::Image((ImTextureID)(intptr_t)texID, ImVec2(thumbW, thumbH), ImVec2(0, 1), ImVec2(1, 0));
+        else
+            ImGui::Dummy(ImVec2(thumbW, thumbH));
+        ImGui::EndGroup();
+    };
+
+    ImGui::Indent(4.0f);
+
+    // Row 1
+    if (gbuffer)
+    {
+        DrawThumb("RT0: Albedo (RGBA8)",      gbuffer->PackedTexture0);
+        ImGui::SameLine();
+        DrawThumb("RT1: Normals (RG16F oct)", gbuffer->PackedTexture1);
+
+        DrawThumb("RT2: Emissive (RGBA8)",    gbuffer->PackedTexture2);
+        ImGui::SameLine();
+        DrawThumb("RT3: Mat Props (RGBA8)",   gbuffer->PackedTexture3);
+
+        DrawThumb("RT4: Velocity (RG16F)",    gbuffer->PackedTexture4);
+        ImGui::SameLine();
+        DrawThumb("Depth (32F)",              gbuffer->DepthTexture);
+    }
+
+    // Row 4: pipeline outputs
+    DrawThumb("Post-Process Output",
+        ppBuffer ? ppBuffer->ColorTexture : 0u);
+    ImGui::SameLine();
+    DrawThumb("Motion Blur Output",
+        mbBuffer ? mbBuffer->ColorTexture : 0u);
+
+    ImGui::Unindent(4.0f);
 }

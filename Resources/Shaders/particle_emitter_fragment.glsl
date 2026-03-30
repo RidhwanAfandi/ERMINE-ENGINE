@@ -29,6 +29,7 @@ uniform sampler3D u_SmokeNoise;
 uniform sampler3D u_SmokeDistort;
 uniform sampler3D u_SmokePuff;
 uniform sampler2D u_SceneDepth;
+uniform sampler2D u_SpriteTexture;  // Swirl01.png, used for renderMode 3 (shockwave)
 
 // Soft circular gradient
 float softCircle(vec2 uv) {
@@ -134,6 +135,55 @@ float electricBolt(vec2 uv, float seed, float thickness, float variation) {
 }
 
 void main() {
+    // Shockwave sprite mode - animated dual-layer swirl
+    if (u_RenderMode == 3) {
+        vec2 centered = vTexCoord - 0.5;
+        float dist = length(centered) * 2.0;  // 0 = center, 1 = edge
+
+        // Layer 1: swirl spinning forward
+        float a1 = u_Time * 2.5;
+        vec2 uv1 = vec2(
+            centered.x * cos(a1) - centered.y * sin(a1),
+            centered.x * sin(a1) + centered.y * cos(a1)
+        ) + 0.5;
+
+        // Layer 2: swirl spinning backward, slightly zoomed in
+        float a2 = -u_Time * 1.6;
+        vec2 uv2 = vec2(
+            centered.x * cos(a2) - centered.y * sin(a2),
+            centered.x * sin(a2) + centered.y * cos(a2)
+        ) * 1.3 + 0.5;
+
+        vec4 s1 = texture(u_SpriteTexture, uv1);
+        vec4 s2 = texture(u_SpriteTexture, uv2);
+
+        // Combine layers additively, clamp alpha
+        float swirlAlpha = clamp(s1.a + s2.a * 0.6, 0.0, 1.0);
+        vec3  swirlRGB   = s1.rgb + s2.rgb * 0.5;
+
+        // Leading-edge ring: sharp bright ring at the expanding boundary
+        float ring = pow(max(0.0, 1.0 - abs(dist - 0.82) / 0.10), 2.5);
+        ring *= 1.0 - vLife * 0.8;  // fades as particle ages
+
+        // Hot center core: flares at birth, gone by mid-life
+        float core = exp(-dist * 5.0) * max(0.0, 1.0 - vLife * 2.5);
+
+        float alpha = (swirlAlpha + ring * 0.9) * vColor.a;
+        if (alpha < 0.01) discard;
+
+        // Swirl body with strong HDR boost for bloom
+        vec3 color = vColor.rgb * swirlRGB * 6.0;
+
+        // Ring is white-hot
+        color += mix(vec3(1.0), vColor.rgb, 0.35) * ring * 12.0;
+
+        // Center core pulses white
+        color += vec3(1.0) * core * 6.0;
+
+        FragColor = vec4(color, alpha);
+        return;
+    }
+
     // Electric mode
     if (u_RenderMode == 2) {
         vec2 uv = vTexCoord;

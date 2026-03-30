@@ -11,6 +11,8 @@ public class RotatingPlatform : MonoBehaviour
 
     private AudioComponent audioComp;
     private GameObject player;
+    private bool warnedMissingAudio = false;
+    private bool warnedMissingPlayer = false;
 
     private bool playerOnPlatform = false;
 
@@ -20,15 +22,19 @@ public class RotatingPlatform : MonoBehaviour
     void Start()
     {
         audioComp = GetComponent<AudioComponent>();
-        player = GameObject.Find("Player");
+        TryResolvePlayer();
 
         if (audioComp == null)
         {
             Console.WriteLine("Warning: No AudioComponent found on rotating platform!");
+            warnedMissingAudio = true;
         }
 
-        if (player == null)
+        if (player == null && !warnedMissingPlayer)
+        {
             Console.WriteLine("Warning: Player not found!");
+            warnedMissingPlayer = true;
+        }
 
         lastPlatformPos = transform.position;
         lastPlatformRot = transform.rotation;
@@ -94,24 +100,83 @@ public class RotatingPlatform : MonoBehaviour
 
     private void HandleAudioByDistance()
     {
-        if (audioComp == null || player == null) return;
+        if (audioComp == null)
+        {
+            audioComp = GetComponent<AudioComponent>();
+            if (audioComp == null)
+            {
+                if (!warnedMissingAudio)
+                {
+                    Console.WriteLine("Warning: No AudioComponent found on rotating platform!");
+                    warnedMissingAudio = true;
+                }
+                return;
+            }
+        }
+
+        if (!TryResolvePlayer()) return;
 
         // Calculate distance manually
 
         Vector3 diff = player.transform.position - transform.position;
         float distance = Mathf.Sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+        float effectiveActivationRange = GetEffectiveActivationRange();
 
         // Start audio when player is close enough
 
-        if (distance < audioActivationRange && !audioComp.isPlaying)
+        if (distance < effectiveActivationRange && !audioComp.isPlaying)
         {
             audioComp.shouldPlay = true;
         }
         // Stop audio when player is too far
-        else if (distance >= audioActivationRange && audioComp.isPlaying)
+        else if (distance >= effectiveActivationRange && audioComp.isPlaying)
         {
             audioComp.shouldStop = true;
         }
+    }
+
+    private bool TryResolvePlayer()
+    {
+        if (player != null && player.activeSelf)
+            return true;
+
+        player = GameObject.Find("Player");
+        if (player == null)
+            player = GameObject.FindWithTag("Player");
+
+        if (player == null)
+        {
+            GameObject[] taggedModels = GameObject.FindGameObjectsWithTag("Model");
+            for (int i = 0; i < taggedModels.Length; ++i)
+            {
+                if (taggedModels[i] != null && taggedModels[i].name == "Player")
+                {
+                    player = taggedModels[i];
+                    break;
+                }
+            }
+        }
+
+        if (player == null)
+        {
+            if (!warnedMissingPlayer)
+            {
+                Console.WriteLine("Warning: Player not found for rotating platform audio.");
+                warnedMissingPlayer = true;
+            }
+            return false;
+        }
+
+        warnedMissingPlayer = false;
+        return true;
+    }
+
+    private float GetEffectiveActivationRange()
+    {
+        float effectiveRange = audioActivationRange;
+        if (audioComp != null && audioComp.maxDistance > effectiveRange)
+            effectiveRange = audioComp.maxDistance;
+        return effectiveRange;
     }
     public void IsActive(bool state)
     {

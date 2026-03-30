@@ -21,6 +21,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <PreCompile.h>
 #include "ResourcePipe.h"
+#include "TangentSpace.h"
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -479,7 +480,7 @@ namespace Ermine {
 
         // Load the image
         ScratchImage image;
-        HRESULT hr = LoadFromWICFile(wInput.c_str(), WIC_FLAGS_NONE, nullptr, image);
+        HRESULT hr = LoadFromWICFile(wInput.c_str(), WIC_FLAGS_DEFAULT_SRGB, nullptr, image);
         if (FAILED(hr)) {
             std::cerr << "    Failed to load texture with WIC" << std::endl;
             return false;
@@ -802,15 +803,33 @@ namespace Ermine {
 
             // Tangent - apply rotation and scale only
             if (mesh->HasTangentsAndBitangents()) {
-                float tang[3] = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+                glm::vec3 tangent(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+                glm::vec3 bitangent(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
                 if (settings.applyPreTransform) {
-                    TransformNormal(transformMatrix, tang, vertex.tangent);
+                    float transformedTangent[3];
+                    float transformedBitangent[3];
+                    const float tangentIn[3] = { tangent.x, tangent.y, tangent.z };
+                    const float bitangentIn[3] = { bitangent.x, bitangent.y, bitangent.z };
+                    TransformNormal(transformMatrix, tangentIn, transformedTangent);
+                    TransformNormal(transformMatrix, bitangentIn, transformedBitangent);
+                    Ermine::StoreTangent(
+                        vertex.tangent,
+                        Ermine::BuildTangentData(
+                            glm::vec3(vertex.normal[0], vertex.normal[1], vertex.normal[2]),
+                            glm::vec3(transformedTangent[0], transformedTangent[1], transformedTangent[2]),
+                            glm::vec3(transformedBitangent[0], transformedBitangent[1], transformedBitangent[2])));
                 }
                 else {
-                    vertex.tangent[0] = tang[0];
-                    vertex.tangent[1] = tang[1];
-                    vertex.tangent[2] = tang[2];
+                    Ermine::StoreTangent(
+                        vertex.tangent,
+                        Ermine::BuildTangentData(
+                            glm::vec3(vertex.normal[0], vertex.normal[1], vertex.normal[2]),
+                            tangent,
+                            bitangent));
                 }
+            }
+            else {
+                Ermine::StoreTangent(vertex.tangent, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
             }
 
             outData.vertices.push_back(vertex);
@@ -933,15 +952,33 @@ namespace Ermine {
 
                 // Tangent - apply rotation and scale only
                 if (mesh->HasTangentsAndBitangents()) {
-                    float tang[3] = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+                    glm::vec3 tangent(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+                    glm::vec3 bitangent(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
                     if (settings.applyPreTransform) {
-                        TransformNormal(transformMatrix, tang, vertex.tangent);
+                        float transformedTangent[3];
+                        float transformedBitangent[3];
+                        const float tangentIn[3] = { tangent.x, tangent.y, tangent.z };
+                        const float bitangentIn[3] = { bitangent.x, bitangent.y, bitangent.z };
+                        TransformNormal(transformMatrix, tangentIn, transformedTangent);
+                        TransformNormal(transformMatrix, bitangentIn, transformedBitangent);
+                        Ermine::StoreTangent(
+                            vertex.tangent,
+                            Ermine::BuildTangentData(
+                                glm::vec3(vertex.normal[0], vertex.normal[1], vertex.normal[2]),
+                                glm::vec3(transformedTangent[0], transformedTangent[1], transformedTangent[2]),
+                                glm::vec3(transformedBitangent[0], transformedBitangent[1], transformedBitangent[2])));
                     }
                     else {
-                        vertex.tangent[0] = tang[0];
-                        vertex.tangent[1] = tang[1];
-                        vertex.tangent[2] = tang[2];
+                        Ermine::StoreTangent(
+                            vertex.tangent,
+                            Ermine::BuildTangentData(
+                                glm::vec3(vertex.normal[0], vertex.normal[1], vertex.normal[2]),
+                                tangent,
+                                bitangent));
                     }
+                }
+                else {
+                    Ermine::StoreTangent(vertex.tangent, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
                 }
 
                 // Bone weights (unchanged)
@@ -1005,7 +1042,7 @@ namespace Ermine {
 
         // Write header
         file.write("MESH", 4);
-        uint32_t version = 1;
+        uint32_t version = 2;
         file.write((char*)&version, sizeof(version));
 
         // Write vertex count and data
@@ -1030,7 +1067,7 @@ namespace Ermine {
 
         // Write header
         file.write("SKIN", 4);
-        uint32_t version = 1;
+        uint32_t version = 2;
         file.write((char*)&version, sizeof(version));
 
         // Write vertex count and data

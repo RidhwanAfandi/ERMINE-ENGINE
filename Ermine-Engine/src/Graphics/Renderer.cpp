@@ -124,6 +124,37 @@ namespace {
 		return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
 	}
 
+	inline std::string ResolveCustomVertexShaderPath(const std::string& fragmentPath)
+	{
+		constexpr const char* kDefaultVertex = "../Resources/Shaders/vertex.glsl";
+		if (fragmentPath.empty()) {
+			return kDefaultVertex;
+		}
+
+		std::filesystem::path fragmentFile(fragmentPath);
+		std::string vertexName = fragmentFile.filename().string();
+
+		const size_t fragmentPos = vertexName.find("fragment");
+		if (fragmentPos != std::string::npos) {
+			vertexName.replace(fragmentPos, std::string("fragment").size(), "vertex");
+		}
+		else if (fragmentFile.extension() == ".frag") {
+			vertexName = fragmentFile.stem().string() + ".vert";
+		}
+		else {
+			return kDefaultVertex;
+		}
+
+		std::filesystem::path vertexPath = fragmentFile.has_parent_path()
+			? (fragmentFile.parent_path() / vertexName)
+			: (std::filesystem::path("../Resources/Shaders") / vertexName);
+
+		if (std::filesystem::exists(vertexPath)) {
+			return vertexPath.generic_string();
+		}
+		return kDefaultVertex;
+	}
+
 	inline glm::vec3 ExtractWorldPosition(const glm::mat4& worldMatrix)
 	{
 		return glm::vec3(worldMatrix[3]);
@@ -370,8 +401,7 @@ void Renderer::Init(const int& screenWidth, const int& screenHeight)
 	m_BloomShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/bloom_vertex.glsl", "../Resources/Shaders/bloom_fragment.glsl");
 	m_PostProcessShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/postprocess_vertex.glsl", "../Resources/Shaders/postprocess_fragment.glsl");
 	m_AAShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/FXAA_vertex.glsl", "../Resources/Shaders/FXAA_fragment.glsl");
-	// m_MotionBlurShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/motionblur_vertex.glsl", "../Resources/Shaders/motionblur_fragment.glsl");
-	// m_MotionBlurMaskShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/motionblur_mask_vertex.glsl", "../Resources/Shaders/motionblur_mask_fragment.glsl");
+	m_MotionBlurShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/motionblur_vertex.glsl", "../Resources/Shaders/motionblur_fragment.glsl");
 	m_ProbeBakeComputeShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/gi_probe_bake_compute.glsl");
 	m_ProbeVoxelizeComputeShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/gi_probe_voxelize_compute.glsl");
 	m_ProbeLightInjectComputeShader = AssetManager::GetInstance().LoadShader("../Resources/Shaders/gi_probe_light_inject_compute.glsl");
@@ -628,6 +658,39 @@ void Renderer::RenderDebugTriangles(const Mtx44& view, const Mtx44& proj)
  * @param height The height of the offscreen buffer
  * @return OffscreenBuffer The offscreen buffer
  */
+void Renderer::EnsureLightsSSBO(size_t requiredLightCount)
+{
+	if (!m_LightsSSBO)
+	{
+		glGenBuffers(1, &m_LightsSSBO);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightsSSBO);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, LIGHT_SSBO_BINDING, m_LightsSSBO);
+		EE_CORE_INFO("Created Lights SSBO at binding point {0}", LIGHT_SSBO_BINDING);
+	}
+	else
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightsSSBO);
+	}
+
+	BindLightsSSBO();
+
+	if (requiredLightCount > m_LightsSSBOCapacity || m_LightsSSBOCapacity == 0)
+	{
+		const GLsizeiptr headerSize = static_cast<GLsizeiptr>(sizeof(glm::vec4));
+		const GLsizeiptr bodySize = static_cast<GLsizeiptr>(requiredLightCount * sizeof(LightGPU));
+		glBufferData(GL_SHADER_STORAGE_BUFFER, headerSize + bodySize, nullptr, GL_DYNAMIC_DRAW);
+		m_LightsSSBOCapacity = requiredLightCount;
+	}
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	glCheckError();
+}
+
+void Renderer::BindLightsSSBO() const
+{
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, LIGHT_SSBO_BINDING, m_LightsSSBO);
+}
+
 Renderer::OffscreenBuffer Renderer::CreateOffscreenBuffer(const int& width, const int& height)
 {
 	OffscreenBuffer buffer{};
@@ -640,17 +703,7 @@ Renderer::OffscreenBuffer Renderer::CreateOffscreenBuffer(const int& width, cons
 		glDeleteRenderbuffers(1, &m_OffscreenBuffer->RBO);
 	}
 
-	if (!m_LightsUBO)
-	{
-		glGenBuffers(1, &m_LightsUBO);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_LightsUBO);
-		const GLsizeiptr headerSize = static_cast<GLsizeiptr>(sizeof(glm::vec4));
-		const GLsizeiptr bodySize = static_cast<GLsizeiptr>(MAX_LIGHTS * sizeof(LightGPU));
-		glBufferData(GL_UNIFORM_BUFFER, headerSize + bodySize, nullptr, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, LightsBindingPoint, m_LightsUBO);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		glCheckError();
-	}
+	EnsureLightsSSBO(0);
 
 	// Create FBO
 	glGenFramebuffers(1, &buffer.FBO);
@@ -801,37 +854,26 @@ void Renderer::CreateGBuffer(const int& width, const int& height)
 		EE_CORE_ERROR("ERROR: Invalid G-Buffer dimensions: {0}x{1}", width, height);
 	}
 
-	// If Light UBO doesn't exist, create it
-	if (!m_LightsUBO)
-	{
-		glGenBuffers(1, &m_LightsUBO);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_LightsUBO);
-		const GLsizeiptr headerSize = static_cast<GLsizeiptr>(sizeof(glm::vec4));
-		const GLsizeiptr bodySize = static_cast<GLsizeiptr>(MAX_LIGHTS * sizeof(LightGPU));
-		glBufferData(GL_UNIFORM_BUFFER, headerSize + bodySize, nullptr, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, LightsBindingPoint, m_LightsUBO);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		glCheckError();
-	}
+	EnsureLightsSSBO(0);
 
 	// Create framebuffer
 	glGenFramebuffers(1, &gBuffer.FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer.FBO);
 
-	// Create RT0 Texture: RGBA16F (48 bits) - Albedo RGB
+	// Create RT0 Texture: RGBA8 (32 bits) - Albedo RGB (albedo is always [0,1], 8bpc is sufficient)
 	glGenTextures(1, &gBuffer.PackedTexture0);
 	glBindTexture(GL_TEXTURE_2D, gBuffer.PackedTexture0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_HALF_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gBuffer.PackedTexture0, 0);
 
-	// Create RT1 Texture: RGB16F (48 bits) - Normals XYZ
+	// Create RT1 Texture: RG16F (32 bits) - Normals oct-encoded (unit vector has 2 DOF, saves 16 bits vs RGB16F)
 	glGenTextures(1, &gBuffer.PackedTexture1);
 	glBindTexture(GL_TEXTURE_2D, gBuffer.PackedTexture1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_HALF_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_HALF_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -858,7 +900,18 @@ void Renderer::CreateGBuffer(const int& width, const int& height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gBuffer.PackedTexture3, 0);
 
-	// Create depth texture for depth testing and reconstruction. 24 bits
+	// Create RT4 Texture: RG16F (32 bits) - Screen-space velocity XY
+	// Savings from RT0 (48→32) + RT1 (48→32) = 32 bits freed, exactly covering this new buffer
+	glGenTextures(1, &gBuffer.PackedTexture4);
+	glBindTexture(GL_TEXTURE_2D, gBuffer.PackedTexture4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_HALF_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gBuffer.PackedTexture4, 0);
+
+	// Create depth texture: 32-bit float required for near=0.1/far=1000 range (10000:1 ratio)
 	glGenTextures(1, &gBuffer.DepthTexture);
 	glBindTexture(GL_TEXTURE_2D, gBuffer.DepthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
@@ -868,9 +921,9 @@ void Renderer::CreateGBuffer(const int& width, const int& height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, gBuffer.DepthTexture, 0);
 
-	// Set up MRTs - all 4 color attachments
-	GLenum drawBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, drawBuffers);
+	// Set up MRTs - 5 color attachments (RT0-RT3 + RT4 velocity)
+	GLenum drawBuffers[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+	glDrawBuffers(5, drawBuffers);
 
 	// Check framebuffer completeness
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -897,12 +950,16 @@ void Renderer::CreateGBuffer(const int& width, const int& height)
 	gBuffer.HandlePackedTexture3 = glGetTextureHandleARB(gBuffer.PackedTexture3);
 	glMakeTextureHandleResidentARB(gBuffer.HandlePackedTexture3);
 
+	gBuffer.HandlePackedTexture4 = glGetTextureHandleARB(gBuffer.PackedTexture4);
+	glMakeTextureHandleResidentARB(gBuffer.HandlePackedTexture4);
+
 	gBuffer.HandleDepthTexture = glGetTextureHandleARB(gBuffer.DepthTexture);
 	glMakeTextureHandleResidentARB(gBuffer.HandleDepthTexture);
 
 	m_GBuffer = std::make_shared<GBuffer>(gBuffer);
 
-	EE_CORE_INFO("Created G-Buffer: {0}x{1}, 176 bits per pixel", width, height);
+	// RT0: RGBA8(32) + RT1: RG16F(32) + RT2: RGBA8(32) + RT3: RGBA8(32) + RT4 velocity: RG16F(32) + Depth: 32F(32) = 192 bits
+	EE_CORE_INFO("Created G-Buffer: {0}x{1}, 192 bits per pixel (velocity buffer included at same cost as before)", width, height);
 }
 
 /**
@@ -1132,7 +1189,6 @@ void Renderer::CreatePostProcessBuffer(const int& width, const int& height)
 	MBMaskBuffer.width = width;
 	MBMaskBuffer.height = height;
 	m_MotionBlurMaskBuffer = std::make_shared<PostProcessBuffer>(MBMaskBuffer);
-
 	// Generate film grain noise texture (256x256, single channel)
 	{
 		constexpr int NOISE_SIZE = 256;
@@ -1496,6 +1552,10 @@ void Renderer::RenderGeometryPass(const Mtx44& view, const Mtx44& projection)
 	m_GBufferShader->SetUniformMatrix4fv("view", &view.m2[0][0]);
 	m_GBufferShader->SetUniformMatrix4fv("projection", &projection.m2[0][0]);
 
+	// Pass previous frame's view-projection for velocity buffer computation
+	m_GBufferShader->SetUniformMatrix4fv("u_PreviousViewProjection", glm::value_ptr(m_PreviousViewProjectionMatrix));
+	m_GBufferShader->SetUniform1f("u_Time", m_ElapsedTime);
+
 	// Calculate and pass normal matrix for view (mat3 extracted from view matrix)
 	// Reuse glmView calculated above for camera position
 	// This avoids extracting mat3(view) per-vertex in the shader
@@ -1553,7 +1613,67 @@ void Renderer::RenderGeometryPass(const Mtx44& view, const Mtx44& projection)
 	// - Full rebuild: Sort by shader FIRST (creates stable batches), then distance
 	// - Fast update: Sort by distance ONLY within existing shader groups
 	SortTransparentObjects(cameraPos, m_NeedsTransparentSort);
+	auto uploadSortedCustomTransparentBuffers = [&]() {
+		if (!m_ForwardTransparentCustomStandardItems.empty() &&
+			m_ForwardTransparentCustomStandardCmdBuffer != 0 &&
+			m_ForwardTransparentCustomStandardInfoBuffer != 0) {
+			std::vector<DrawElementsIndirectCommand> commands;
+			std::vector<DrawInfo> infos;
+			commands.reserve(m_ForwardTransparentCustomStandardItems.size());
+			infos.reserve(m_ForwardTransparentCustomStandardItems.size());
+			for (const auto& item : m_ForwardTransparentCustomStandardItems) {
+				commands.push_back(item.command);
+				infos.push_back(item.info);
+			}
+
+			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				static_cast<GLsizeiptr>(commands.size() * sizeof(DrawElementsIndirectCommand)),
+				commands.data());
+
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomStandardInfoBuffer);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				static_cast<GLsizeiptr>(infos.size() * sizeof(DrawInfo)),
+				infos.data());
+		}
+
+		if (!m_ForwardTransparentCustomSkinnedItems.empty() &&
+			m_ForwardTransparentCustomSkinnedCmdBuffer != 0 &&
+			m_ForwardTransparentCustomSkinnedInfoBuffer != 0) {
+			std::vector<DrawElementsIndirectCommand> commands;
+			std::vector<DrawInfo> infos;
+			commands.reserve(m_ForwardTransparentCustomSkinnedItems.size());
+			infos.reserve(m_ForwardTransparentCustomSkinnedItems.size());
+			for (const auto& item : m_ForwardTransparentCustomSkinnedItems) {
+				commands.push_back(item.command);
+				infos.push_back(item.info);
+			}
+
+			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				static_cast<GLsizeiptr>(commands.size() * sizeof(DrawElementsIndirectCommand)),
+				commands.data());
+
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomSkinnedInfoBuffer);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				static_cast<GLsizeiptr>(infos.size() * sizeof(DrawInfo)),
+				infos.data());
+		}
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	};
+	uploadSortedCustomTransparentBuffers();
 	m_NeedsTransparentSort = false;  // Reset flag after sorting
+
+	// Save current VP for next frame's velocity computation
+	glm::mat4 glmProjection = glm::mat4(
+		projection.m00, projection.m01, projection.m02, projection.m03,
+		projection.m10, projection.m11, projection.m12, projection.m13,
+		projection.m20, projection.m21, projection.m22, projection.m23,
+		projection.m30, projection.m31, projection.m32, projection.m33
+	);
+	m_PreviousViewProjectionMatrix = glmProjection * glmView;
 
 	EndGeometryPass();
 }
@@ -1829,7 +1949,7 @@ void Renderer::RebuildDrawData()
 			info.materialIndex = materialIndex;
 			info.aabbMax = glm::vec3(mesh.aabbMax.x, mesh.aabbMax.y, mesh.aabbMax.z);
 			info.entityID = static_cast<uint32_t>(entity);
-			info.flags = 0; // Primitives: no skinning, no camera attachment
+			info.flags = materialComponent.flickerEmissive ? FLAG_FLICKER_EMISSIVE : 0; // Primitives: no skinning, no camera attachment
 			info.boneTransformOffset = 0;
 			info._pad0 = 0;
 			info._pad1 = 0;
@@ -1852,6 +1972,8 @@ void Renderer::RebuildDrawData()
 			cacheItem.hasCustomShader = isCustomShader;
 			cacheItem.useSkinning = false; // Primitives never use skinning
 			cacheItem.hasSkinningData = false;
+			cacheItem.isCameraAttached = false;
+			cacheItem.flickerEmissive = materialComponent.flickerEmissive;
 			cacheItem.boneOffset = 0;
 			m_CachedDrawItems.push_back(cacheItem);
 
@@ -1926,6 +2048,7 @@ void Renderer::RebuildDrawData()
 
 			// Process each mesh in the model
 			for (const auto& mesh : modelComp.m_model->GetMeshes()) {
+				glm::mat4 meshModel = entityModel * mesh.localTransform;
 
 				// Get mesh handle from MeshManager
 				MeshHandle meshHandle = m_MeshManager.GetMeshHandle(mesh.meshID);
@@ -1973,6 +2096,11 @@ void Renderer::RebuildDrawData()
 				// Skip this mesh if no material found
 				if (!material) continue;
 
+				bool flickerEmissive = false;
+				if (materialEntity != 0 && ecs.HasComponent<Ermine::Material>(materialEntity)) {
+					flickerEmissive = ecs.GetComponent<Ermine::Material>(materialEntity).flickerEmissive;
+				}
+
 				uint32_t materialIndex = material->GetMaterialIndex();
 
 				// Determine which pass this mesh belongs to
@@ -1990,11 +2118,11 @@ void Renderer::RebuildDrawData()
 
 				// Build draw info with AABB and model matrix
 				DrawInfo info;
-				info.modelMatrix = entityModel;
+				info.modelMatrix = meshModel;
 				
 
 				// Pre-calculate normal matrix and store as 3 separate columns (std430 mat3 has 16-byte stride!)
-				glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(entityModel)));
+				glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(meshModel)));
 				info.normalMatrixCol0 = glm::vec4(normalMat[0], 0.0f);
 				info.normalMatrixCol1 = glm::vec4(normalMat[1], 0.0f);
 				info.normalMatrixCol2 = glm::vec4(normalMat[2], 0.0f);
@@ -2057,7 +2185,13 @@ void Renderer::RebuildDrawData()
 				}
 
 				// Build flags for this draw
-				info.flags = isCameraAttached ? FLAG_CAMERA_ATTACHED : 0;
+				info.flags = 0;
+				if (isCameraAttached) {
+					info.flags |= FLAG_CAMERA_ATTACHED;
+				}
+				if (flickerEmissive) {
+					info.flags |= FLAG_FLICKER_EMISSIVE;
+				}
 				info.boneTransformOffset = 0;
 				info._pad0 = 0;
 				info._pad1 = 0;
@@ -2081,6 +2215,7 @@ void Renderer::RebuildDrawData()
 				cacheItem.useSkinning = false; // Static models never use skinning
 				cacheItem.hasSkinningData = false;
 				cacheItem.isCameraAttached = isCameraAttached; // Cache camera-attachment for fast path
+				cacheItem.flickerEmissive = flickerEmissive;
 				cacheItem.boneOffset = 0;
 				m_CachedDrawItems.push_back(cacheItem);
 
@@ -2165,6 +2300,7 @@ void Renderer::RebuildDrawData()
 			const auto& meshes = modelComp.m_model->GetMeshes();
 
 			for (const auto& mesh : meshes) {
+				glm::mat4 meshModelMatrix = modelMatrix * mesh.localTransform;
 
 				// Get mesh handle from MeshManager
 				MeshHandle meshHandle = m_MeshManager.GetMeshHandle(mesh.meshID);
@@ -2218,6 +2354,11 @@ void Renderer::RebuildDrawData()
 				// Skip this mesh if no material found
 				if (!meshMaterial) continue;
 
+				bool flickerEmissive = false;
+				if (materialEntity != 0 && ecs.HasComponent<Ermine::Material>(materialEntity)) {
+					flickerEmissive = ecs.GetComponent<Ermine::Material>(materialEntity).flickerEmissive;
+				}
+
 				// Determine material properties for this mesh
 				uint32_t materialIndex = meshMaterial->GetMaterialIndex();
 				bool isTransparent = IsTransparentMaterial(meshMaterial);
@@ -2234,11 +2375,11 @@ void Renderer::RebuildDrawData()
 
 				// Build draw info with AABB and model matrix
 				DrawInfo info;
-				info.modelMatrix = modelMatrix;
+				info.modelMatrix = meshModelMatrix;
 				
 
 				// Pre-calculate normal matrix and store as 3 separate columns (std430 mat3 has 16-byte stride!)
-				glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
+				glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(meshModelMatrix)));
 				info.normalMatrixCol0 = glm::vec4(normalMat[0], 0.0f);
 				info.normalMatrixCol1 = glm::vec4(normalMat[1], 0.0f);
 				info.normalMatrixCol2 = glm::vec4(normalMat[2], 0.0f);
@@ -2306,10 +2447,14 @@ void Renderer::RebuildDrawData()
 				{
 					info.flags |= FLAG_CAMERA_ATTACHED;
 				}
+				if (flickerEmissive)
+				{
+					info.flags |= FLAG_FLICKER_EMISSIVE;
+				}
 
 				info.boneTransformOffset = boneOffset;
 				info._pad0 = 0;
-			info._pad1 = 0;
+				info._pad1 = 0;
 
 				// Cache this draw item for fast path updates - store complete material structure
 				CachedDrawItem cacheItem;
@@ -2332,6 +2477,7 @@ void Renderer::RebuildDrawData()
 					mesh.boneAabbValid.begin(), mesh.boneAabbValid.end(),
 					[](uint8_t v) { return v != 0; });
 				cacheItem.isCameraAttached = isCameraAttached; // Cache camera-attachment for fast path
+				cacheItem.flickerEmissive = flickerEmissive;
 				cacheItem.boneOffset = boneOffset;
 				m_CachedDrawItems.push_back(cacheItem);
 
@@ -2397,288 +2543,6 @@ void Renderer::RebuildDrawData()
 		}
 	}
 
-	GPUProfiler::SetCulledMeshesCount(culledMeshes);
-
-	// ========== WRITE ALL DRAW DATA TO GPU BUFFERS ==========
-
-	// PASS 1: PICKING PASS - ALL visible geometry (opaque + transparent, for object selection)
-	m_MeshManager.m_PickingStandardDrawCommandBuffer.WriteCommands(m_PickingStandardCommands, 0);
-	m_MeshManager.m_PickingStandardDrawInfoBuffer.WriteDrawInfos(m_PickingStandardInfos, 0);
-	m_MeshManager.m_PickingSkinnedDrawCommandBuffer.WriteCommands(m_PickingSkinnedCommands, 0);
-	m_MeshManager.m_PickingSkinnedDrawInfoBuffer.WriteDrawInfos(m_PickingSkinnedInfos, 0);
-
-	// PASS 2: DEPTH PREPASS - Opaque visible geometry only (for early-z rejection)
-	m_MeshManager.m_DepthPrepassStandardDrawCommandBuffer.WriteCommands(m_DepthPrepassStandardCommands, 0);
-	m_MeshManager.m_DepthPrepassStandardDrawInfoBuffer.WriteDrawInfos(m_DepthPrepassStandardInfos, 0);
-	m_MeshManager.m_DepthPrepassSkinnedDrawCommandBuffer.WriteCommands(m_DepthPrepassSkinnedCommands, 0);
-	m_MeshManager.m_DepthPrepassSkinnedDrawInfoBuffer.WriteDrawInfos(m_DepthPrepassSkinnedInfos, 0);
-
-	// PASS 3: GEOMETRY PASS - Opaque default shader only (deferred lighting)
-	// Extract commands and infos from Items
-	std::vector<DrawElementsIndirectCommand> geometryStandardCommands;
-	std::vector<DrawInfo> geometryStandardInfos;
-	geometryStandardCommands.reserve(m_GeometryStandardItems.size());
-	geometryStandardInfos.reserve(m_GeometryStandardItems.size());
-	for (const auto& item : m_GeometryStandardItems) {
-		geometryStandardCommands.push_back(item.command);
-		geometryStandardInfos.push_back(item.info);
-	}
-
-	std::vector<DrawElementsIndirectCommand> geometrySkinnedCommands;
-	std::vector<DrawInfo> geometrySkinnedInfos;
-	geometrySkinnedCommands.reserve(m_GeometrySkinnedItems.size());
-	geometrySkinnedInfos.reserve(m_GeometrySkinnedItems.size());
-	for (const auto& item : m_GeometrySkinnedItems) {
-		geometrySkinnedCommands.push_back(item.command);
-		geometrySkinnedInfos.push_back(item.info);
-	}
-
-	m_MeshManager.m_GeometryStandardDrawCommandBuffer.WriteCommands(geometryStandardCommands, 0);
-	m_MeshManager.m_GeometryStandardDrawInfoBuffer.WriteDrawInfos(geometryStandardInfos, 0);
-	m_MeshManager.m_GeometrySkinnedDrawCommandBuffer.WriteCommands(geometrySkinnedCommands, 0);
-	m_MeshManager.m_GeometrySkinnedDrawInfoBuffer.WriteDrawInfos(geometrySkinnedInfos, 0);
-
-	// PASS 4: FORWARD PASS - Transparent default shaders
-	// Extract commands and infos from Items
-	std::vector<DrawElementsIndirectCommand> forwardTransparentDefaultStandardCommands;
-	std::vector<DrawInfo> forwardTransparentDefaultStandardInfos;
-	forwardTransparentDefaultStandardCommands.reserve(m_ForwardTransparentDefaultStandardItems.size());
-	forwardTransparentDefaultStandardInfos.reserve(m_ForwardTransparentDefaultStandardItems.size());
-	for (const auto& item : m_ForwardTransparentDefaultStandardItems) {
-		forwardTransparentDefaultStandardCommands.push_back(item.command);
-		forwardTransparentDefaultStandardInfos.push_back(item.info);
-	}
-
-	std::vector<DrawElementsIndirectCommand> forwardTransparentDefaultSkinnedCommands;
-	std::vector<DrawInfo> forwardTransparentDefaultSkinnedInfos;
-	forwardTransparentDefaultSkinnedCommands.reserve(m_ForwardTransparentDefaultSkinnedItems.size());
-	forwardTransparentDefaultSkinnedInfos.reserve(m_ForwardTransparentDefaultSkinnedItems.size());
-	for (const auto& item : m_ForwardTransparentDefaultSkinnedItems) {
-		forwardTransparentDefaultSkinnedCommands.push_back(item.command);
-		forwardTransparentDefaultSkinnedInfos.push_back(item.info);
-	}
-
-	m_MeshManager.m_ForwardStandardDrawCommandBuffer.WriteCommands(forwardTransparentDefaultStandardCommands, 0);
-	m_MeshManager.m_ForwardStandardDrawInfoBuffer.WriteDrawInfos(forwardTransparentDefaultStandardInfos, 0);
-	m_MeshManager.m_ForwardSkinnedDrawCommandBuffer.WriteCommands(forwardTransparentDefaultSkinnedCommands, 0);
-	m_MeshManager.m_ForwardSkinnedDrawInfoBuffer.WriteDrawInfos(forwardTransparentDefaultSkinnedInfos, 0);
-
-	// Upload opaque custom shader buffers to GPU
-	// FULL REBUILD: Always use glBufferData (not per-frame, ensures clean state)
-	if (!m_ForwardOpaqueCustomStandardItems.empty()) {
-		// Extract commands and infos from items
-		std::vector<DrawElementsIndirectCommand> commands;
-		std::vector<DrawInfo> infos;
-		commands.reserve(m_ForwardOpaqueCustomStandardItems.size());
-		infos.reserve(m_ForwardOpaqueCustomStandardItems.size());
-
-		for (const auto& item : m_ForwardOpaqueCustomStandardItems) {
-			commands.push_back(item.command);
-			infos.push_back(item.info);
-		}
-
-		// Create buffers if needed
-		if (m_ForwardOpaqueCustomStandardCmdBuffer == 0) {
-			glGenBuffers(1, &m_ForwardOpaqueCustomStandardCmdBuffer);
-			glGenBuffers(1, &m_ForwardOpaqueCustomStandardInfoBuffer);
-		}
-
-		// Upload command buffer - always use glBufferData for full rebuild
-		size_t cmdSize = commands.size();
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomStandardCmdBuffer);
-		glBufferData(GL_DRAW_INDIRECT_BUFFER,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardOpaqueCustomStandardCmdBufferCapacity = cmdSize;
-
-		// Upload draw info buffer - always use glBufferData for full rebuild
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardOpaqueCustomStandardInfoBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,
-			cmdSize * sizeof(DrawInfo),
-			infos.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardOpaqueCustomStandardInfoBufferCapacity = cmdSize;
-
-		// Track actual uploaded count (what's currently on GPU)
-		m_ForwardOpaqueCustomStandardUploadedCount = cmdSize;
-	}
-	else {
-		// No data to upload - reset uploaded count
-		m_ForwardOpaqueCustomStandardUploadedCount = 0;
-	}
-
-	if (!m_ForwardOpaqueCustomSkinnedItems.empty()) {
-		// Extract commands and infos from items
-		std::vector<DrawElementsIndirectCommand> commands;
-		std::vector<DrawInfo> infos;
-		commands.reserve(m_ForwardOpaqueCustomSkinnedItems.size());
-		infos.reserve(m_ForwardOpaqueCustomSkinnedItems.size());
-
-		for (const auto& item : m_ForwardOpaqueCustomSkinnedItems) {
-			commands.push_back(item.command);
-			infos.push_back(item.info);
-		}
-
-		// Create buffers if needed
-		if (m_ForwardOpaqueCustomSkinnedCmdBuffer == 0) {
-			glGenBuffers(1, &m_ForwardOpaqueCustomSkinnedCmdBuffer);
-			glGenBuffers(1, &m_ForwardOpaqueCustomSkinnedInfoBuffer);
-		}
-
-		// Upload command buffer - always use glBufferData for full rebuild
-		size_t cmdSize = commands.size();
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomSkinnedCmdBuffer);
-		glBufferData(GL_DRAW_INDIRECT_BUFFER,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardOpaqueCustomSkinnedCmdBufferCapacity = cmdSize;
-
-		// Upload draw info buffer - always use glBufferData for full rebuild
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardOpaqueCustomSkinnedInfoBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,
-			cmdSize * sizeof(DrawInfo),
-			infos.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardOpaqueCustomSkinnedInfoBufferCapacity = cmdSize;
-
-		// Track actual uploaded count (what's currently on GPU)
-		m_ForwardOpaqueCustomSkinnedUploadedCount = cmdSize;
-	}
-	else {
-		// No data to upload - reset uploaded count
-		m_ForwardOpaqueCustomSkinnedUploadedCount = 0;
-	}
-
-	// Upload transparent custom shader buffers to GPU
-	if (!m_ForwardTransparentCustomStandardItems.empty()) {
-		// Extract commands and infos from items
-		std::vector<DrawElementsIndirectCommand> commands;
-		std::vector<DrawInfo> infos;
-		commands.reserve(m_ForwardTransparentCustomStandardItems.size());
-		infos.reserve(m_ForwardTransparentCustomStandardItems.size());
-
-		for (const auto& item : m_ForwardTransparentCustomStandardItems) {
-			commands.push_back(item.command);
-			infos.push_back(item.info);
-		}
-
-		// Create buffers if needed
-		if (m_ForwardTransparentCustomStandardCmdBuffer == 0) {
-			glGenBuffers(1, &m_ForwardTransparentCustomStandardCmdBuffer);
-			glGenBuffers(1, &m_ForwardTransparentCustomStandardInfoBuffer);
-		}
-
-		// Upload command buffer - always use glBufferData for full rebuild
-		size_t cmdSize = commands.size();
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
-		glBufferData(GL_DRAW_INDIRECT_BUFFER,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardTransparentCustomStandardCmdBufferCapacity = cmdSize;
-
-		// Upload draw info buffer - always use glBufferData for full rebuild
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomStandardInfoBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,
-			cmdSize * sizeof(DrawInfo),
-			infos.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardTransparentCustomStandardInfoBufferCapacity = cmdSize;
-
-		// Track actual uploaded count (what's currently on GPU)
-		m_ForwardTransparentCustomStandardUploadedCount = cmdSize;
-	}
-	else {
-		// No data to upload - reset uploaded count
-		m_ForwardTransparentCustomStandardUploadedCount = 0;
-	}
-
-	if (!m_ForwardTransparentCustomSkinnedItems.empty()) {
-		// Extract commands and infos from items
-		std::vector<DrawElementsIndirectCommand> commands;
-		std::vector<DrawInfo> infos;
-		commands.reserve(m_ForwardTransparentCustomSkinnedItems.size());
-		infos.reserve(m_ForwardTransparentCustomSkinnedItems.size());
-
-		for (const auto& item : m_ForwardTransparentCustomSkinnedItems) {
-			commands.push_back(item.command);
-			infos.push_back(item.info);
-		}
-
-		// Create buffers if needed
-		if (m_ForwardTransparentCustomSkinnedCmdBuffer == 0) {
-			glGenBuffers(1, &m_ForwardTransparentCustomSkinnedCmdBuffer);
-			glGenBuffers(1, &m_ForwardTransparentCustomSkinnedInfoBuffer);
-		}
-
-		// Upload command buffer - always use glBufferData for full rebuild
-		size_t cmdSize = commands.size();
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
-		glBufferData(GL_DRAW_INDIRECT_BUFFER,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardTransparentCustomSkinnedCmdBufferCapacity = cmdSize;
-
-		// Upload draw info buffer - always use glBufferData for full rebuild
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomSkinnedInfoBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER,
-			cmdSize * sizeof(DrawInfo),
-			infos.data(),
-			GL_DYNAMIC_DRAW);
-		m_ForwardTransparentCustomSkinnedInfoBufferCapacity = cmdSize;
-
-		// Track actual uploaded count (what's currently on GPU)
-		m_ForwardTransparentCustomSkinnedUploadedCount = cmdSize;
-	}
-	else {
-		// No data to upload - reset uploaded count
-		m_ForwardTransparentCustomSkinnedUploadedCount = 0;
-	}
-
-	// Unbind buffers
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-	// PASS 5: SHADOW PASS - ALL geometry with castsShadows=true (instanced for cascaded shadow maps)
-	//      No need to merge from geometry/forward passes - they're already included
-
-	std::vector<DrawElementsIndirectCommand> shadowStandardCommands;
-	shadowStandardCommands.reserve(m_ShadowStandardCommands.size());
-
-	// Set instance count for cascaded shadow maps
-	for (const auto& cmd : m_ShadowStandardCommands) {
-		DrawElementsIndirectCommand shadowCmd = cmd;
-		shadowCmd.instanceCount = m_TotalShadowInstances;
-		shadowStandardCommands.push_back(shadowCmd);
-	}
-
-	std::vector<DrawElementsIndirectCommand> shadowSkinnedCommands;
-	shadowSkinnedCommands.reserve(m_ShadowSkinnedCommands.size());
-
-	// Set instance count for cascaded shadow maps
-	for (const auto& cmd : m_ShadowSkinnedCommands) {
-		DrawElementsIndirectCommand shadowCmd = cmd;
-		shadowCmd.instanceCount = m_TotalShadowInstances;
-		shadowSkinnedCommands.push_back(shadowCmd);
-	}
-
-	// Write shadow buffers (infos are already correct, just need instanced commands)
-	m_MeshManager.m_ShadowStandardDrawCommandBuffer.WriteCommands(shadowStandardCommands, 0);
-	m_MeshManager.m_ShadowStandardDrawInfoBuffer.WriteDrawInfos(m_ShadowStandardInfos, 0);
-	m_MeshManager.m_ShadowSkinnedDrawCommandBuffer.WriteCommands(shadowSkinnedCommands, 0);
-	m_MeshManager.m_ShadowSkinnedDrawInfoBuffer.WriteDrawInfos(m_ShadowSkinnedInfos, 0);
-
-	// ========== SORTING ==========
-	// Sort opaque custom shaders by shader pointer (for batching, minimize state changes)
-	// NOTE: This doesn't require camera position, only shader pointer comparison
-	SortOpaqueCustomShadersByShader();
-
-	// Transparent sorting happens later during RenderGeometryPass when view matrix is available
-	// (Transparent sorting requires camera position calculated from view matrix)
-
 	// ========== UPDATE DIRTY TRACKING HASHES ==========
 	// Update entity list hash for next frame's comparison
 	m_LastEntityListHash = CalculateEntityListHash();
@@ -2686,7 +2550,9 @@ void Renderer::RebuildDrawData()
 	// Clear full rebuild flag (will be set again if major change detected)
 	m_DrawDataNeedsFullRebuild = false;
 
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);
+	// Re-run the stable fast path immediately so the rendered frame uses the same
+	// packing/update path as subsequent frames.
+	UpdateDrawData();
 }
 
 /**
@@ -2816,6 +2682,9 @@ void Renderer::UpdateDrawData()
 		else {
 			model = GetEntityWorldMatrix(cachedItem.entity);
 		}
+		if (cachedItem.modelMeshData) {
+			model *= cachedItem.modelMeshData->localTransform;
+		}
 
 		glm::vec3 localAabbMin = cachedItem.aabbMin;
 		glm::vec3 localAabbMax = cachedItem.aabbMax;
@@ -2927,6 +2796,10 @@ void Renderer::UpdateDrawData()
 		if (cachedItem.isCameraAttached)
 		{
 			info.flags |= FLAG_CAMERA_ATTACHED;
+		}
+		if (cachedItem.flickerEmissive)
+		{
+			info.flags |= FLAG_FLICKER_EMISSIVE;
 		}
 
 		info.boneTransformOffset = cachedItem.boneOffset;
@@ -3206,16 +3079,39 @@ void Renderer::UpdateDrawData()
 			infos.push_back(item.info);
 		}
 
+		if (m_ForwardOpaqueCustomStandardCmdBuffer == 0) {
+			glGenBuffers(1, &m_ForwardOpaqueCustomStandardCmdBuffer);
+			glGenBuffers(1, &m_ForwardOpaqueCustomStandardInfoBuffer);
+		}
+
 		size_t cmdSize = commands.size();
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomStandardCmdBuffer);
-		glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data());
+		if (cmdSize > m_ForwardOpaqueCustomStandardCmdBufferCapacity) {
+			glBufferData(GL_DRAW_INDIRECT_BUFFER,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardOpaqueCustomStandardCmdBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data());
+		}
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardOpaqueCustomStandardInfoBuffer);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-			cmdSize * sizeof(DrawInfo),
-			infos.data());
+		if (cmdSize > m_ForwardOpaqueCustomStandardInfoBufferCapacity) {
+			glBufferData(GL_SHADER_STORAGE_BUFFER,
+				cmdSize * sizeof(DrawInfo),
+				infos.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardOpaqueCustomStandardInfoBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				cmdSize * sizeof(DrawInfo),
+				infos.data());
+		}
 
 		m_ForwardOpaqueCustomStandardUploadedCount = cmdSize;
 	}
@@ -3235,16 +3131,39 @@ void Renderer::UpdateDrawData()
 			infos.push_back(item.info);
 		}
 
+		if (m_ForwardOpaqueCustomSkinnedCmdBuffer == 0) {
+			glGenBuffers(1, &m_ForwardOpaqueCustomSkinnedCmdBuffer);
+			glGenBuffers(1, &m_ForwardOpaqueCustomSkinnedInfoBuffer);
+		}
+
 		size_t cmdSize = commands.size();
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomSkinnedCmdBuffer);
-		glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data());
+		if (cmdSize > m_ForwardOpaqueCustomSkinnedCmdBufferCapacity) {
+			glBufferData(GL_DRAW_INDIRECT_BUFFER,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardOpaqueCustomSkinnedCmdBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data());
+		}
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardOpaqueCustomSkinnedInfoBuffer);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-			cmdSize * sizeof(DrawInfo),
-			infos.data());
+		if (cmdSize > m_ForwardOpaqueCustomSkinnedInfoBufferCapacity) {
+			glBufferData(GL_SHADER_STORAGE_BUFFER,
+				cmdSize * sizeof(DrawInfo),
+				infos.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardOpaqueCustomSkinnedInfoBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				cmdSize * sizeof(DrawInfo),
+				infos.data());
+		}
 
 		m_ForwardOpaqueCustomSkinnedUploadedCount = cmdSize;
 	}
@@ -3264,16 +3183,39 @@ void Renderer::UpdateDrawData()
 			infos.push_back(item.info);
 		}
 
+		if (m_ForwardTransparentCustomStandardCmdBuffer == 0) {
+			glGenBuffers(1, &m_ForwardTransparentCustomStandardCmdBuffer);
+			glGenBuffers(1, &m_ForwardTransparentCustomStandardInfoBuffer);
+		}
+
 		size_t cmdSize = commands.size();
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
-		glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data());
+		if (cmdSize > m_ForwardTransparentCustomStandardCmdBufferCapacity) {
+			glBufferData(GL_DRAW_INDIRECT_BUFFER,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardTransparentCustomStandardCmdBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data());
+		}
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomStandardInfoBuffer);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-			cmdSize * sizeof(DrawInfo),
-			infos.data());
+		if (cmdSize > m_ForwardTransparentCustomStandardInfoBufferCapacity) {
+			glBufferData(GL_SHADER_STORAGE_BUFFER,
+				cmdSize * sizeof(DrawInfo),
+				infos.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardTransparentCustomStandardInfoBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				cmdSize * sizeof(DrawInfo),
+				infos.data());
+		}
 
 		m_ForwardTransparentCustomStandardUploadedCount = cmdSize;
 	}
@@ -3293,16 +3235,39 @@ void Renderer::UpdateDrawData()
 			infos.push_back(item.info);
 		}
 
+		if (m_ForwardTransparentCustomSkinnedCmdBuffer == 0) {
+			glGenBuffers(1, &m_ForwardTransparentCustomSkinnedCmdBuffer);
+			glGenBuffers(1, &m_ForwardTransparentCustomSkinnedInfoBuffer);
+		}
+
 		size_t cmdSize = commands.size();
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
-		glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
-			cmdSize * sizeof(DrawElementsIndirectCommand),
-			commands.data());
+		if (cmdSize > m_ForwardTransparentCustomSkinnedCmdBufferCapacity) {
+			glBufferData(GL_DRAW_INDIRECT_BUFFER,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardTransparentCustomSkinnedCmdBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+				cmdSize * sizeof(DrawElementsIndirectCommand),
+				commands.data());
+		}
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomSkinnedInfoBuffer);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-			cmdSize * sizeof(DrawInfo),
-			infos.data());
+		if (cmdSize > m_ForwardTransparentCustomSkinnedInfoBufferCapacity) {
+			glBufferData(GL_SHADER_STORAGE_BUFFER,
+				cmdSize * sizeof(DrawInfo),
+				infos.data(),
+				GL_DYNAMIC_DRAW);
+			m_ForwardTransparentCustomSkinnedInfoBufferCapacity = cmdSize;
+		}
+		else {
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+				cmdSize * sizeof(DrawInfo),
+				infos.data());
+		}
 
 		m_ForwardTransparentCustomSkinnedUploadedCount = cmdSize;
 	}
@@ -3477,6 +3442,91 @@ void Renderer::RenderLightingPass(const Mtx44& view, const Mtx44& projection)
 }
 
 /**
+ * @brief Render motion blur using the per-pixel velocity GBuffer.
+ *        Reads from m_PostProcessBuffer, writes to m_MotionBlurBuffer.
+ *        Camera-attached objects have zero velocity (written in vertex shader) so they're never blurred.
+ */
+void Renderer::RenderMotionBlurPass()
+{
+	if (!m_MotionBlurEnabled || !m_MotionBlurShader || !m_MotionBlurShader->IsValid())
+		return;
+	if (!m_MotionBlurBuffer || !m_PostProcessBuffer || !m_GBuffer)
+		return;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_MotionBlurBuffer->FBO);
+	glViewport(0, 0, m_MotionBlurBuffer->width, m_MotionBlurBuffer->height);
+	glDisable(GL_DEPTH_TEST);
+
+	m_MotionBlurShader->Bind();
+
+	// Input color from lighting/forward pass
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_PostProcessBuffer->ColorTexture);
+	m_MotionBlurShader->SetUniform1i("u_ColorTexture", 0);
+
+	// Bindless depth handle
+	GLint locDepth = glGetUniformLocation(m_MotionBlurShader->GetRendererID(), "u_DepthHandle");
+	if (locDepth != -1)
+	{
+		glUniform2ui(locDepth,
+			static_cast<GLuint>(m_GBuffer->HandleDepthTexture),
+			static_cast<GLuint>(m_GBuffer->HandleDepthTexture >> 32));
+	}
+
+	// Bindless velocity handle (RT4)
+	GLint locVel = glGetUniformLocation(m_MotionBlurShader->GetRendererID(), "u_VelocityHandle");
+	if (locVel != -1)
+	{
+		glUniform2ui(locVel,
+			static_cast<GLuint>(m_GBuffer->HandlePackedTexture4),
+			static_cast<GLuint>(m_GBuffer->HandlePackedTexture4 >> 32));
+	}
+
+	m_MotionBlurShader->SetUniform1f("u_MotionBlurStrength", m_MotionBlurStrength);
+	m_MotionBlurShader->SetUniform1i("u_NumSamples", m_MotionBlurSamples);
+	m_MotionBlurShader->SetUniform1i("u_FirstFrame", (frameCounter == 0) ? 1 : 0);
+
+	// Camera near/far for depth linearization in depth-aware blur rejection
+	float nearClip = 0.1f;
+	float farClip = 1000.0f;
+	auto& ecs = ECS::GetInstance();
+#if defined(EE_EDITOR)
+	if (editor::EditorGUI::isPlaying)
+	{
+		auto gameCamera = ecs.GetSystem<graphics::CameraSystem>();
+		if (gameCamera && gameCamera->HasValidCamera())
+		{
+			nearClip = gameCamera->GetNearClip();
+			farClip = gameCamera->GetFarClip();
+		}
+		else
+		{
+			const auto& editorCamera = editor::EditorCamera::GetInstance();
+			nearClip = editorCamera.GetNearClip();
+			farClip = editorCamera.GetFarClip();
+		}
+	}
+	else
+	{
+		const auto& editorCamera = editor::EditorCamera::GetInstance();
+		nearClip = editorCamera.GetNearClip();
+		farClip = editorCamera.GetFarClip();
+	}
+#else
+	auto gameCamera = ecs.GetSystem<graphics::CameraSystem>();
+	if (gameCamera && gameCamera->HasValidCamera())
+	{
+		nearClip = gameCamera->GetNearClip();
+		farClip = gameCamera->GetFarClip();
+	}
+#endif
+	m_MotionBlurShader->SetUniform1f("u_NearClip", nearClip);
+	m_MotionBlurShader->SetUniform1f("u_FarClip", farClip);
+
+	Draw(m_QuadMesh.vertex_array, m_QuadMesh.index_buffer);
+}
+
+/**
  * @brief Render post-processing effects using the lighting pass output
  * @param view The view matrix
  * @param projection The projection matrix
@@ -3509,8 +3559,8 @@ void Renderer::RenderPostProcessPass(const Mtx44& view, const Mtx44& projection)
 	m_BloomShader->SetUniform1f("u_BloomThreshold", m_BloomThreshold);
 	m_BloomShader->SetUniform1f("u_BloomRadius", m_BloomRadius);
 
-	// Bind Lights UBO for god rays
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_LightsUBO);
+	// Bind light SSBO for god rays
+	BindLightsSSBO();
 
 	// Bind bindless textures for god rays
 	if (m_GBuffer)
@@ -3628,7 +3678,7 @@ void Renderer::RenderPostProcessPass(const Mtx44& view, const Mtx44& projection)
 
 	m_PostProcessShader->Bind();
 
-	// Bind main scene texture
+	// Bind main scene texture (already includes motion blur if enabled in deferred stage)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_PostProcessBuffer->ColorTexture);
 	m_PostProcessShader->SetUniform1i("u_LightingTexture", 0);
@@ -3682,6 +3732,10 @@ void Renderer::RenderPostProcessPass(const Mtx44& view, const Mtx44& projection)
 	m_PostProcessShader->SetUniform1f("u_GrainScale", m_GrainScale);
 	m_PostProcessShader->SetUniform1i("u_ChromaticAberration", m_ChromaticAberrationEnabled ? 1 : 0);
 	m_PostProcessShader->SetUniform1f("u_ChromaticAmount", m_ChromaticAmount);
+	m_PostProcessShader->SetUniform1i("u_RadialBlur", m_RadialBlurEnabled ? 1 : 0);
+	m_PostProcessShader->SetUniform1f("u_RadialBlurStrength", m_RadialBlurStrength);
+	m_PostProcessShader->SetUniform1i("u_RadialBlurSamples", m_RadialBlurSamples);
+	m_PostProcessShader->SetUniform2f("u_RadialBlurCenter", m_RadialBlurCenter.x, m_RadialBlurCenter.y);
 
 	// Bind noise texture for film grain (use texture unit 3 to avoid conflict with outline mask on unit 2)
 	glActiveTexture(GL_TEXTURE3);
@@ -3689,6 +3743,17 @@ void Renderer::RenderPostProcessPass(const Mtx44& view, const Mtx44& projection)
 	m_PostProcessShader->SetUniform1i("u_NoiseTexture", 3);
 	// Animate noise by offsetting UV based on time
 	m_PostProcessShader->SetUniform2f("u_NoiseOffset", std::fmod(m_ElapsedTime * 10.0f, 1.0f), std::fmod(m_ElapsedTime * 7.0f, 1.0f));
+
+	// Bind optional vignette map texture on texture unit 4
+	const bool hasVignetteMap = (m_VignetteMapTexture && m_VignetteMapTexture->IsValid());
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, hasVignetteMap ? m_VignetteMapTexture->GetRendererID() : 0);
+	m_PostProcessShader->SetUniform1i("u_VignetteMap", 4);
+	m_PostProcessShader->SetUniform1i("u_HasVignetteMap", hasVignetteMap ? 1 : 0);
+	m_PostProcessShader->SetUniform1f("u_VignetteCoverage", m_VignetteCoverage);
+	m_PostProcessShader->SetUniform1f("u_VignetteFalloff", m_VignetteFalloff);
+	m_PostProcessShader->SetUniform1f("u_VignetteMapStrength", m_VignetteMapStrength);
+	m_PostProcessShader->SetUniform3f("u_VignetteMapRGBModifier", m_VignetteMapRGBModifier);
 
 	Draw(m_QuadMesh.vertex_array, m_QuadMesh.index_buffer);
 
@@ -3749,16 +3814,8 @@ void Renderer::RenderDeferredPipeline(const Mtx44& view, const Mtx44& projection
 	// Runs BEFORE depth pre-pass to avoid GL state pollution from depth pre-pass
 	if (frameCounter % SHADOW_MAP_REFRESH_INTERVAL_IN_FRAMES == 0)
 	{
-		// Build shadow light list and layer allocation for this frame's shadow pass
-		UpdateLightsUBO(editor::EditorCamera::GetInstance().GetViewMatrix());
 		RenderShadowPass();
 	}
-
-	// Re-sync lights UBO after shadow layer allocation/matrix updates
-	UpdateLightsUBO(editor::EditorCamera::GetInstance().GetViewMatrix());
-
-	// Update light probes UBO
-	UpdateLightProbesUBO();
 
 	// Depth pre-pass - render depth-only to eliminate fragment shader overdraw
 	RenderDepthPrePass(view, projection);
@@ -3797,27 +3854,28 @@ void Renderer::RenderDeferredPipeline(const Mtx44& view, const Mtx44& projection
 		glDepthMask(GL_FALSE);
 	}
 
+	// Motion blur pass - apply to deferred/skybox layer only.
+	// Forward-rendered content (including camera-attached objects) is composited after this, unblurred.
+	RenderMotionBlurPass();
+
+	// When motion blur is enabled, copy blurred base back into post-process buffer before forward pass.
+	if (m_MotionBlurEnabled && m_MotionBlurShader && m_MotionBlurShader->IsValid() &&
+		m_MotionBlurBuffer && m_PostProcessBuffer)
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_MotionBlurBuffer->FBO);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_PostProcessBuffer->FBO);
+		glBlitFramebuffer(
+			0, 0, m_MotionBlurBuffer->width, m_MotionBlurBuffer->height,
+			0, 0, m_PostProcessBuffer->width, m_PostProcessBuffer->height,
+			GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_PostProcessBuffer->FBO);
+	}
+
 	// FORWARD PASS - render all custom shaders (opaque + transparent) and transparent standard
 	// This handles: opaque custom shaders, transparent custom shaders, and transparent standard
 	RenderForwardPass(view, projection);
 
-	// Render camera-attached mask for forward-rendered objects (motion blur)
-	// RenderMotionBlurMask(view, projection);
-
 #if defined(EE_EDITOR)
-	if (m_PostProcessBuffer && ECS::GetInstance().GetSystem<Physics>()->wireframe) {
-		glBindFramebuffer(GL_FRAMEBUFFER, m_PostProcessBuffer->FBO);
-		glViewport(0, 0, m_PostProcessBuffer->width, m_PostProcessBuffer->height);
-
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		glDisable(GL_CULL_FACE);
-
-		if (auto physics = ECS::GetInstance().GetSystem<Physics>()) {
-			physics->DrawDebugPhysics();
-		}
-		RenderDebugLines(view, projection);
-	}
 
 	if (m_PostProcessBuffer)
 	{
@@ -3828,6 +3886,11 @@ void Renderer::RenderDeferredPipeline(const Mtx44& view, const Mtx44& projection
 		glDepthFunc(GL_LEQUAL);
 		glDisable(GL_CULL_FACE);
 
+		if (auto physics = ECS::GetInstance().GetSystem<Physics>())
+		{
+			if (physics->wireframe)
+				physics->DrawDebugPhysics();
+		}
 		// Light probe volume gizmos
 		{
 			auto& ecs = ECS::GetInstance();
@@ -3873,7 +3936,7 @@ void Renderer::RenderDeferredPipeline(const Mtx44& view, const Mtx44& projection
 
 #endif
 
-	// Post-processing pass - read from lighting + transparency pass output
+	// Post-processing pass - read final composited scene output
 	RenderPostProcessPass(view, projection);
 }
 
@@ -3956,6 +4019,10 @@ void Renderer::CleanupGBuffer()
 			glMakeTextureHandleNonResidentARB(m_GBuffer->HandlePackedTexture3);
 			m_GBuffer->HandlePackedTexture3 = 0;
 		}
+		if (m_GBuffer->HandlePackedTexture4 != 0) {
+			glMakeTextureHandleNonResidentARB(m_GBuffer->HandlePackedTexture4);
+			m_GBuffer->HandlePackedTexture4 = 0;
+		}
 		if (m_GBuffer->HandleDepthTexture != 0) {
 			glMakeTextureHandleNonResidentARB(m_GBuffer->HandleDepthTexture);
 			m_GBuffer->HandleDepthTexture = 0;
@@ -3979,6 +4046,10 @@ void Renderer::CleanupGBuffer()
 		if (m_GBuffer->PackedTexture3 != 0)
 		{
 			glDeleteTextures(1, &m_GBuffer->PackedTexture3);
+		}
+		if (m_GBuffer->PackedTexture4 != 0)
+		{
+			glDeleteTextures(1, &m_GBuffer->PackedTexture4);
 		}
 		if (m_GBuffer->DepthTexture != 0)
 		{
@@ -4115,84 +4186,69 @@ void Renderer::CleanupPostProcessBuffer()
 }
 
 /**
- * @brief Updates the lights' uniform buffer object (UBO) with the current light and transform data from all living entities.
- * @param view The view matrix to transform the positions and directions of the lights into view space.
+ * @brief Updates the lights' shader storage buffer object (SSBO) with current light data.
+ * @param view Current output-frame view matrix.
+ * @param projection Current output-frame projection matrix.
  */
-void Renderer::UpdateLightsUBO(const Mtx44& view)
+void Renderer::UpdateLightsSSBO(const Mtx44& view, const Mtx44& projection)
 {
-	(void)view;
-
 	const auto& ecs = Ermine::ECS::GetInstance();
 	if (!m_LightSystem) {
+		m_VisibleLights.clear();
+		m_ShadowCastingLights.clear();
+		m_TotalShadowInstances = 0;
+		m_LastUploadedLightCount = 0;
 		return;
 	}
 
-	// ========== FRUSTUM CULLING SETUP ==========
-	// Get camera view and projection matrices
-	// Use GameCamera if active (playing), otherwise use EditorCamera
-	Mtx44 viewMtx, projMtx;
+	BuildVisibleLightSet(view, projection);
+	UploadLightsSSBOFromPreparedState();
+}
 
-#if defined(EE_EDITOR)
-	// In editor build, check if playing
-	if (editor::EditorGUI::isPlaying)
-	{
-		auto gameCamera = ecs.GetSystem<graphics::CameraSystem>();
-		if (gameCamera && gameCamera->HasValidCamera())
-		{
-			// Use player camera when in play mode
-			viewMtx = gameCamera->GetViewMatrix();
-			projMtx = gameCamera->GetProjectionMatrix();
-		}
-		else
-		{
-			// Fallback to editor camera if no valid game camera
-			const auto& editorCamera = editor::EditorCamera::GetInstance();
-			viewMtx = editorCamera.GetViewMatrix();
-			projMtx = editorCamera.GetProjectionMatrix();
-		}
+void Renderer::BuildVisibleLightSet(const Mtx44& view, const Mtx44& projection)
+{
+	const auto& ecs = Ermine::ECS::GetInstance();
+	if (!m_LightSystem) {
+		m_VisibleLights.clear();
+		m_ShadowCastingLights.clear();
+		m_TotalShadowInstances = 0;
+		return;
 	}
-	else
-	{
-		// Use editor camera when not playing
-		const auto& editorCamera = editor::EditorCamera::GetInstance();
-		viewMtx = editorCamera.GetViewMatrix();
-		projMtx = editorCamera.GetProjectionMatrix();
-	}
-#else
-	// Standalone build - use game camera
-	auto gameCamera = ecs.GetSystem<graphics::CameraSystem>();
-	if (gameCamera && gameCamera->HasValidCamera())
-	{
-		viewMtx = gameCamera->GetViewMatrix();
-		projMtx = gameCamera->GetProjectionMatrix();
-	}
-	else
-	{
-		// Fallback if no camera is available
-		viewMtx = Mtx44(); // Identity matrix
-		projMtx = Mtx44(); // Identity matrix
-	}
-#endif
 
-	// Convert to glm for frustum extraction
-	glm::mat4 viewGlm = ToGlm(viewMtx);
-	glm::mat4 projGlm = ToGlm(projMtx);
+	// Convert current output-frame view/projection to glm for frustum extraction
+	glm::mat4 viewGlm = ToGlm(view);
+	glm::mat4 projGlm = ToGlm(projection);
 
 	// Build frustum from view-projection matrix
 	Frustum frustum;
 	glm::mat4 viewProj = projGlm * viewGlm;
 	frustum.ExtractFromViewProjection(viewProj);
+	const glm::mat4 sortView = viewGlm;
 
-	std::vector<LightGPU> lights;
-	lights.reserve(MAX_LIGHTS);
+	struct SortedLightCandidate
+	{
+		EntityID entity;
+		float viewZ;
+	};
+
+	std::vector<SortedLightCandidate> visibleLights;
+	visibleLights.reserve(m_LightSystem->m_Entities.size());
 
 	// Clear and prepare shadow casting light list and layer allocator
+	m_VisibleLights.clear();
+	m_VisibleLights.reserve(visibleLights.capacity());
 	m_ShadowCastingLights.clear();
 	int currentLayer = 0;
-	int lightIndex = 0;
 
 	for (EntityID e : m_LightSystem->m_Entities)
 	{
+		if (ecs.HasComponent<ObjectMetaData>(e))
+		{
+			const auto& meta = ecs.GetComponent<ObjectMetaData>(e);
+			if (!meta.selfActive)
+				continue;
+		}
+
 		auto& light = ecs.GetComponent<Light>(e);
 		const glm::mat4 lightWorld = GetEntityWorldMatrix(e);
 
@@ -4224,15 +4280,37 @@ void Renderer::UpdateLightsUBO(const Mtx44& view)
 		{
 			continue;
 		}
+
+		const glm::vec4 viewPosition = sortView * glm::vec4(lightPos, 1.0f);
+		visibleLights.push_back({ e, viewPosition.z });
+	}
+
+	std::stable_sort(visibleLights.begin(), visibleLights.end(),
+		[](const SortedLightCandidate& a, const SortedLightCandidate& b)
+		{
+			// View-space forward is -Z, so the light with the larger Z value is nearer.
+			return a.viewZ > b.viewZ;
+		});
+	for (const SortedLightCandidate& candidate : visibleLights)
+	{
+		EntityID e = candidate.entity;
+		if (ecs.HasComponent<ObjectMetaData>(e))
+		{
+			const auto& meta = ecs.GetComponent<ObjectMetaData>(e);
+			if (!meta.selfActive)
+				continue;
+		}
+
+		auto& light = ecs.GetComponent<Light>(e);
+		const bool effectiveCastsShadows = light.castsShadows && light.type != LightType::POINT;
+
 		// Allocate shadow layers for this light (if any)
 		int shadowLayersNeeded = 0;
-		if (light.castsShadows) {
+		if (effectiveCastsShadows) {
 			if (light.type == LightType::DIRECTIONAL) {
 				shadowLayersNeeded = NUM_CASCADES;
 			} else if (light.type == LightType::SPOT) {
 				shadowLayersNeeded = 1;
-			} else if (light.type == LightType::POINT) {
-				shadowLayersNeeded = 6;
 			}
 		}
 
@@ -4244,7 +4322,27 @@ void Renderer::UpdateLightsUBO(const Mtx44& view)
 			light.startOffset = -1;
 		}
 
-		// Set spot angles
+		m_VisibleLights.push_back(e);
+	}
+
+	m_TotalShadowInstances = currentLayer;
+}
+
+void Renderer::UploadLightsSSBOFromPreparedState()
+{
+	const auto& ecs = Ermine::ECS::GetInstance();
+	std::vector<LightGPU> lights;
+	lights.reserve(m_VisibleLights.size());
+
+	for (EntityID e : m_VisibleLights)
+	{
+		auto& light = ecs.GetComponent<Light>(e);
+		const glm::mat4 lightWorld = GetEntityWorldMatrix(e);
+		const bool effectiveCastsShadows = light.castsShadows && light.type != LightType::POINT;
+
+		const glm::vec3 lightPos = ExtractWorldPosition(lightWorld);
+		const glm::vec3 dirWorld = ExtractWorldForward(lightWorld);
+
 		float innerCos = 1.0f, outerCos = 1.0f;
 		if (light.type == LightType::SPOT) {
 			float innerAngle = glm::radians(light.innerAngle);
@@ -4253,17 +4351,15 @@ void Renderer::UpdateLightsUBO(const Mtx44& view)
 			outerCos = glm::cos(outerAngle);
 		}
 
-		// Convert to LightGPU structure - NOW IN WORLD SPACE
 		LightGPU gpu{};
 		gpu.position_type = glm::vec4(lightPos.x, lightPos.y, lightPos.z, static_cast<float>(light.type));
 		gpu.color_intensity = glm::vec4(light.color.x, light.color.y, light.color.z, light.intensity);
 		gpu.direction_range = glm::vec4(dirWorld.x, dirWorld.y, dirWorld.z, light.radius);
 
-		// Pack flags into bitfield: bit 0 = castsShadows, bit 1 = castsRays
 		float flags = 0.0f;
-		bool hasShadowLayers = light.castsShadows && light.startOffset >= 0;
-		if (hasShadowLayers) flags += 1.0f;  // bit 0
-		if (light.castsRays) flags += 2.0f;     // bit 1
+		bool hasShadowLayers = effectiveCastsShadows && light.startOffset >= 0;
+		if (hasShadowLayers) flags += 1.0f;
+		if (light.castsRays) flags += 2.0f;
 
 		gpu.spot_angles_castshadows_startOffset = glm::vec4(innerCos, outerCos, flags, static_cast<float>(light.startOffset));
 
@@ -4275,26 +4371,25 @@ void Renderer::UpdateLightsUBO(const Mtx44& view)
 			gpu.pointLightMatrices[i] = light.pointLightMatrices[i];
 		}
 		lights.emplace_back(gpu);
-		lightIndex++;
 	}
 
-	// Calculate total shadow instances for cascade rendering
-	m_TotalShadowInstances = currentLayer;
+	m_LastUploadedLightCount = lights.size();
 
-	// Upload to UBO
-	glBindBuffer(GL_UNIFORM_BUFFER, m_LightsUBO);
+	// Upload to SSBO
+	EnsureLightsSSBO(lights.size());
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightsSSBO);
 
 	glm::vec4 count(static_cast<float>(lights.size()), 0.0f, 0.0f, 0.0f);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), &count);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4), &count);
 
 	if (!lights.empty())
 	{
 		const GLsizeiptr bodyOffset = static_cast<GLsizeiptr>(sizeof(glm::vec4));
 		const GLsizeiptr bodySize = static_cast<GLsizeiptr>(lights.size() * sizeof(LightGPU));
-		glBufferSubData(GL_UNIFORM_BUFFER, bodyOffset, bodySize, lights.data());
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, bodyOffset, bodySize, lights.data());
 	}
 
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	glCheckError();
 }
 
@@ -4682,7 +4777,7 @@ void Renderer::CaptureLightProbe(EntityID probeEntity)
 		glUseProgram(0);
 	}
 
-	// Inject direct lighting into voxel emissive using LightsUBO
+	// Inject direct lighting into voxel emissive using the light SSBO
 	if (m_ProbeLightInjectComputeShader && m_ProbeLightInjectComputeShader->IsValid()) {
 		const GLuint program = m_ProbeLightInjectComputeShader->GetRendererID();
 		glUseProgram(program);
@@ -4694,7 +4789,7 @@ void Renderer::CaptureLightProbe(EntityID probeEntity)
 		if (locVoxelMax != -1) glUniform3f(locVoxelMax, worldBoundsMax.x, worldBoundsMax.y, worldBoundsMax.z);
 		if (locVoxelRes != -1) glUniform1i(locVoxelRes, m_ProbeVoxelResolution);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, LightsBindingPoint, m_LightsUBO);
+		BindLightsSSBO();
 		glBindImageTexture(0, m_ProbeVoxelAlbedoTexture, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
 		glBindImageTexture(1, m_ProbeVoxelEmissiveTexture, 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 		glBindImageTexture(2, m_ProbeVoxelNormalTexture, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
@@ -5102,10 +5197,22 @@ void Renderer::UpdateMaterialSSBO(const graphics::MaterialSSBO& materialData, ui
 		return;
 	}
 
+	if (materialIndex >= m_CompiledMaterials.size())
+	{
+		EE_CORE_WARN("UpdateMaterialSSBO: materialIndex {0} out of range (compiled={1}). Marking materials dirty.",
+			materialIndex, m_CompiledMaterials.size());
+		MarkMaterialsDirty();
+		return;
+	}
+
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_MaterialSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_BINDING, m_MaterialSSBO);
 
 	const size_t materialSize = sizeof(graphics::MaterialSSBO);
 	const size_t offset = materialSize * materialIndex;
+
+	// Keep CPU mirror coherent with the GPU update path.
+	m_CompiledMaterials[materialIndex] = materialData;
 
 	// Upload to specific index in the array
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, materialSize, &materialData);
@@ -5202,8 +5309,8 @@ void Renderer::SetMaterialIndex(EntityID entity, const std::shared_ptr<Shader>& 
 }
 
 /**
- * @brief Binds the MaterialBlock uniform block to the specified shader program if it has not been bound before.
- * @param shader The shader program to which the material block should be bound.
+ * @brief Binds the MaterialBlock shader storage block to the specified shader program if it has not been bound before.
+ * @param shader The shader program to which the material SSBO block should be bound.
  */
 void Renderer::BindMaterialBlockIfPresent(const std::shared_ptr<Shader>& shader)
 {
@@ -5214,7 +5321,7 @@ void Renderer::BindMaterialBlockIfPresent(const std::shared_ptr<Shader>& shader)
 	if (m_MaterialBlockBoundPrograms.find(program) != m_MaterialBlockBoundPrograms.end())
 		return;
 
-	// Get the shader storage block index instead of uniform block index
+	// Resolve SSBO block index and bind it to the global material binding slot.
 	GLuint blockIndex = glGetProgramResourceIndex(program, GL_SHADER_STORAGE_BLOCK, "MaterialBlock");
 	if (blockIndex != GL_INVALID_INDEX)
 	{
@@ -5231,11 +5338,8 @@ void Renderer::Update(const Mtx44& view, const Mtx44& projection)
 	// Accumulate elapsed time for shader effects
 	m_ElapsedTime += FrameController::GetDeltaTime();
 
-	// Update lights UBO
-	if (!m_UseDeferredRendering) {
-		UpdateLightsUBO(editor::EditorCamera::GetInstance().GetViewMatrix());
-		UpdateLightProbesUBO();
-	}
+	SyncShadowViewsForOutputFrame(view, projection);
+	UpdateLightProbesUBO();
 
 
 	// Check if new meshes have been registered and need uploading
@@ -5250,6 +5354,15 @@ void Renderer::Update(const Mtx44& view, const Mtx44& projection)
 	{
 		CompileMaterials();
 	}
+
+	// Rebind global SSBOs every frame so custom shaders always see valid data.
+	if (m_MaterialSSBO != 0) {
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_BINDING, m_MaterialSSBO);
+	}
+	if (m_TextureArraySSBO != 0) {
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, TEXTURE_SSBO_BINDING, m_TextureArraySSBO);
+	}
+
 	if (m_UseDeferredRendering)
 	{
 		// Use deferred rendering pipeline (now includes transparency)
@@ -5407,6 +5520,57 @@ void Renderer::Update(const Mtx44& view, const Mtx44& projection)
 		// - Full rebuild: Sort by shader FIRST (creates stable batches), then distance
 		// - Fast update: Sort by distance ONLY within existing shader groups
 		SortTransparentObjects(cameraPos, m_NeedsTransparentSort);
+		auto uploadSortedCustomTransparentBuffers = [&]() {
+			if (!m_ForwardTransparentCustomStandardItems.empty() &&
+				m_ForwardTransparentCustomStandardCmdBuffer != 0 &&
+				m_ForwardTransparentCustomStandardInfoBuffer != 0) {
+				std::vector<DrawElementsIndirectCommand> commands;
+				std::vector<DrawInfo> infos;
+				commands.reserve(m_ForwardTransparentCustomStandardItems.size());
+				infos.reserve(m_ForwardTransparentCustomStandardItems.size());
+				for (const auto& item : m_ForwardTransparentCustomStandardItems) {
+					commands.push_back(item.command);
+					infos.push_back(item.info);
+				}
+
+				glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
+				glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+					static_cast<GLsizeiptr>(commands.size() * sizeof(DrawElementsIndirectCommand)),
+					commands.data());
+
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomStandardInfoBuffer);
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+					static_cast<GLsizeiptr>(infos.size() * sizeof(DrawInfo)),
+					infos.data());
+			}
+
+			if (!m_ForwardTransparentCustomSkinnedItems.empty() &&
+				m_ForwardTransparentCustomSkinnedCmdBuffer != 0 &&
+				m_ForwardTransparentCustomSkinnedInfoBuffer != 0) {
+				std::vector<DrawElementsIndirectCommand> commands;
+				std::vector<DrawInfo> infos;
+				commands.reserve(m_ForwardTransparentCustomSkinnedItems.size());
+				infos.reserve(m_ForwardTransparentCustomSkinnedItems.size());
+				for (const auto& item : m_ForwardTransparentCustomSkinnedItems) {
+					commands.push_back(item.command);
+					infos.push_back(item.info);
+				}
+
+				glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
+				glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+					static_cast<GLsizeiptr>(commands.size() * sizeof(DrawElementsIndirectCommand)),
+					commands.data());
+
+				glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ForwardTransparentCustomSkinnedInfoBuffer);
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+					static_cast<GLsizeiptr>(infos.size() * sizeof(DrawInfo)),
+					infos.data());
+			}
+
+			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		};
+		uploadSortedCustomTransparentBuffers();
 		m_NeedsTransparentSort = false;  // Reset flag after sorting
 
 		// Second pass: Render transparent objects in sorted order
@@ -5649,10 +5813,12 @@ Renderer::~Renderer()
 		CleanupPostProcessBuffer();
 
 		// Now delete buffers
-		if (m_LightsUBO)
+		if (m_LightsSSBO)
 		{
-			glDeleteBuffers(1, &m_LightsUBO);
-			m_LightsUBO = 0;
+			glDeleteBuffers(1, &m_LightsSSBO);
+			m_LightsSSBO = 0;
+			m_LightsSSBOCapacity = 0;
+			m_LastUploadedLightCount = 0;
 		}
 
 		if (m_MaterialSSBO)
@@ -6150,6 +6316,46 @@ void Renderer::SortTransparentObjects(const Vec3& cameraPos, bool fullRebuild)
  */
 void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& projection)
 {
+	static bool s_DisableOpaqueCustomMDI = false;
+	auto drawCustomBatch = [&](const std::vector<CustomShaderDrawItem>& items,
+		size_t batchStart,
+		size_t batchEnd,
+		const std::shared_ptr<graphics::Shader>& shaderToBind) {
+		const size_t batchSize = batchEnd - batchStart;
+		if (batchSize == 0 || !shaderToBind) {
+			return;
+		}
+
+		const size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
+		if (!s_DisableOpaqueCustomMDI) {
+			glMultiDrawElementsIndirect(
+				GL_TRIANGLES,
+				GL_UNSIGNED_INT,
+				reinterpret_cast<const void*>(byteOffset),
+				static_cast<GLsizei>(batchSize),
+				0
+			);
+			if (glGetError() != GL_NO_ERROR) {
+				s_DisableOpaqueCustomMDI = true;
+			}
+		}
+
+		if (s_DisableOpaqueCustomMDI) {
+			for (size_t drawIdx = batchStart; drawIdx < batchEnd; ++drawIdx) {
+				const auto& cmd = items[drawIdx].command;
+				shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(drawIdx));
+				glDrawElementsInstancedBaseVertexBaseInstance(
+					GL_TRIANGLES,
+					static_cast<GLsizei>(cmd.count),
+					GL_UNSIGNED_INT,
+					reinterpret_cast<const void*>(static_cast<uintptr_t>(cmd.firstIndex) * sizeof(uint32_t)),
+					static_cast<GLsizei>(cmd.instanceCount),
+					static_cast<GLint>(cmd.baseVertex),
+					cmd.baseInstance
+				);
+			}
+		}
+	};
 	// Skip if no opaque custom shader meshes uploaded to GPU
 	if (m_ForwardOpaqueCustomStandardUploadedCount == 0 && m_ForwardOpaqueCustomSkinnedUploadedCount == 0) {
 		return;
@@ -6173,7 +6379,9 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
 	glCullFace(GL_BACK);
 
 	// ========== RENDER OPAQUE CUSTOM STANDARD MESHES (NON-SKINNED) ==========
-	if (m_ForwardOpaqueCustomStandardUploadedCount > 0) {
+	if (m_ForwardOpaqueCustomStandardUploadedCount > 0 && !m_ForwardOpaqueCustomStandardItems.empty()) {
+		const auto& items = m_ForwardOpaqueCustomStandardItems;
+		const size_t renderCount = std::min(m_ForwardOpaqueCustomStandardUploadedCount, items.size());
 		GLuint standardVAO = m_MeshManager.GetStandardVAO();
 		// Check that VAO and GPU buffers are valid before binding
 		if (standardVAO != 0 && m_ForwardOpaqueCustomStandardInfoBuffer != 0 && m_ForwardOpaqueCustomStandardCmdBuffer != 0) {
@@ -6183,18 +6391,19 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
 
 			// Batch draws by shader
 			size_t batchStart = 0;
-			std::shared_ptr<graphics::Shader> currentShader = m_ForwardOpaqueCustomStandardItems[0].shader;
+			std::shared_ptr<graphics::Shader> currentShader = items[0].shader;
 
-			for (size_t i = 0; i <= m_ForwardOpaqueCustomStandardUploadedCount; ++i) {
+			for (size_t i = 0; i <= renderCount; ++i) {
 				// Check if we've reached end or shader changed
-				bool shaderChanged = (i < m_ForwardOpaqueCustomStandardUploadedCount && m_ForwardOpaqueCustomStandardItems[i].shader != currentShader);
-				bool isEnd = (i == m_ForwardOpaqueCustomStandardUploadedCount);
+				bool shaderChanged = (i < renderCount && items[i].shader != currentShader);
+				bool isEnd = (i == renderCount);
 
 				if (shaderChanged || isEnd) {
 					// Bind shader
 					std::shared_ptr<graphics::Shader> shaderToBind = currentShader;
 					if (shaderToBind && shaderToBind->IsValid()) {
 						shaderToBind->Bind();
+						BindMaterialBlockIfPresent(shaderToBind);
 						shaderToBind->SetUniformMatrix4fv("view", &view.m2[0][0]);
 						shaderToBind->SetUniformMatrix4fv("projection", &projection.m2[0][0]);
 						shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(batchStart));
@@ -6211,22 +6420,13 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
 						}
 						shaderToBind->SetUniform2f("u_IGNResolution", m_IGNTextureSize);
 
-						// Execute multi-draw for this batch
-						size_t batchSize = i - batchStart;
-						size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
-						glMultiDrawElementsIndirect(
-							GL_TRIANGLES,
-							GL_UNSIGNED_INT,
-							reinterpret_cast<const void*>(byteOffset),
-							static_cast<GLsizei>(batchSize),
-							0
-						);
+						drawCustomBatch(items, batchStart, i, shaderToBind);
 					}
 
 					// Start new batch
-					if (i < m_ForwardOpaqueCustomStandardUploadedCount) {
+					if (i < renderCount) {
 						batchStart = i;
-						currentShader = m_ForwardOpaqueCustomStandardItems[i].shader;
+						currentShader = items[i].shader;
 					}
 				}
 			}
@@ -6237,28 +6437,32 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
 	}
 
 	// ========== RENDER OPAQUE CUSTOM SKINNED MESHES ==========
-	if (m_ForwardOpaqueCustomSkinnedUploadedCount > 0) {
+	if (m_ForwardOpaqueCustomSkinnedUploadedCount > 0 && !m_ForwardOpaqueCustomSkinnedItems.empty()) {
+		const auto& items = m_ForwardOpaqueCustomSkinnedItems;
+		const size_t renderCount = std::min(m_ForwardOpaqueCustomSkinnedUploadedCount, items.size());
 		GLuint skinnedVAO = m_MeshManager.GetSkinnedVAO();
 		// Check that VAO and GPU buffers are valid before binding
 		if (skinnedVAO != 0 && m_ForwardOpaqueCustomSkinnedInfoBuffer != 0 && m_ForwardOpaqueCustomSkinnedCmdBuffer != 0) {
 			glBindVertexArray(skinnedVAO);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SKELETAL_SSBO_BINDING, m_MeshManager.m_SkeletalSSBO.GetBufferID());
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardOpaqueCustomSkinnedInfoBuffer);
 			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomSkinnedCmdBuffer);
 
 			// Batch draws by shader
 			size_t batchStart = 0;
-			std::shared_ptr<graphics::Shader> currentShader = m_ForwardOpaqueCustomSkinnedItems[0].shader;
+			std::shared_ptr<graphics::Shader> currentShader = items[0].shader;
 
-			for (size_t i = 0; i <= m_ForwardOpaqueCustomSkinnedUploadedCount; ++i) {
+			for (size_t i = 0; i <= renderCount; ++i) {
 				// Check if we've reached end or shader changed
-				bool shaderChanged = (i < m_ForwardOpaqueCustomSkinnedUploadedCount && m_ForwardOpaqueCustomSkinnedItems[i].shader != currentShader);
-				bool isEnd = (i == m_ForwardOpaqueCustomSkinnedUploadedCount);
+				bool shaderChanged = (i < renderCount && items[i].shader != currentShader);
+				bool isEnd = (i == renderCount);
 
 				if (shaderChanged || isEnd) {
 					// Bind shader
 					std::shared_ptr<graphics::Shader> shaderToBind = currentShader;
 					if (shaderToBind && shaderToBind->IsValid()) {
 						shaderToBind->Bind();
+						BindMaterialBlockIfPresent(shaderToBind);
 						shaderToBind->SetUniformMatrix4fv("view", &view.m2[0][0]);
 						shaderToBind->SetUniformMatrix4fv("projection", &projection.m2[0][0]);
 						shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(batchStart));
@@ -6275,22 +6479,13 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
 						}
 						shaderToBind->SetUniform2f("u_IGNResolution", m_IGNTextureSize);
 
-						// Execute multi-draw for this batch
-						size_t batchSize = i - batchStart;
-						size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
-						glMultiDrawElementsIndirect(
-							GL_TRIANGLES,
-							GL_UNSIGNED_INT,
-							reinterpret_cast<const void*>(byteOffset),
-							static_cast<GLsizei>(batchSize),
-							0
-						);
+						drawCustomBatch(items, batchStart, i, shaderToBind);
 					}
 
 					// Start new batch
-					if (i < m_ForwardOpaqueCustomSkinnedUploadedCount) {
+					if (i < renderCount) {
 						batchStart = i;
-						currentShader = m_ForwardOpaqueCustomSkinnedItems[i].shader;
+						currentShader = items[i].shader;
 					}
 				}
 			}
@@ -6313,6 +6508,46 @@ void Renderer::RenderOpaqueCustomShaders(const Mtx44& view, const Mtx44& project
  */
 void Renderer::RenderTransparentCustomShaders(const Mtx44& view, const Mtx44& projection)
 {
+	static bool s_DisableTransparentCustomMDI = false;
+	auto drawCustomBatch = [&](const std::vector<CustomShaderDrawItem>& items,
+		size_t batchStart,
+		size_t batchEnd,
+		const std::shared_ptr<graphics::Shader>& shaderToBind) {
+		const size_t batchSize = batchEnd - batchStart;
+		if (batchSize == 0 || !shaderToBind) {
+			return;
+		}
+
+		const size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
+		if (!s_DisableTransparentCustomMDI) {
+			glMultiDrawElementsIndirect(
+				GL_TRIANGLES,
+				GL_UNSIGNED_INT,
+				reinterpret_cast<const void*>(byteOffset),
+				static_cast<GLsizei>(batchSize),
+				0
+			);
+			if (glGetError() != GL_NO_ERROR) {
+				s_DisableTransparentCustomMDI = true;
+			}
+		}
+
+		if (s_DisableTransparentCustomMDI) {
+			for (size_t drawIdx = batchStart; drawIdx < batchEnd; ++drawIdx) {
+				const auto& cmd = items[drawIdx].command;
+				shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(drawIdx));
+				glDrawElementsInstancedBaseVertexBaseInstance(
+					GL_TRIANGLES,
+					static_cast<GLsizei>(cmd.count),
+					GL_UNSIGNED_INT,
+					reinterpret_cast<const void*>(static_cast<uintptr_t>(cmd.firstIndex) * sizeof(uint32_t)),
+					static_cast<GLsizei>(cmd.instanceCount),
+					static_cast<GLint>(cmd.baseVertex),
+					cmd.baseInstance
+				);
+			}
+		}
+	};
 	// Skip if no transparent custom shader meshes uploaded to GPU
 	if (m_ForwardTransparentCustomStandardUploadedCount == 0 && m_ForwardTransparentCustomSkinnedUploadedCount == 0) {
 		return;
@@ -6322,26 +6557,29 @@ void Renderer::RenderTransparentCustomShaders(const Mtx44& view, const Mtx44& pr
 	// Buffers were already uploaded in CompileDrawData - just bind and draw
 
 	// ========== RENDER TRANSPARENT CUSTOM STANDARD MESHES (NON-SKINNED) ==========
-	if (m_ForwardTransparentCustomStandardUploadedCount > 0 && m_MeshManager.GetStandardVAO() != 0
+	if (m_ForwardTransparentCustomStandardUploadedCount > 0 && !m_ForwardTransparentCustomStandardItems.empty() && m_MeshManager.GetStandardVAO() != 0
 		&& m_ForwardTransparentCustomStandardInfoBuffer != 0 && m_ForwardTransparentCustomStandardCmdBuffer != 0) {
+		const auto& items = m_ForwardTransparentCustomStandardItems;
+		const size_t renderCount = std::min(m_ForwardTransparentCustomStandardUploadedCount, items.size());
 		glBindVertexArray(m_MeshManager.GetStandardVAO());
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardTransparentCustomStandardInfoBuffer);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
 
 		// Batch draws by shader (each unique shader gets its own draw call)
 		size_t batchStart = 0;
-		std::shared_ptr<graphics::Shader> currentShader = m_ForwardTransparentCustomStandardItems[0].shader;
+		std::shared_ptr<graphics::Shader> currentShader = items[0].shader;
 
-		for (size_t i = 0; i <= m_ForwardTransparentCustomStandardUploadedCount; ++i) {
+		for (size_t i = 0; i <= renderCount; ++i) {
 			// Check if we've reached end or shader changed
-			bool shaderChanged = (i < m_ForwardTransparentCustomStandardUploadedCount && m_ForwardTransparentCustomStandardItems[i].shader != currentShader);
-			bool isEnd = (i == m_ForwardTransparentCustomStandardUploadedCount);
+			bool shaderChanged = (i < renderCount && items[i].shader != currentShader);
+			bool isEnd = (i == renderCount);
 
 			if (shaderChanged || isEnd) {
 				// Bind shader
 				std::shared_ptr<graphics::Shader> shaderToBind = currentShader;
 				if (shaderToBind && shaderToBind->IsValid()) {
 					shaderToBind->Bind();
+					BindMaterialBlockIfPresent(shaderToBind);
 					shaderToBind->SetUniformMatrix4fv("view", &view.m2[0][0]);
 					shaderToBind->SetUniformMatrix4fv("projection", &projection.m2[0][0]);
 					shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(batchStart));
@@ -6358,22 +6596,13 @@ void Renderer::RenderTransparentCustomShaders(const Mtx44& view, const Mtx44& pr
 					}
 					shaderToBind->SetUniform2f("u_IGNResolution", m_IGNTextureSize);
 
-					// Execute multi-draw for this batch
-					size_t batchSize = i - batchStart;
-					size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
-					glMultiDrawElementsIndirect(
-						GL_TRIANGLES,
-						GL_UNSIGNED_INT,
-						reinterpret_cast<const void*>(byteOffset),
-						static_cast<GLsizei>(batchSize),
-						0
-					);
+					drawCustomBatch(items, batchStart, i, shaderToBind);
 				}
 
 				// Start new batch
-				if (i < m_ForwardTransparentCustomStandardUploadedCount) {
+				if (i < renderCount) {
 					batchStart = i;
-					currentShader = m_ForwardTransparentCustomStandardItems[i].shader;
+					currentShader = items[i].shader;
 				}
 			}
 		}
@@ -6383,26 +6612,30 @@ void Renderer::RenderTransparentCustomShaders(const Mtx44& view, const Mtx44& pr
 	}
 
 	// ========== RENDER TRANSPARENT CUSTOM SKINNED MESHES ==========
-	if (m_ForwardTransparentCustomSkinnedUploadedCount > 0 && m_MeshManager.GetSkinnedVAO() != 0
+	if (m_ForwardTransparentCustomSkinnedUploadedCount > 0 && !m_ForwardTransparentCustomSkinnedItems.empty() && m_MeshManager.GetSkinnedVAO() != 0
 		&& m_ForwardTransparentCustomSkinnedInfoBuffer != 0 && m_ForwardTransparentCustomSkinnedCmdBuffer != 0) {
+		const auto& items = m_ForwardTransparentCustomSkinnedItems;
+		const size_t renderCount = std::min(m_ForwardTransparentCustomSkinnedUploadedCount, items.size());
 		glBindVertexArray(m_MeshManager.GetSkinnedVAO());
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SKELETAL_SSBO_BINDING, m_MeshManager.m_SkeletalSSBO.GetBufferID());
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardTransparentCustomSkinnedInfoBuffer);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
 
 		// Batch draws by shader
 		size_t batchStart = 0;
-		std::shared_ptr<graphics::Shader> currentShader = m_ForwardTransparentCustomSkinnedItems[0].shader;
+		std::shared_ptr<graphics::Shader> currentShader = items[0].shader;
 
-		for (size_t i = 0; i <= m_ForwardTransparentCustomSkinnedUploadedCount; ++i) {
+		for (size_t i = 0; i <= renderCount; ++i) {
 			// Check if we've reached end or shader changed
-			bool shaderChanged = (i < m_ForwardTransparentCustomSkinnedUploadedCount && m_ForwardTransparentCustomSkinnedItems[i].shader != currentShader);
-			bool isEnd = (i == m_ForwardTransparentCustomSkinnedUploadedCount);
+			bool shaderChanged = (i < renderCount && items[i].shader != currentShader);
+			bool isEnd = (i == renderCount);
 
 			if (shaderChanged || isEnd) {
 				// Bind shader
 				std::shared_ptr<graphics::Shader> shaderToBind = currentShader;
 				if (shaderToBind && shaderToBind->IsValid()) {
 					shaderToBind->Bind();
+					BindMaterialBlockIfPresent(shaderToBind);
 					shaderToBind->SetUniformMatrix4fv("view", &view.m2[0][0]);
 					shaderToBind->SetUniformMatrix4fv("projection", &projection.m2[0][0]);
 					shaderToBind->SetUniform1ui("baseDrawID", static_cast<uint32_t>(batchStart));
@@ -6419,22 +6652,13 @@ void Renderer::RenderTransparentCustomShaders(const Mtx44& view, const Mtx44& pr
 					}
 					shaderToBind->SetUniform2f("u_IGNResolution", m_IGNTextureSize);
 
-					// Execute multi-draw for this batch
-					size_t batchSize = i - batchStart;
-					size_t byteOffset = batchStart * sizeof(DrawElementsIndirectCommand);
-					glMultiDrawElementsIndirect(
-						GL_TRIANGLES,
-						GL_UNSIGNED_INT,
-						reinterpret_cast<const void*>(byteOffset),
-						static_cast<GLsizei>(batchSize),
-						0
-					);
+					drawCustomBatch(items, batchStart, i, shaderToBind);
 				}
 
 				// Start new batch
-				if (i < m_ForwardTransparentCustomSkinnedUploadedCount) {
+				if (i < renderCount) {
 					batchStart = i;
-					currentShader = m_ForwardTransparentCustomSkinnedItems[i].shader;
+					currentShader = items[i].shader;
 				}
 			}
 		}
@@ -7082,19 +7306,16 @@ void Renderer::calculatePointLightShadowMatrices(const glm::vec3& lightPos,
  * @brief Calculates light-space matrices for all shadow-casting lights.
  * Computes cascade splits and shadow matrices for directional and spot lights based on the camera's view and projection.
  * Updates each light's shadow matrix and split depth for use in shadow mapping.
- * @param editorCamera Reference to the editor camera providing view and projection matrices.
+ * @param view Current output-frame view matrix.
+ * @param projection Current output-frame projection matrix.
  */
-void Renderer::CalculateLightMatrix(const editor::EditorCamera& editorCamera)
+void Renderer::CalculateLightMatrix(const Mtx44& view, const Mtx44& projection)
 {
-	// Convert camera projection/view to glm
-	const Mtx44 proj = editorCamera.GetProjectionMatrix();
-	const Mtx44 view = editorCamera.GetViewMatrix();
-
 	glm::mat4 glmProj = glm::mat4(
-		proj.m00, proj.m01, proj.m02, proj.m03,
-		proj.m10, proj.m11, proj.m12, proj.m13,
-		proj.m20, proj.m21, proj.m22, proj.m23,
-		proj.m30, proj.m31, proj.m32, proj.m33
+		projection.m00, projection.m01, projection.m02, projection.m03,
+		projection.m10, projection.m11, projection.m12, projection.m13,
+		projection.m20, projection.m21, projection.m22, projection.m23,
+		projection.m30, projection.m31, projection.m32, projection.m33
 	);
 	glm::mat4 glmView = glm::mat4(
 		view.m00, view.m01, view.m02, view.m03,
@@ -7140,7 +7361,7 @@ void Renderer::CalculateLightMatrix(const editor::EditorCamera& editorCamera)
 	for (EntityID e : m_ShadowCastingLights) {
 		if (!ecs.HasComponent<Light>(e)) continue;
 		auto& light = ecs.GetComponent<Light>(e);
-		if (light.castsShadows == 0) continue;
+		if (!light.castsShadows || light.type == LightType::POINT) continue;
 		int baseLayer = light.startOffset;
 		if (baseLayer < 0) continue;
 
@@ -7360,6 +7581,13 @@ void Renderer::CalculateLightMatrix(const editor::EditorCamera& editorCamera)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void Renderer::SyncShadowViewsForOutputFrame(const Mtx44& view, const Mtx44& projection)
+{
+	BuildVisibleLightSet(view, projection);
+	CalculateLightMatrix(view, projection);
+	UploadLightsSSBOFromPreparedState();
+}
+
 /**
  * @brief Renders shadow map using indirect rendering and instancing across all shadow layers.
  *
@@ -7459,9 +7687,6 @@ void Renderer::RenderShadowMapInstanced()
  */
 void Renderer::RenderShadowPass()
 {
-	// Calculate directional light matrices
-	CalculateLightMatrix(editor::EditorCamera::GetInstance());
-
 	// Render shadows using instanced rendering
 	RenderShadowMapInstanced();
 }
@@ -7651,6 +7876,7 @@ void Renderer::RenderPickingPass(const Mtx44& view, const Mtx44& projection)
 		if (skinnedVAO != 0)
 		{
 			glBindVertexArray(skinnedVAO);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SKELETAL_SSBO_BINDING, m_MeshManager.m_SkeletalSSBO.GetBufferID());
 
 			// Render all skinned meshes from picking buffer (opaque + transparent)
 			m_PickingIndirectSkinnedShader->SetUniform1ui("baseDrawID", 0);
@@ -7671,116 +7897,14 @@ void Renderer::RenderPickingPass(const Mtx44& view, const Mtx44& projection)
 		m_PickingIndirectSkinnedShader->Unbind();
 	}
 
-	// ========== RENDER OPAQUE CUSTOM SHADER MESHES ==========
-	if (m_ForwardOpaqueCustomStandardUploadedCount > 0)
-	{
-		m_PickingIndirectShader->Bind();
-		m_PickingIndirectShader->SetUniformMatrix4fv("u_ViewProjection", vp);
+	// Custom-shader meshes are already included in m_PickingStandardCommands /
+	// m_PickingSkinnedCommands during draw-data compilation. Re-drawing them here is redundant
+	// and can diverge from the generic picking buffers.
 
-		GLuint standardVAO = m_MeshManager.GetStandardVAO();
-		if (standardVAO != 0)
-		{
-			glBindVertexArray(standardVAO);
-			m_PickingIndirectShader->SetUniform1ui("baseDrawID", 0);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardOpaqueCustomStandardInfoBuffer);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomStandardCmdBuffer);
-			glMultiDrawElementsIndirect(
-				GL_TRIANGLES,
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(m_ForwardOpaqueCustomStandardUploadedCount),
-				0
-			);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-			glBindVertexArray(0);
-		}
-
-		m_PickingIndirectShader->Unbind();
-	}
-
-	if (m_ForwardOpaqueCustomSkinnedUploadedCount > 0)
-	{
-		m_PickingIndirectSkinnedShader->Bind();
-		m_PickingIndirectSkinnedShader->SetUniformMatrix4fv("u_ViewProjection", vp);
-
-		GLuint skinnedVAO = m_MeshManager.GetSkinnedVAO();
-		if (skinnedVAO != 0)
-		{
-			glBindVertexArray(skinnedVAO);
-			m_PickingIndirectSkinnedShader->SetUniform1ui("baseDrawID", 0);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardOpaqueCustomSkinnedInfoBuffer);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardOpaqueCustomSkinnedCmdBuffer);
-			glMultiDrawElementsIndirect(
-				GL_TRIANGLES,
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(m_ForwardOpaqueCustomSkinnedUploadedCount),
-				0
-			);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-			glBindVertexArray(0);
-		}
-
-		m_PickingIndirectSkinnedShader->Unbind();
-	}
-
-	// ========== RENDER TRANSPARENT CUSTOM SHADER MESHES ==========
-	if (m_ForwardTransparentCustomStandardUploadedCount > 0)
-	{
-		m_PickingIndirectShader->Bind();
-		m_PickingIndirectShader->SetUniformMatrix4fv("u_ViewProjection", vp);
-
-		GLuint standardVAO = m_MeshManager.GetStandardVAO();
-		if (standardVAO != 0)
-		{
-			glBindVertexArray(standardVAO);
-			m_PickingIndirectShader->SetUniform1ui("baseDrawID", 0);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardTransparentCustomStandardInfoBuffer);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomStandardCmdBuffer);
-			glMultiDrawElementsIndirect(
-				GL_TRIANGLES,
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(m_ForwardTransparentCustomStandardUploadedCount),
-				0
-			);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-			glBindVertexArray(0);
-		}
-
-		m_PickingIndirectShader->Unbind();
-	}
-
-	if (m_ForwardTransparentCustomSkinnedUploadedCount > 0)
-	{
-		m_PickingIndirectSkinnedShader->Bind();
-		m_PickingIndirectSkinnedShader->SetUniformMatrix4fv("u_ViewProjection", vp);
-
-		GLuint skinnedVAO = m_MeshManager.GetSkinnedVAO();
-		if (skinnedVAO != 0)
-		{
-			glBindVertexArray(skinnedVAO);
-			m_PickingIndirectSkinnedShader->SetUniform1ui("baseDrawID", 0);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, DRAW_INFO_SSBO_BINDING, m_ForwardTransparentCustomSkinnedInfoBuffer);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_ForwardTransparentCustomSkinnedCmdBuffer);
-			glMultiDrawElementsIndirect(
-				GL_TRIANGLES,
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(m_ForwardTransparentCustomSkinnedUploadedCount),
-				0
-			);
-			glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-			glBindVertexArray(0);
-		}
-
-		m_PickingIndirectSkinnedShader->Unbind();
-	}
-
-	// Restore
+	// Restore default framebuffer after the picking pass.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	glCheckError();
+
 #endif
 }
 
@@ -7857,6 +7981,15 @@ void Renderer::SyncToGlobalGraphics()
 	m_GlobalGraphics.gamma = m_Gamma;
 	m_GlobalGraphics.vignetteIntensity = m_VignetteIntensity;
 	m_GlobalGraphics.vignetteRadius = m_VignetteRadius;
+	m_GlobalGraphics.vignetteCoverage = m_VignetteCoverage;
+	m_GlobalGraphics.vignetteFalloff = m_VignetteFalloff;
+	m_GlobalGraphics.vignetteMapStrength = m_VignetteMapStrength;
+	m_GlobalGraphics.vignetteMapRGBModifier = Ermine::Vec3(
+		m_VignetteMapRGBModifier.r,
+		m_VignetteMapRGBModifier.g,
+		m_VignetteMapRGBModifier.b
+	);
+	m_GlobalGraphics.vignetteMapPath = m_VignetteMapPath;
 	m_GlobalGraphics.bloomStrength = m_BloomStrength;
 
 	m_GlobalGraphics.filmGrainEnabled = m_FilmGrainEnabled;
@@ -7864,6 +7997,11 @@ void Renderer::SyncToGlobalGraphics()
 	m_GlobalGraphics.grainScale = m_GrainScale;
 	m_GlobalGraphics.chromaticAberrationEnabled = m_ChromaticAberrationEnabled;
 	m_GlobalGraphics.chromaticAmount = m_ChromaticAmount;
+	m_GlobalGraphics.radialBlurEnabled = m_RadialBlurEnabled;
+	m_GlobalGraphics.radialBlurStrength = m_RadialBlurStrength;
+	m_GlobalGraphics.radialBlurSamples = m_RadialBlurSamples;
+	m_GlobalGraphics.radialBlurCenterX = m_RadialBlurCenter.x;
+	m_GlobalGraphics.radialBlurCenterY = m_RadialBlurCenter.y;
 
 	m_GlobalGraphics.fxaaSpanMax = m_FXAASpanMax;
 	m_GlobalGraphics.fxaaReduceMin = m_FXAAReduceMin;
@@ -7926,6 +8064,25 @@ void Renderer::ApplyFromGlobalGraphics()
 	m_Gamma = m_GlobalGraphics.gamma;
 	m_VignetteIntensity = m_GlobalGraphics.vignetteIntensity;
 	m_VignetteRadius = m_GlobalGraphics.vignetteRadius;
+	m_VignetteCoverage = m_GlobalGraphics.vignetteCoverage;
+	m_VignetteFalloff = m_GlobalGraphics.vignetteFalloff;
+	m_VignetteMapStrength = m_GlobalGraphics.vignetteMapStrength;
+	m_VignetteMapRGBModifier = glm::vec3(
+		m_GlobalGraphics.vignetteMapRGBModifier.x,
+		m_GlobalGraphics.vignetteMapRGBModifier.y,
+		m_GlobalGraphics.vignetteMapRGBModifier.z
+	);
+	m_VignetteMapPath = m_GlobalGraphics.vignetteMapPath;
+	if (!m_VignetteMapPath.empty()) {
+		m_VignetteMapTexture = AssetManager::GetInstance().LoadTexture(m_VignetteMapPath);
+		if (!m_VignetteMapTexture || !m_VignetteMapTexture->IsValid()) {
+			EE_CORE_WARN("Failed to load vignette map texture: {}", m_VignetteMapPath);
+			m_VignetteMapTexture.reset();
+		}
+	}
+	else {
+		m_VignetteMapTexture.reset();
+	}
 	m_BloomStrength = m_GlobalGraphics.bloomStrength;
 
 	m_FilmGrainEnabled = m_GlobalGraphics.filmGrainEnabled;
@@ -7933,6 +8090,13 @@ void Renderer::ApplyFromGlobalGraphics()
 	m_GrainScale = m_GlobalGraphics.grainScale;
 	m_ChromaticAberrationEnabled = m_GlobalGraphics.chromaticAberrationEnabled;
 	m_ChromaticAmount = m_GlobalGraphics.chromaticAmount;
+	m_RadialBlurEnabled = m_GlobalGraphics.radialBlurEnabled;
+	m_RadialBlurStrength = std::clamp(m_GlobalGraphics.radialBlurStrength, 0.0f, 0.35f);
+	m_RadialBlurSamples = std::clamp(m_GlobalGraphics.radialBlurSamples, 4, 24);
+	m_RadialBlurCenter = glm::vec2(
+		std::clamp(m_GlobalGraphics.radialBlurCenterX, 0.0f, 1.0f),
+		std::clamp(m_GlobalGraphics.radialBlurCenterY, 0.0f, 1.0f)
+	);
 
 	m_FXAASpanMax = m_GlobalGraphics.fxaaSpanMax;
 	m_FXAAReduceMin = m_GlobalGraphics.fxaaReduceMin;
@@ -8054,6 +8218,43 @@ void Renderer::CompileMaterials()
 		if (!material) {
 			EE_CORE_WARN("Entity {0} has null material", entity);
 			continue;
+		}
+
+		// Resolve custom shader ownership deterministically before routing.
+		auto& assets = AssetManager::GetInstance();
+		std::string resolvedCustomFragmentShader;
+		if (materialComponent.materialGuid.IsValid()) {
+			if (const std::string* frag = assets.GetMaterialCustomFragmentShader(materialComponent.materialGuid)) {
+				resolvedCustomFragmentShader = *frag;
+			}
+			materialComponent.customFragmentShader = resolvedCustomFragmentShader;
+		}
+		else {
+			resolvedCustomFragmentShader = materialComponent.customFragmentShader;
+		}
+
+		if (resolvedCustomFragmentShader.empty()) {
+			if (HasCustomShader(material)) {
+				material->SetShader(nullptr);
+			}
+		}
+		else {
+			const std::string vertexPath = ResolveCustomVertexShaderPath(resolvedCustomFragmentShader);
+			auto shader = assets.LoadShader(vertexPath, resolvedCustomFragmentShader);
+			if (shader && shader->IsValid()) {
+				if (material->GetShader() != shader) {
+					material->SetShader(shader);
+				}
+			}
+			else {
+				EE_CORE_WARN("Failed to load custom shader pair: vertex='{}', fragment='{}'", vertexPath, resolvedCustomFragmentShader);
+				if (HasCustomShader(material)) {
+					material->SetShader(nullptr);
+				}
+			}
+		}
+		if (auto param = material->GetParameter("materialCastsShadows"); !param || param->boolValue != materialComponent.cacheCastsShadows) {
+			material->SetBool("materialCastsShadows", materialComponent.cacheCastsShadows);
 		}
 
 		// Check if we've already seen this material
@@ -8238,6 +8439,9 @@ void Renderer::UploadMaterialsToGPU()
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_MaterialSSBO);
 	}
 
+	// Keep SSBO binding point 3 valid for all passes and custom shaders.
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_BINDING, m_MaterialSSBO);
+
 	// Calculate total size needed
 	const size_t materialSize = sizeof(graphics::MaterialSSBO);
 	const size_t requiredSize = m_CompiledMaterials.size();
@@ -8361,6 +8565,9 @@ void Renderer::BuildTextureArray()
 	{
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_TextureArraySSBO);
 	}
+
+	// Keep SSBO binding point 5 valid for all passes and custom shaders.
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, TEXTURE_SSBO_BINDING, m_TextureArraySSBO);
 
 	// Create bindless texture handles for all textures
 	std::vector<GLuint64> textureHandles;

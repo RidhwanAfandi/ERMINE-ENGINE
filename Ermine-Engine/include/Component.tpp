@@ -176,6 +176,21 @@ namespace Ermine {
 		return GetComponentArray<T>()->GetData(entity);
 	}
 
+	/**
+	 * @brief Try to get a pointer to a component of type T for an entity
+	 * @param entity The entity to get the component from
+	 * @return Pointer to the component if it exists, nullptr otherwise
+	 */
+	template <typename T>
+	T* ComponentManager::TryGetComponent(EntityID entity)
+	{
+		auto componentArray = GetComponentArray<T>();
+		if (componentArray && componentArray->HasEntity(entity)) {
+			return &componentArray->GetData(entity);
+		}
+		return nullptr;
+	}
+
 	template <typename T>
 	void ComponentManager::ForEachComponentType(T&& fn) const
 	{

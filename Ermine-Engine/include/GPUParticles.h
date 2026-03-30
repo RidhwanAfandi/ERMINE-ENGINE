@@ -110,6 +110,8 @@ namespace Ermine {
         unsigned long long m_SmokeNoiseHandle = 0;
         unsigned long long m_SmokeDistortHandle = 0;
         unsigned long long m_SmokePuffHandle = 0;
+        unsigned int m_Swirl01Tex = 0;
+        std::shared_ptr<graphics::Texture> m_Swirl01TexRef; // Keeps AssetManager ref alive
 
         float m_ElapsedTime = 0.0f;
         bool m_Initialized = false;

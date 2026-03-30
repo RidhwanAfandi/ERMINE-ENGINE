@@ -545,6 +545,19 @@ private:
 
         TexMetadata metadata = image.GetMetadata();
 
+        // Flip texture vertically for DirectX/UI compatibility
+        //ScratchImage flipped;
+        //hr = FlipRotate(image.GetImages(), image.GetImageCount(), metadata,
+        //    TEX_FR_FLIP_VERTICAL, flipped);
+        //if (FAILED(hr)) {
+        //    std::cout << "      ⚠ Failed to flip texture, continuing without flip" << std::endl;
+        //    flipped = std::move(image);
+        //}
+        //else {
+        //    std::cout << "      ✓ Flipped texture vertically" << std::endl;
+        //    metadata = flipped.GetMetadata();
+        //}
+
         // Convert to engine-supported DXGI format
         // B8G8R8A8_UNORM is safe for your engine
         ScratchImage standardized;
@@ -565,8 +578,15 @@ private:
         ScratchImage mipChain;
         hr = GenerateMipMaps(standardized.GetImages(), standardized.GetImageCount(),
             metadata, TEX_FILTER_DEFAULT, 0, mipChain);
-        if (FAILED(hr))
+        if (FAILED(hr)) {
+            std::cout << "      Warning: mip generation failed (HRESULT: 0x"
+                << std::hex << hr << std::dec << "), saving single-mip DDS" << std::endl;
             mipChain = std::move(standardized);
+        }
+        else {
+            std::cout << "      Generated " << mipChain.GetMetadata().mipLevels
+                << " mip levels" << std::endl;
+        }
 
         std::string filename = std::filesystem::path(inputPath).filename().string();
         DXGI_FORMAT targetFormat = DetermineOptimalFormat(filename);
@@ -1213,10 +1233,17 @@ public:
             return DXGI_FORMAT_BC3_UNORM;
         }
 
+        // Textures explicitly named as having alpha: Use BC3 to preserve transparency gradient
+        if (lowerFilename.find("_alpha") != std::string::npos ||
+            lowerFilename.find("alpha_") != std::string::npos) {
+            std::cout << "      Detected: Alpha Texture → BC3_UNORM" << std::endl;
+            return DXGI_FORMAT_BC3_UNORM;
+        }
+
         // Default: BC1 for simple RGB textures (no alpha)
         // BC1 offers 6:1 compression and is suitable for most color textures
-        std::cout << "      Default: Color Texture → BC1_UNORM" << std::endl;
-        return DXGI_FORMAT_BC1_UNORM;
+        std::cout << "      Default: Color Texture → BC1_UNORM_SRGB" << std::endl;
+        return DXGI_FORMAT_BC1_UNORM_SRGB;
     }
 };
 

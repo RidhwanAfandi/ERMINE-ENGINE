@@ -26,12 +26,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "FiniteStateMachine.h"
 #include "NavMeshAgentSystem.h"
 #include "AudioManager.h"
+#include "AudioSystem.h"
 #include "Physics.h"
 #include "SceneManager.h"
 #include "Serialisation.h"
 #include "UIRenderSystem.h"
 #include "Window.h"
 #include "VideoManager.h"
+#include "Renderer.h"
 
 namespace fs = std::filesystem;
 
@@ -871,6 +873,8 @@ namespace
 	MonoClass* s_AudioComponentClass = nullptr;
 	MonoClass* s_SerializeFieldAttr = nullptr;
 	MonoClass* s_AnimatorClass = nullptr;
+	MonoClass* s_MaterialClass = nullptr;
+	MonoClass* s_UIImageComponentClass = nullptr;
 
 	MonoClass* s_ObjectClass = nullptr;
 	MonoClassField* s_EntityIDField = nullptr;
@@ -1100,6 +1104,7 @@ namespace
 		return { vx + qw * tx + cx, vy + qw * ty + cy, vz + qw * tz + cz };
 	}
 
+	struct ManagedVector2 { float x, y; };
 	struct ManagedVector3 { float x, y, z; };
 	struct ManagedQuaternion { float x, y, z, w; };
 	struct ManagedMatrix4x4 {
@@ -1116,6 +1121,7 @@ namespace
 		uint64_t entityID; // the EntityID of the collider that was hit
 	};
 	ManagedVector3 ToManagedVec(const Ermine::Vec3& v) { return { v.x, v.y, v.z }; }
+	ManagedVector2 ToManagedVec2(const Ermine::Vec2& v) { return { v.x, v.y }; }
 	ManagedQuaternion ToManagedQuat(const Ermine::Quaternion& q) { return { q.x, q.y, q.z, q.w }; }
 	ManagedMatrix4x4 ToManagedMatrix4x4(const Ermine::Matrix4x4& m4x4) {
 		return { m4x4.m00, m4x4.m01, m4x4.m02, m4x4.m03,
@@ -1125,6 +1131,7 @@ namespace
 	}
 
 	Ermine::Vec3 ToNativeVec(const ManagedVector3& v) { return { v.x, v.y, v.z }; }
+	Ermine::Vec2 ToNativeVec2(const ManagedVector2& v) { return { v.x, v.y }; }
 	Ermine::Quaternion ToNativeQuat(const ManagedQuaternion& q) { return { q.x, q.y, q.z, q.w }; }
 	Ermine::Matrix4x4 ToNativeMatrix4x4(const ManagedMatrix4x4& m4x4) {
 		return { m4x4.m00, m4x4.m01, m4x4.m02, m4x4.m03,
@@ -1143,6 +1150,32 @@ namespace
 			return nullptr;
 		}
 		return &ECS::GetInstance().GetComponent<Transform>(id);
+	}
+
+	Ermine::UIImageComponent* GetUIImageComponentFromManaged(MonoObject* thisObj)
+	{
+		using namespace Ermine;
+		EntityID id = GetEntityIDFromManaged(thisObj);
+		if (id == 0 || !ECS::GetInstance().IsEntityValid(id) || !ECS::GetInstance().HasComponent<UIImageComponent>(id))
+		{
+			EE_CORE_WARN("Cannot get UIImageComponent for {0}; either not valid or doesn't have UIImageComponent!", id);
+			return nullptr;
+		}
+		return &ECS::GetInstance().GetComponent<UIImageComponent>(id);
+	}
+
+	ManagedVector3 icall_uiimage_get_position(MonoObject* thisObj)
+	{
+		if (auto* ui = GetUIImageComponentFromManaged(thisObj))
+			return ToManagedVec(ui->position);
+
+		return { 0.5f, 0.5f, 0.0f };
+	}
+
+	void icall_uiimage_set_position(MonoObject* thisObj, ManagedVector3 value)
+	{
+		if (auto* ui = GetUIImageComponentFromManaged(thisObj))
+			ui->position = ToNativeVec(value);
 	}
 
 #pragma region Transform ICalls
@@ -1469,6 +1502,67 @@ namespace
 		SetComponentGameObject(obj, children[index]);
 		return obj;
 	}
+	ManagedVector3 icall_transform_get_world_position(MonoObject* thisObj)
+	{
+		using namespace Ermine;
+		EntityID id = GetEntityIDFromManaged(thisObj);
+		auto& ecs = ECS::GetInstance();
+
+		if (id == 0 || !ecs.IsEntityValid(id))
+			return { 0.f, 0.f, 0.f };
+
+		if (auto hs = ecs.GetSystem<HierarchySystem>())
+		{
+			Ermine::Vec3 wp = hs->GetWorldPosition(id);
+			return ToManagedVec(wp);
+		}
+
+		// fallback (no hierarchy system)
+		if (ecs.HasComponent<Transform>(id))
+			return ToManagedVec(ecs.GetComponent<Transform>(id).position);
+
+		return { 0.f, 0.f, 0.f };
+	}
+
+	ManagedQuaternion icall_transform_get_world_rotation(MonoObject* thisObj)
+	{
+		using namespace Ermine;
+		EntityID id = GetEntityIDFromManaged(thisObj);
+		auto& ecs = ECS::GetInstance();
+
+		if (id == 0 || !ecs.IsEntityValid(id))
+			return { .x = 0.f, .y = 0.f, .z = 0.f, .w = 1.f };
+
+		if (auto hs = ecs.GetSystem<HierarchySystem>())
+		{
+			Quaternion wr = hs->GetWorldRotation(id);
+			return ToManagedQuat(wr);
+		}
+
+		// fallback (no hierarchy system)
+		if (ecs.HasComponent<Transform>(id))
+			return ToManagedQuat(ecs.GetComponent<Transform>(id).rotation);
+
+		return { .x = 0.f, .y = 0.f, .z = 0.f, .w = 1.f };
+	}
+
+	ManagedVector3 icall_transform_get_world_scale(MonoObject* thisObj)
+	{
+		using namespace Ermine;
+		EntityID id = GetEntityIDFromManaged(thisObj);
+		auto& ecs = ECS::GetInstance();
+
+		if (id == 0 || !ecs.IsEntityValid(id))
+			return { 1.f, 1.f, 1.f };
+
+		if (auto hs = ecs.GetSystem<HierarchySystem>())
+			return ToManagedVec(hs->GetWorldScale(id));
+
+		if (ecs.HasComponent<Transform>(id))
+			return ToManagedVec(ecs.GetComponent<Transform>(id).scale);
+
+		return { 1.f, 1.f, 1.f };
+	}
 #pragma endregion
 
 #pragma region Rigidbody ICalls
@@ -1780,6 +1874,26 @@ namespace
 		EE_CORE_WARN("GlobalAudio: No GlobalAudioComponent found in scene");
 	}
 
+	void icall_globalaudio_play_sfx_with_reverb(MonoString* name, mono_bool useReverb, float wetLevel, float dryLevel, float decayTime, float earlyDelay, float lateDelay)
+	{
+		using namespace Ermine;
+		std::string sfxName;
+		ToTempUTF8(name, sfxName);
+
+		// Find GlobalAudioComponent entity
+		auto& ecs = ECS::GetInstance();
+		for (EntityID entity = 1; entity <= MAX_ENTITIES; ++entity)
+		{
+			if (ecs.IsEntityValid(entity) && ecs.HasComponent<GlobalAudioComponent>(entity))
+			{
+				auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(entity);
+				AudioSystem::PlayGlobalSFX(globalAudio, sfxName, useReverb != 0, wetLevel, dryLevel, decayTime, earlyDelay, lateDelay);
+				return;
+			}
+		}
+		EE_CORE_WARN("GlobalAudio: No GlobalAudioComponent found in scene");
+	}
+
 	void icall_globalaudio_play_music(MonoString* name)
 	{
 		using namespace Ermine;
@@ -1829,6 +1943,73 @@ namespace
 			}
 		}
 	}
+
+	void icall_globalaudio_play_voice(MonoString* name)
+	{
+		using namespace Ermine;
+		std::string voiceName;
+		ToTempUTF8(name, voiceName);
+
+		auto& ecs = ECS::GetInstance();
+		for (EntityID entity = 1; entity <= MAX_ENTITIES; ++entity)
+		{
+			if (ecs.IsEntityValid(entity) && ecs.HasComponent<GlobalAudioComponent>(entity))
+			{
+				auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(entity);
+				globalAudio.PlayVoice(voiceName);
+				return;
+			}
+		}
+		EE_CORE_WARN("GlobalAudio: No GlobalAudioComponent found in scene");
+	}
+
+	void icall_globalaudio_stop_voice()
+	{
+		using namespace Ermine;
+		auto& ecs = ECS::GetInstance();
+		for (EntityID entity = 1; entity <= MAX_ENTITIES; ++entity)
+		{
+			if (ecs.IsEntityValid(entity) && ecs.HasComponent<GlobalAudioComponent>(entity))
+			{
+				auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(entity);
+				globalAudio.StopVoice();
+				return;
+			}
+		}
+	}
+
+	void icall_globalaudio_stop_sfx(MonoString* name)
+	{
+		using namespace Ermine;
+		std::string sfxName;
+		ToTempUTF8(name, sfxName);
+
+		auto& ecs = ECS::GetInstance();
+		for (EntityID entity = 1; entity <= MAX_ENTITIES; ++entity)
+		{
+			if (ecs.IsEntityValid(entity) && ecs.HasComponent<GlobalAudioComponent>(entity))
+			{
+				auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(entity);
+				globalAudio.StopSFX(sfxName);
+				return;
+			}
+		}
+	}
+
+	void icall_globalaudio_set_voice_volume(float volume)
+	{
+		using namespace Ermine;
+		auto& ecs = ECS::GetInstance();
+		for (EntityID entity = 1; entity <= MAX_ENTITIES; ++entity)
+		{
+			if (ecs.IsEntityValid(entity) && ecs.HasComponent<GlobalAudioComponent>(entity))
+			{
+				auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(entity);
+				globalAudio.SetVoiceVolume(volume);
+				return;
+			}
+		}
+	}
 #pragma endregion
 
 #pragma region AudioListener ICalls
@@ -1871,6 +2052,112 @@ namespace
 			return nullptr;
 		}
 		return &ECS::GetInstance().GetComponent<AudioComponent>(id);
+	}
+
+	Ermine::Material* GetMaterialComponentFromManaged(MonoObject* thisObj)
+	{
+		using namespace Ermine;
+		EntityID id = GetEntityIDFromManaged(thisObj);
+		if (id == 0 || !ECS::GetInstance().IsEntityValid(id) || !ECS::GetInstance().HasComponent<Ermine::Material>(id))
+		{
+			return nullptr;
+		}
+		return &ECS::GetInstance().GetComponent<Ermine::Material>(id);
+	}
+
+	float icall_material_get_fill(MonoObject* thisObj)
+	{
+		auto* matComp = GetMaterialComponentFromManaged(thisObj);
+		if (!matComp)
+			return 1.0f;
+
+		auto* material = matComp->GetMaterial();
+		if (!material)
+			return 1.0f;
+
+		if (const auto* param = material->GetParameter("materialFillAmount"))
+		{
+			if (!param->floatValues.empty())
+				return param->floatValues[0];
+		}
+
+		return 1.0f;
+	}
+
+	void icall_material_set_fill(MonoObject* thisObj, float value)
+	{
+		using namespace Ermine;
+		const EntityID id = GetEntityIDFromManaged(thisObj);
+
+		auto* matComp = GetMaterialComponentFromManaged(thisObj);
+		if (!matComp)
+		{
+			EE_CORE_WARN("[Material.Fill] Entity {0}: Material component missing", id);
+			return;
+		}
+
+		auto* material = matComp->GetMaterial();
+		if (!material)
+		{
+			EE_CORE_WARN("[Material.Fill] Entity {0}: graphics::Material missing", id);
+			return;
+		}
+
+		if (value < 0.0f) value = 0.0f;
+		if (value > 1.0f) value = 1.0f;
+		material->SetFloat("materialFillAmount", value);
+
+		// Ensure GPU material buffer is updated immediately after script-side changes.
+		auto renderer = ECS::GetInstance().GetSystem<graphics::Renderer>();
+		if (!renderer)
+			return;
+
+		const int materialIndex = material->GetMaterialIndex();
+		if (materialIndex >= 0)
+		{
+			const auto ssboData = material->GetSSBOData();
+			renderer->UpdateMaterialSSBO(ssboData, static_cast<uint32_t>(materialIndex));
+		}
+		else
+		{
+			// Fallback: force material recompilation path if this material is not indexed yet.
+			EE_CORE_WARN("[Material.Fill] Entity {0}: invalid material index ({1}), marking materials dirty", id, materialIndex);
+			renderer->MarkMaterialsDirty();
+		}
+	}
+
+	mono_bool icall_material_get_flicker_emissive(MonoObject* thisObj)
+	{
+		auto* matComp = GetMaterialComponentFromManaged(thisObj);
+		if (!matComp)
+			return 0;
+
+		return matComp->flickerEmissive ? 1 : 0;
+	}
+
+	void icall_material_set_flicker_emissive(MonoObject* thisObj, mono_bool value)
+	{
+		using namespace Ermine;
+		const EntityID id = GetEntityIDFromManaged(thisObj);
+
+		auto* matComp = GetMaterialComponentFromManaged(thisObj);
+		if (!matComp)
+		{
+			EE_CORE_WARN("[Material.FlickerEmissive] Entity {0}: Material component missing", id);
+			return;
+		}
+
+		const bool enabled = (value != 0);
+		if (matComp->flickerEmissive == enabled)
+			return;
+
+		matComp->flickerEmissive = enabled;
+
+		auto renderer = ECS::GetInstance().GetSystem<graphics::Renderer>();
+		if (renderer)
+		{
+			renderer->MarkDrawDataForRebuild();
+		}
 	}
 
 	mono_bool icall_audiocomponent_get_shouldplay(MonoObject* thisObj)
@@ -2005,6 +2292,59 @@ namespace
 	{
 		if (auto* ac = GetAudioComponentFromManaged(thisObj))
 			ac->followTransform = (value != 0);
+	}
+
+	// Reverb properties
+	mono_bool icall_audiocomponent_get_usereverb(MonoObject* thisObj)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			return ac->useReverb ? 1 : 0;
+		return 0;
+	}
+
+	void icall_audiocomponent_set_usereverb(MonoObject* thisObj, mono_bool value)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			ac->useReverb = (value != 0);
+	}
+
+	float icall_audiocomponent_get_reverbwetlevel(MonoObject* thisObj)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			return ac->reverbWetLevel;
+		return -12.0f;
+	}
+
+	void icall_audiocomponent_set_reverbwetlevel(MonoObject* thisObj, float value)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			ac->reverbWetLevel = value;
+	}
+
+	float icall_audiocomponent_get_reverbdrylevel(MonoObject* thisObj)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			return ac->reverbDryLevel;
+		return 0.0f;
+	}
+
+	void icall_audiocomponent_set_reverbdrylevel(MonoObject* thisObj, float value)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			ac->reverbDryLevel = value;
+	}
+
+	float icall_audiocomponent_get_reverbdecaytime(MonoObject* thisObj)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			return ac->reverbDecayTime;
+		return 1.0f;
+	}
+
+	void icall_audiocomponent_set_reverbdecaytime(MonoObject* thisObj, float value)
+	{
+		if (auto* ac = GetAudioComponentFromManaged(thisObj))
+			ac->reverbDecayTime = value;
 	}
 #pragma endregion
 
@@ -2221,6 +2561,40 @@ namespace
 			return obj;
 		}
 
+		// Handle Material component
+		if (klass == s_MaterialClass)
+		{
+			if (!ECS::GetInstance().HasComponent<Ermine::Material>(id))
+				return nullptr;
+
+			auto* dom = Ermine::ECS::GetInstance()
+				.GetSystem<Ermine::scripting::ScriptSystem>()->m_ScriptEngine->GetGameDomain();
+
+			MonoObject* obj = mono_object_new(dom, s_MaterialClass);
+			mono_runtime_object_init(obj);
+			SetEntityIDOnManaged(obj, id);
+			SetComponentGameObject(obj, id);
+
+			return obj;
+		}
+
+		// Handle UIImage component
+		if (klass == s_UIImageComponentClass)
+		{
+			if (!ECS::GetInstance().HasComponent<UIImageComponent>(id))
+				return nullptr;
+
+			auto* dom = Ermine::ECS::GetInstance()
+				.GetSystem<Ermine::scripting::ScriptSystem>()->m_ScriptEngine->GetGameDomain();
+
+			MonoObject* obj = mono_object_new(dom, s_UIImageComponentClass);
+			mono_runtime_object_init(obj);
+			SetEntityIDOnManaged(obj, id);
+			SetComponentGameObject(obj, id);
+
+			return obj;
+		}
+
 		// return back the obj when requesting MonoBehaviour derived -> Script component
 		if (IsSubclassOf(klass, s_MonoBehaviourClass))
 		{
@@ -2260,6 +2634,12 @@ namespace
 
 		if (klass == s_AnimatorClass)
 			return ECS::GetInstance().HasComponent<AnimationComponent>(id);
+
+		if (klass == s_MaterialClass)
+			return ECS::GetInstance().HasComponent<Ermine::Material>(id);
+
+		if (klass == s_UIImageComponentClass)
+			return ECS::GetInstance().HasComponent<UIImageComponent>(id);
 
 		if (IsSubclassOf(klass, s_MonoBehaviourClass))
 			return ECS::GetInstance().HasComponent<Script>(id);
@@ -2519,6 +2899,32 @@ namespace
 		auto physics = ECS::GetInstance().GetSystem<Physics>();
 		physics->ForceUpdate();
 	}
+	void icall_physics_set_light_value(uint64_t entityID, float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		if (entityID == 0 || !ecs.IsEntityValid(entityID))
+			return;
+
+		if (auto physics = ecs.GetSystem<Physics>())
+		{
+			physics->SetLightValue(entityID, value);
+		}
+	}
+
+	float icall_physics_get_light_value(uint64_t entityID)
+	{
+		using namespace Ermine;
+
+		auto& ecs = ECS::GetInstance();
+		if (entityID == 0 || !ecs.IsEntityValid(entityID))
+			return 0.0f;
+
+		if (!ecs.HasComponent<Light>(entityID))
+			return 0.0f;
+
+		const auto& lightobj = ecs.GetComponent<Light>(entityID);
+		return lightobj.intensity;
+	}
 
 #pragma endregion
 
@@ -2742,6 +3148,24 @@ namespace
 		agent.jumpDuration = (link.jumpDuration > 0.0f) ? link.jumpDuration : autoDuration;
 		agent.jumpHeight = (link.jumpHeight > 0.0f) ? link.jumpHeight : autoHeight;
 	}
+
+	void icall_navagent_set_auto_rotate(uint64_t agentEntityID, bool enabled)
+	{
+		using namespace Ermine;
+
+		auto& ecs = ECS::GetInstance();
+		EntityID agentID = (EntityID)agentEntityID;
+
+		if (!ecs.IsEntityValid(agentID))
+			return;
+
+		if (!ecs.HasComponent<NavMeshAgent>(agentID))
+			return;
+
+		auto& agent = ecs.GetComponent<NavMeshAgent>(agentID);
+
+		agent.autoRotate = enabled;
+	}
 #pragma endregion
 
 #pragma region UI ICalls
@@ -2919,6 +3343,217 @@ namespace
 	}
 #pragma endregion
 
+#pragma region PostProcess ICalls
+
+	std::shared_ptr<Ermine::graphics::Renderer> GetPostProcessRenderer()
+	{
+		auto renderer = Ermine::ECS::GetInstance().GetSystem<Ermine::graphics::Renderer>();
+		if (!renderer)
+			EE_CORE_WARN("PostProcess internal call: Renderer system not registered.");
+		return renderer;
+	}
+
+	mono_bool icall_postprocess_get_vignette_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_postprocess_set_vignette_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteEnabled = (enabled != 0);
+	}
+
+	float icall_postprocess_get_vignette_intensity()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteIntensity;
+		return 0.0f;
+	}
+
+	void icall_postprocess_set_vignette_intensity(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteIntensity = std::clamp(value, 0.0f, 1.0f);
+	}
+
+	float icall_postprocess_get_vignette_radius()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteRadius;
+		return 0.8f;
+	}
+
+	void icall_postprocess_set_vignette_radius(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteRadius = std::clamp(value, 0.0f, 2.0f);
+	}
+
+	float icall_postprocess_get_vignette_coverage()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteCoverage;
+		return 0.0f;
+	}
+
+	void icall_postprocess_set_vignette_coverage(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteCoverage = std::clamp(value, 0.0f, 1.0f);
+	}
+
+	float icall_postprocess_get_vignette_falloff()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteFalloff;
+		return 0.2f;
+	}
+
+	void icall_postprocess_set_vignette_falloff(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteFalloff = std::max(value, 0.01f);
+	}
+
+	float icall_postprocess_get_vignette_map_strength()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteMapStrength;
+		return 1.0f;
+	}
+
+	void icall_postprocess_set_vignette_map_strength(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteMapStrength = std::clamp(value, 0.0f, 1.0f);
+	}
+
+	ManagedVector3 icall_postprocess_get_vignette_map_rgb_modifier()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+		{
+			return ManagedVector3{
+				renderer->m_VignetteMapRGBModifier.r,
+				renderer->m_VignetteMapRGBModifier.g,
+				renderer->m_VignetteMapRGBModifier.b
+			};
+		}
+		return ManagedVector3{ 1.0f, 1.0f, 1.0f };
+	}
+
+	void icall_postprocess_set_vignette_map_rgb_modifier(ManagedVector3 value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+		{
+			renderer->m_VignetteMapRGBModifier = glm::vec3(
+				std::max(value.x, 0.0f),
+				std::max(value.y, 0.0f),
+				std::max(value.z, 0.0f)
+			);
+		}
+	}
+
+	MonoString* icall_postprocess_get_vignette_map_path()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return mono_string_new(mono_domain_get(), renderer->m_VignetteMapPath.c_str());
+		return mono_string_new(mono_domain_get(), "");
+	}
+
+	void icall_postprocess_set_vignette_map_path(MonoString* path)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+		{
+			std::string pathText;
+			ToTempUTF8(path, pathText);
+			renderer->m_VignetteMapPath = pathText;
+
+			if (pathText.empty())
+			{
+				renderer->ClearVignetteMapTexture();
+				return;
+			}
+
+			auto texture = AssetManager::GetInstance().LoadTexture(pathText);
+			if (texture && texture->IsValid())
+			{
+				renderer->SetVignetteMapTexture(texture, pathText);
+			}
+			else
+			{
+				renderer->SetVignetteMapTexture(nullptr, pathText);
+				EE_CORE_WARN("PostProcess: failed to load vignette map '{}'", pathText);
+			}
+		}
+	}
+
+	mono_bool icall_postprocess_get_radial_blur_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_RadialBlurEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_postprocess_set_radial_blur_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_RadialBlurEnabled = (enabled != 0);
+	}
+
+	float icall_postprocess_get_radial_blur_strength()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_RadialBlurStrength;
+		return 0.0f;
+	}
+
+	void icall_postprocess_set_radial_blur_strength(float value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_RadialBlurStrength = std::clamp(value, 0.0f, 0.35f);
+	}
+
+	int icall_postprocess_get_radial_blur_samples()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_RadialBlurSamples;
+		return 12;
+	}
+
+	void icall_postprocess_set_radial_blur_samples(int value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_RadialBlurSamples = std::clamp(value, 4, 24);
+	}
+
+	ManagedVector2 icall_postprocess_get_radial_blur_center()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+		{
+			return ManagedVector2{
+				renderer->m_RadialBlurCenter.x,
+				renderer->m_RadialBlurCenter.y
+			};
+		}
+		return ManagedVector2{ 0.5f, 0.5f };
+	}
+
+	void icall_postprocess_set_radial_blur_center(ManagedVector2 value)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+		{
+			renderer->m_RadialBlurCenter = glm::vec2(
+				std::clamp(value.x, 0.0f, 1.0f),
+				std::clamp(value.y, 0.0f, 1.0f)
+			);
+		}
+	}
+
+#pragma endregion
+
 #pragma region VideoManager ICalls
 
 	std::shared_ptr<Ermine::VideoManager> GetVideoManager()
@@ -3057,6 +3692,15 @@ namespace
 		if (auto videoSystem = GetVideoManager())
 			return videoSystem->IsRenderEnabled() ? 1 : 0;
 		return 0;
+	}
+
+	void icall_videomanager_set_audio_volume(MonoString* name, float volume)
+	{
+		auto videoSystem = GetVideoManager();
+		if (!videoSystem || !name) return;
+		char* nameStr = mono_string_to_utf8(name);
+		videoSystem->SetAudioVolume(nameStr, volume);
+		mono_free(nameStr);
 	}
 
 #pragma endregion
@@ -3231,6 +3875,130 @@ namespace
 				return;
 			}
 		}
+	}
+#pragma endregion
+
+#pragma region PostEffects ICalls
+	void icall_posteffects_set_exposure(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_Exposure = value;
+	}
+
+	void icall_posteffects_set_contrast(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_Contrast = value;
+	}
+
+	void icall_posteffects_set_saturation(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_Saturation = value;
+	}
+
+	void icall_posteffects_set_gamma(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 3.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_Gamma = value;
+	}
+
+	void icall_posteffects_set_vignetteintensity(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_VignetteIntensity = value;
+	}
+
+	void icall_posteffects_set_vignetteradius(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_VignetteRadius = value;
+	}
+
+	void icall_posteffects_set_bloomStrength(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_BloomStrength = value;
+	}
+
+	void icall_posteffects_set_grainintensity(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_GrainIntensity = value;
+	}
+
+	void icall_posteffects_set_grainsize(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_GrainScale = value;
+	}
+
+	void icall_posteffects_set_chromaticaberration(float value)
+	{
+		auto& ecs = ECS::GetInstance();
+		value = std::clamp(value, 0.0f, 2.0f);
+		ecs.GetSystem<graphics::Renderer>()->m_ChromaticAmount = value;
+	}
+
+	mono_bool icall_posteffects_get_vignette_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_VignetteEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_posteffects_set_vignette_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_VignetteEnabled = (enabled != 0);
+	}
+
+	mono_bool icall_posteffects_get_flim_grain_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_FilmGrainEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_posteffects_set_flim_grain_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_FilmGrainEnabled = (enabled != 0);
+	}
+
+	mono_bool icall_posteffects_get_chromatic_aberration_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_ChromaticAberrationEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_posteffects_set_chromatic_aberration_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_ChromaticAberrationEnabled = (enabled != 0);
+	}
+
+	mono_bool icall_posteffects_get_bloom_enabled()
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			return renderer->m_BloomEnabled ? 1 : 0;
+		return 0;
+	}
+
+	void icall_posteffects_set_bloom_enabled(mono_bool enabled)
+	{
+		if (auto renderer = GetPostProcessRenderer())
+			renderer->m_BloomEnabled = (enabled != 0);
 	}
 #pragma endregion
 }
@@ -3498,6 +4266,8 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	if (!s_SerializeFieldAttr)
 		s_SerializeFieldAttr = mono_class_from_name(s_APIImage, "ErmineEngine", "SerializeField");
 	s_AnimatorClass = GetAPIClass("ErmineEngine", "Animator");
+	s_MaterialClass = GetAPIClass("ErmineEngine", "Material");
+	s_UIImageComponentClass = GetAPIClass("ErmineEngine", "UIImage");
 
 	s_ObjectClass = GetAPIClass("ErmineEngine", "Object");
 	if (s_ObjectClass && !s_EntityIDField)
@@ -3524,6 +4294,9 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	mono_add_internal_call("ErmineEngine.Transform::Internal_RemoveChild", (const void*)icall_transform_remove_child);
 	mono_add_internal_call("ErmineEngine.Transform::Internal_GetChildTransformByName", (const void*)icall_transform_get_transform_by_name);
 	mono_add_internal_call("ErmineEngine.Transform::Internal_GetChildTransformByIndex", (const void*)icall_transform_get_transform_by_index);
+	mono_add_internal_call("ErmineEngine.Transform::Internal_GetWorldPosition",(const void*)icall_transform_get_world_position);
+	mono_add_internal_call("ErmineEngine.Transform::Internal_GetWorldRotation",(const void*)icall_transform_get_world_rotation);
+	mono_add_internal_call("ErmineEngine.Transform::Internal_GetWorldScale",(const void*)icall_transform_get_world_scale);
 #pragma endregion
 
 #pragma region Rigidbody ICalls
@@ -3555,9 +4328,14 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 
 #pragma region GlobalAudio ICalls
 	mono_add_internal_call("ErmineEngine.GlobalAudio::PlaySFX", (const void*)icall_globalaudio_play_sfx);
+	mono_add_internal_call("ErmineEngine.GlobalAudio::PlaySFXWithReverb", (const void*)icall_globalaudio_play_sfx_with_reverb);
+	mono_add_internal_call("ErmineEngine.GlobalAudio::StopSFX", (const void*)icall_globalaudio_stop_sfx);
 	mono_add_internal_call("ErmineEngine.GlobalAudio::PlayMusic", (const void*)icall_globalaudio_play_music);
 	mono_add_internal_call("ErmineEngine.GlobalAudio::SetMusicVolume", (const void*)icall_globalaudio_set_music_volume);
 	mono_add_internal_call("ErmineEngine.GlobalAudio::SetSFXVolume", (const void*)icall_globalaudio_set_sfx_volume);
+	mono_add_internal_call("ErmineEngine.GlobalAudio::PlayVoice", (const void*)icall_globalaudio_play_voice);
+	mono_add_internal_call("ErmineEngine.GlobalAudio::StopVoice", (const void*)icall_globalaudio_stop_voice);
+	mono_add_internal_call("ErmineEngine.GlobalAudio::SetVoiceVolume", (const void*)icall_globalaudio_set_voice_volume);
 #pragma endregion
 
 #pragma region AudioListener ICalls
@@ -3587,6 +4365,22 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	mono_add_internal_call("ErmineEngine.AudioComponent::set_maxDistance", (const void*)icall_audiocomponent_set_maxdistance);
 	mono_add_internal_call("ErmineEngine.AudioComponent::get_followTransform", (const void*)icall_audiocomponent_get_followtransform);
 	mono_add_internal_call("ErmineEngine.AudioComponent::set_followTransform", (const void*)icall_audiocomponent_set_followtransform);
+	// Reverb properties
+	mono_add_internal_call("ErmineEngine.AudioComponent::get_useReverb", (const void*)icall_audiocomponent_get_usereverb);
+	mono_add_internal_call("ErmineEngine.AudioComponent::set_useReverb", (const void*)icall_audiocomponent_set_usereverb);
+	mono_add_internal_call("ErmineEngine.AudioComponent::get_reverbWetLevel", (const void*)icall_audiocomponent_get_reverbwetlevel);
+	mono_add_internal_call("ErmineEngine.AudioComponent::set_reverbWetLevel", (const void*)icall_audiocomponent_set_reverbwetlevel);
+	mono_add_internal_call("ErmineEngine.AudioComponent::get_reverbDryLevel", (const void*)icall_audiocomponent_get_reverbdrylevel);
+	mono_add_internal_call("ErmineEngine.AudioComponent::set_reverbDryLevel", (const void*)icall_audiocomponent_set_reverbdrylevel);
+	mono_add_internal_call("ErmineEngine.AudioComponent::get_reverbDecayTime", (const void*)icall_audiocomponent_get_reverbdecaytime);
+	mono_add_internal_call("ErmineEngine.AudioComponent::set_reverbDecayTime", (const void*)icall_audiocomponent_set_reverbdecaytime);
+#pragma endregion
+
+#pragma region Material ICalls
+	mono_add_internal_call("ErmineEngine.Material::Internal_GetFill", (const void*)icall_material_get_fill);
+	mono_add_internal_call("ErmineEngine.Material::Internal_SetFill", (const void*)icall_material_set_fill);
+	mono_add_internal_call("ErmineEngine.Material::Internal_GetFlickerEmissive", (const void*)icall_material_get_flicker_emissive);
+	mono_add_internal_call("ErmineEngine.Material::Internal_SetFlickerEmissive", (const void*)icall_material_set_flicker_emissive);
 #pragma endregion
 
 #pragma region Debug ICalls
@@ -3652,6 +4446,7 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 			Ermine::RequestPathForAgent((Ermine::EntityID)entityID, v);
 		});
 	mono_add_internal_call("ErmineEngine.NavAgent::StartJump", (const void*)icall_navagent_start_jump);
+	mono_add_internal_call("ErmineEngine.NavAgent::SetAutoRotate", (void*)icall_navagent_set_auto_rotate);
 #pragma endregion
 
 #pragma region Physics ICalls
@@ -3668,6 +4463,8 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	mono_add_internal_call("ErmineEngine.Physics::CheckMotionType", (const void*)icall_Physics_CheckMotionType);
 	mono_add_internal_call("ErmineEngine.Physics::ForceUpdate", (const void*)icall_Physics_ForceUpdate);
 	mono_add_internal_call("ErmineEngine.Physics::HasPhysicComp", (const void*)icall_Physics_HasPhysicComp);
+	mono_add_internal_call("ErmineEngine.Physics::Internal_SetLightValue",(const void*)icall_physics_set_light_value);
+	mono_add_internal_call("ErmineEngine.Physics::Internal_GetLightValue",(const void*)icall_physics_get_light_value);
 #pragma endregion
 
 #pragma region Cursor ICalls
@@ -3694,6 +4491,9 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	mono_add_internal_call("ErmineEngine.UIBookCounter::Internal_SetCollected", (const void*)Internal_BookCounter_SetCollected);
 	mono_add_internal_call("ErmineEngine.UIBookCounter::Internal_AddBook", (const void*)Internal_BookCounter_AddBook);
 	mono_add_internal_call("ErmineEngine.UIBookCounter::Internal_GetTotal", (const void*)Internal_BookCounter_GetTotal);
+
+	mono_add_internal_call("ErmineEngine.UIImage::get_position", (const void*)icall_uiimage_get_position);
+	mono_add_internal_call("ErmineEngine.UIImage::set_position", (const void*)icall_uiimage_set_position);
 
 #pragma endregion UI ICalls
 
@@ -3815,6 +4615,7 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 
 	mono_add_internal_call("ErmineEngine.VideoManager::Internal_SetRenderEnabled", (const void*)icall_videomanager_set_render_enabled);
 	mono_add_internal_call("ErmineEngine.VideoManager::Internal_GetRenderEnabled", (const void*)icall_videomanager_get_render_enabled);
+	mono_add_internal_call("ErmineEngine.VideoManager::Internal_SetAudioVolume", (const void*)icall_videomanager_set_audio_volume);
 #pragma endregion VideoManager ICalls
 
 #pragma region Animation ICalls
@@ -3832,5 +4633,46 @@ void Ermine::scripting::ScriptEngine::RegisterInternalCalls() const
 	mono_add_internal_call("ErmineEngine.Animator::Internal_GetCurrentStateName", (const void*)icall_animator_get_current_state);
 
 	mono_add_internal_call("ErmineEngine.Animator::Internal_SetState", (const void*)icall_animator_set_state);
+#pragma endregion
+
+#pragma region PostEffects ICalls
+	mono_add_internal_call("ErmineEngine.PostEffects::SetExposure", (const void*)icall_posteffects_set_exposure);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetContrast", (const void*)icall_posteffects_set_contrast);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetSaturation", (const void*)icall_posteffects_set_saturation);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetGamma", (const void*)icall_posteffects_set_gamma);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetBloomStrength", (const void*)icall_posteffects_set_bloomStrength);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetGrainIntensity", (const void*)icall_posteffects_set_grainintensity);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetGrainSize", (const void*)icall_posteffects_set_grainsize);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetChromaticAberrationIntensity", (const void*)icall_posteffects_set_chromaticaberration);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteEnabled", (const void*)icall_posteffects_get_vignette_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteEnabled", (const void*)icall_posteffects_set_vignette_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetFlimGrainEnabled", (const void*)icall_posteffects_get_flim_grain_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetFlimGrainEnabled", (const void*)icall_posteffects_set_flim_grain_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetChromaticAberrationEnabled", (const void*)icall_posteffects_get_chromatic_aberration_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetChromaticAberrationEnabled", (const void*)icall_posteffects_set_chromatic_aberration_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetBloomEnabled", (const void*)icall_posteffects_get_bloom_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetBloomEnabled", (const void*)icall_posteffects_set_bloom_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteIntensity", (const void*)icall_postprocess_get_vignette_intensity);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteIntensity", (const void*)icall_postprocess_set_vignette_intensity);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteRadius", (const void*)icall_postprocess_get_vignette_radius);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteRadius", (const void*)icall_postprocess_set_vignette_radius);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteCoverage", (const void*)icall_postprocess_get_vignette_coverage);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteCoverage", (const void*)icall_postprocess_set_vignette_coverage);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteFalloff", (const void*)icall_postprocess_get_vignette_falloff);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteFalloff", (const void*)icall_postprocess_set_vignette_falloff);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetVignetteMapStrength", (const void*)icall_postprocess_get_vignette_map_strength);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetVignetteMapStrength", (const void*)icall_postprocess_set_vignette_map_strength);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_GetVignetteMapRGBModifier", (const void*)icall_postprocess_get_vignette_map_rgb_modifier);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_SetVignetteMapRGBModifier", (const void*)icall_postprocess_set_vignette_map_rgb_modifier);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_GetVignetteMapPath", (const void*)icall_postprocess_get_vignette_map_path);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_SetVignetteMapPath", (const void*)icall_postprocess_set_vignette_map_path);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetRadialBlurEnabled", (const void*)icall_postprocess_get_radial_blur_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetRadialBlurEnabled", (const void*)icall_postprocess_set_radial_blur_enabled);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetRadialBlurStrength", (const void*)icall_postprocess_get_radial_blur_strength);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetRadialBlurStrength", (const void*)icall_postprocess_set_radial_blur_strength);
+	mono_add_internal_call("ErmineEngine.PostEffects::GetRadialBlurSamples", (const void*)icall_postprocess_get_radial_blur_samples);
+	mono_add_internal_call("ErmineEngine.PostEffects::SetRadialBlurSamples", (const void*)icall_postprocess_set_radial_blur_samples);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_GetRadialBlurCenter", (const void*)icall_postprocess_get_radial_blur_center);
+	mono_add_internal_call("ErmineEngine.PostEffects::Internal_SetRadialBlurCenter", (const void*)icall_postprocess_set_radial_blur_center);
 #pragma endregion
 }

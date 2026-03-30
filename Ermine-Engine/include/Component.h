@@ -93,6 +93,11 @@ namespace Ermine
 		template<typename T>
 		T& GetComponent(EntityID entity);
 
+		// PERFORMANCE: Try to get a component pointer (returns nullptr if doesn't exist)
+		// This avoids the double-lookup pattern of HasComponent + GetComponent
+		template<typename T>
+		T* TryGetComponent(EntityID entity);
+
 		// Notify all component arrays that an entity has been destroyed
 		void EntityDestroyed(EntityID entity) const;
 

@@ -127,7 +127,9 @@ namespace Ermine
             // Restore saved position once
             if (!snode.positionInitialized)
             {
+#if defined(EE_EDITOR)
                 ImNodes::SetNodeGridSpacePos(snode.id, snode.editorPosition);
+#endif
                 snode.positionInitialized = true;
             }
 

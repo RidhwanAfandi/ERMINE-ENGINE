@@ -56,6 +56,19 @@ namespace
 	ImTextureID gIconPlay = 0;
 	ImTextureID gIconStop = 0;
 	bool gIconsLoaded = false;
+	bool gShowGrid = false;
+
+	void EnterPlayModeWithRendererRebuild()
+	{
+		EditorGUI::s_state = EditorGUI::SimState::playing;
+		SceneManager::GetInstance().SaveTemp();
+
+		if (auto renderer = Ermine::ECS::GetInstance().GetSystem<Ermine::graphics::Renderer>()) {
+			renderer->MarkMaterialsDirty();
+			renderer->CompileMaterials();
+			renderer->ForceDrawDataRebuild();
+		}
+	}
 
 	struct ViewportRect
 	{
@@ -300,8 +313,7 @@ void Ermine::ViewPortGUI::TopBarSimulationControl(const ImVec2 iconSize)
 		ImGui::BeginDisabled(playing);
 		if (DrawIconOrTextButton(gIconPlay, "Play", iconSize))
 		{
-			EditorGUI::s_state = EditorGUI::SimState::playing;
-			SceneManager::GetInstance().SaveTemp();
+			EnterPlayModeWithRendererRebuild();
 			EE_CORE_INFO("Simulation: Play");
 		}
 		if (ImGui::IsItemHovered())
@@ -363,12 +375,18 @@ void Ermine::ViewPortGUI::TopBarSimulationControl(const ImVec2 iconSize)
 	}
 	ImGui::EndGroup();
 
-	float rightOffset = ImGui::GetContentRegionAvail().x - 150.0f;
+	float rightOffset = ImGui::GetContentRegionAvail().x - 275.0f;
 	ImGui::SameLine(ImGui::GetCursorPosX() + rightOffset);
 
 	ImGui::Checkbox("Physics Wireframe", &ECS::GetInstance().GetSystem<Physics>()->wireframe);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Requires Physics Component");
+
+	ImGui::SameLine();
+
+	ImGui::Checkbox("Grid", &gShowGrid);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Toggle reference grid");
 
 	ImGui::PopStyleVar();
 }
@@ -897,7 +915,7 @@ void Ermine::ViewPortGUI::Update()
 	int max_size;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
 
-	if (!EditorGUI::isPlaying)
+	if (!EditorGUI::isPlaying && gShowGrid)
 	{
 		constexpr float lineSpacing = 1.0f;
 		constexpr int majorEvery = 10;
@@ -1023,6 +1041,9 @@ void Ermine::ViewPortGUI::Update()
 
 	//DrawSelectionHighlightRect(selectedEntity, imgMin, imgMax);
 
+	// UI element drag gizmo (before 3D gizmo to intercept clicks first)
+	bool uiGizmoActive = UIGizmoOverlay(imgMin, imgSize, selectedEntity);
+
 	GizmoOverlay(imgMin, imgSize, vmSize, vmPos, selectedEntity, gOperation, gMode);
 
 	// Marquee mutli-selection state
@@ -1036,7 +1057,7 @@ void Ermine::ViewPortGUI::Update()
 
 	// Drag selection
 	if (viewportHovered && !EditorGUI::isPlaying && ImGui::IsMouseClicked(ImGuiMouseButton_Left)
-		&& !overViewCube && !ImGuizmo::IsOver() && !ImGuizmo::IsUsing() && !altDown)
+		&& !overViewCube && !ImGuizmo::IsOver() && !ImGuizmo::IsUsing() && !altDown && !uiGizmoActive)
 	{
 		s_dragSelecting = true;
 		s_dragStart = ImGui::GetMousePos();
@@ -1170,7 +1191,7 @@ void Ermine::ViewPortGUI::Update()
 	}
 
 	//ObjectPicking(offscreen_buffer, imgMin, imgSize, overViewCube, s_orbiting);
-	if (!(s_dragSelecting || (ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
+	if (!uiGizmoActive && !(s_dragSelecting || (ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
 		(fabsf(s_dragEnd.x - s_dragStart.x) > dragThreshold || fabsf(s_dragEnd.y - s_dragStart.y) > dragThreshold))))
 		ObjectPicking(offscreen_buffer, imgMin, imgSize, overViewCube, s_orbiting);
 
@@ -1202,8 +1223,7 @@ void Ermine::ViewPortGUI::Update()
 	}
 	else if (Input::IsKeyDownEditor(GLFW_KEY_LEFT_CONTROL) && Input::IsKeyPressedEditor(GLFW_KEY_P))
 	{
-		EditorGUI::s_state = EditorGUI::SimState::playing;
-		SceneManager::GetInstance().SaveTemp();
+		EnterPlayModeWithRendererRebuild();
 	}
 
 	if (Input::IsKeyDownEditor(GLFW_KEY_LEFT_CONTROL) && Input::IsKeyPressedEditor(GLFW_KEY_Z))
@@ -1229,4 +1249,365 @@ void Ermine::ViewPortGUI::Update()
 	}
 
 	ImGui::End();
+}
+
+bool Ermine::ViewPortGUI::UIGizmoOverlay(const ImVec2& imgMin, const ImVec2& imgSize, const Ermine::EntityID& selectedEntity)
+{
+	if (EditorGUI::isPlaying) return false;
+	if (!ECS::GetInstance().IsEntityValid(selectedEntity)) return false;
+
+	auto& ecs = ECS::GetInstance();
+
+	// Determine which UI component the selected entity has
+	Vec3* posPtr = nullptr;
+	float* widthPtr = nullptr;
+	float* heightPtr = nullptr;
+	float* fontSizePtr = nullptr;
+	bool hasUIComp = false;
+	bool isImageComp = false;
+	bool maintainAR = false;
+
+	if (ecs.HasComponent<UIButtonComponent>(selectedEntity))
+	{
+		auto& btn = ecs.GetComponent<UIButtonComponent>(selectedEntity);
+		posPtr = &btn.position;
+		widthPtr = &btn.size.x;
+		heightPtr = &btn.size.y;
+		hasUIComp = true;
+	}
+	else if (ecs.HasComponent<UISliderComponent>(selectedEntity))
+	{
+		auto& slider = ecs.GetComponent<UISliderComponent>(selectedEntity);
+		posPtr = &slider.position;
+		widthPtr = &slider.size.x;
+		heightPtr = &slider.size.y;
+		hasUIComp = true;
+	}
+	else if (ecs.HasComponent<UIImageComponent>(selectedEntity))
+	{
+		auto& img = ecs.GetComponent<UIImageComponent>(selectedEntity);
+		if (!img.fullscreen)
+		{
+			posPtr = &img.position;
+			widthPtr = &img.width;
+			heightPtr = &img.height;
+			isImageComp = true;
+			maintainAR = img.maintainAspectRatio;
+			hasUIComp = true;
+		}
+	}
+	else if (ecs.HasComponent<UITextComponent>(selectedEntity))
+	{
+		auto& txt = ecs.GetComponent<UITextComponent>(selectedEntity);
+		posPtr = &txt.position;
+		fontSizePtr = &txt.fontSize;
+		hasUIComp = true;
+	}
+
+	if (!hasUIComp || !posPtr) return false;
+
+	// Get current size for display
+	Vec2 compSize;
+	bool isTextComp = (fontSizePtr != nullptr);
+	if (isTextComp)
+		compSize = { 0.1f, 0.03f };
+	else
+		compSize = { *widthPtr, *heightPtr };
+
+	// Convert normalized UI position to viewport pixel coordinates
+	// UI: (0,0) = bottom-left, (1,1) = top-right
+	// ImGui: (imgMin.x, imgMin.y) = top-left
+	float aspectRatio = (imgSize.y > 0.0f) ? (imgSize.x / imgSize.y) : 1.0f;
+	float pixelX = imgMin.x + posPtr->x * imgSize.x;
+	float pixelY = imgMin.y + (1.0f - posPtr->y) * imgSize.y;
+
+	// Calculate bounding rect with aspect ratio correction
+	float halfW = (compSize.x * 0.5f / aspectRatio) * imgSize.x;
+	float halfH = (compSize.y * 0.5f) * imgSize.y;
+
+	ImVec2 rectMin = { pixelX - halfW, pixelY - halfH };
+	ImVec2 rectMax = { pixelX + halfW, pixelY + halfH };
+
+	// Draw overlay rect
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+	ImU32 outlineColor = IM_COL32(0, 180, 255, 200);
+	ImU32 fillColor = IM_COL32(0, 180, 255, 30);
+	drawList->AddRectFilled(rectMin, rectMax, fillColor);
+	drawList->AddRect(rectMin, rectMax, outlineColor, 0.0f, 0, 2.0f);
+
+	// Center drag handle
+	float handleRadius = 6.0f;
+	ImVec2 center = { pixelX, pixelY };
+	ImU32 handleColor = IM_COL32(255, 255, 0, 255);
+	drawList->AddCircleFilled(center, handleRadius, handleColor);
+	drawList->AddCircle(center, handleRadius, IM_COL32(0, 0, 0, 200), 0, 2.0f);
+
+	// Directional arrows
+	float arrowLen = 16.0f;
+	ImU32 arrowColorX = IM_COL32(255, 80, 80, 255);
+	ImU32 arrowColorY = IM_COL32(80, 255, 80, 255);
+
+	// Right arrow (X+)
+	drawList->AddLine(center, { center.x + arrowLen, center.y }, arrowColorX, 2.0f);
+	drawList->AddTriangleFilled(
+		{ center.x + arrowLen + 4, center.y },
+		{ center.x + arrowLen - 2, center.y - 4 },
+		{ center.x + arrowLen - 2, center.y + 4 },
+		arrowColorX);
+
+	// Up arrow (Y+ in UI space = screen up = pixel Y-)
+	drawList->AddLine(center, { center.x, center.y - arrowLen }, arrowColorY, 2.0f);
+	drawList->AddTriangleFilled(
+		{ center.x, center.y - arrowLen - 4 },
+		{ center.x - 4, center.y - arrowLen + 2 },
+		{ center.x + 4, center.y - arrowLen + 2 },
+		arrowColorY);
+
+	// --- Resize handles (8 points: 4 corners + 4 edge midpoints) ---
+	constexpr float handleHalfSize = 3.5f;
+	constexpr float handleHitHalfSize = 6.0f;
+	ImU32 resizeHandleColor = IM_COL32(255, 255, 255, 255);
+	ImU32 resizeHandleOutline = IM_COL32(0, 0, 0, 200);
+
+	// Handle positions: corners and edge midpoints
+	struct HandleInfo { UIGizmoHandle type; ImVec2 pos; ImGuiMouseCursor cursor; };
+	float midX = (rectMin.x + rectMax.x) * 0.5f;
+	float midY = (rectMin.y + rectMax.y) * 0.5f;
+	HandleInfo handles[] = {
+		{ UIGizmoHandle::TopLeft,     { rectMin.x, rectMin.y }, ImGuiMouseCursor_ResizeNWSE },
+		{ UIGizmoHandle::TopRight,    { rectMax.x, rectMin.y }, ImGuiMouseCursor_ResizeNESW },
+		{ UIGizmoHandle::BottomLeft,  { rectMin.x, rectMax.y }, ImGuiMouseCursor_ResizeNESW },
+		{ UIGizmoHandle::BottomRight, { rectMax.x, rectMax.y }, ImGuiMouseCursor_ResizeNWSE },
+		{ UIGizmoHandle::Top,         { midX,      rectMin.y }, ImGuiMouseCursor_ResizeNS },
+		{ UIGizmoHandle::Bottom,      { midX,      rectMax.y }, ImGuiMouseCursor_ResizeNS },
+		{ UIGizmoHandle::Left,        { rectMin.x, midY      }, ImGuiMouseCursor_ResizeEW },
+		{ UIGizmoHandle::Right,       { rectMax.x, midY      }, ImGuiMouseCursor_ResizeEW },
+	};
+
+	// Draw resize handles
+	for (auto& h : handles)
+	{
+		ImVec2 hMin = { h.pos.x - handleHalfSize, h.pos.y - handleHalfSize };
+		ImVec2 hMax = { h.pos.x + handleHalfSize, h.pos.y + handleHalfSize };
+		drawList->AddRectFilled(hMin, hMax, resizeHandleColor);
+		drawList->AddRect(hMin, hMax, resizeHandleOutline, 0.0f, 0, 1.0f);
+	}
+
+	// --- Hit testing and interaction ---
+	ImGuiIO& io = ImGui::GetIO();
+	ImVec2 mousePos = io.MousePos;
+
+	// Check resize handles first (higher priority)
+	UIGizmoHandle hoveredHandle = UIGizmoHandle::None;
+	ImGuiMouseCursor hoveredCursor = ImGuiMouseCursor_Arrow;
+	for (auto& h : handles)
+	{
+		if (mousePos.x >= h.pos.x - handleHitHalfSize && mousePos.x <= h.pos.x + handleHitHalfSize &&
+		    mousePos.y >= h.pos.y - handleHitHalfSize && mousePos.y <= h.pos.y + handleHitHalfSize)
+		{
+			hoveredHandle = h.type;
+			hoveredCursor = h.cursor;
+			break;
+		}
+	}
+
+	// Check center handle / rect interior for move
+	float grabRadius = 12.0f;
+	bool overCenterHandle = (mousePos.x >= center.x - grabRadius && mousePos.x <= center.x + grabRadius &&
+	                         mousePos.y >= center.y - grabRadius && mousePos.y <= center.y + grabRadius);
+	bool overRect = (mousePos.x >= rectMin.x && mousePos.x <= rectMax.x &&
+	                 mousePos.y >= rectMin.y && mousePos.y <= rectMax.y);
+
+	// Start drag on click
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && m_uiGizmoActiveHandle == UIGizmoHandle::None)
+	{
+		Vec2 startSize = isTextComp ? Vec2{ *fontSizePtr, *fontSizePtr } : compSize;
+
+		if (hoveredHandle != UIGizmoHandle::None)
+		{
+			m_uiGizmoActiveHandle = hoveredHandle;
+			m_uiGizmoDragStart = mousePos;
+			m_uiGizmoStartPos = *posPtr;
+			m_uiGizmoStartSize = startSize;
+		}
+		else if (overCenterHandle || overRect)
+		{
+			m_uiGizmoActiveHandle = UIGizmoHandle::Move;
+			m_uiGizmoDragStart = mousePos;
+			m_uiGizmoStartPos = *posPtr;
+			m_uiGizmoStartSize = startSize;
+		}
+	}
+
+	// Process active drag
+	if (m_uiGizmoActiveHandle != UIGizmoHandle::None)
+	{
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+		{
+			float deltaPixelX = mousePos.x - m_uiGizmoDragStart.x;
+			float deltaPixelY = mousePos.y - m_uiGizmoDragStart.y;
+
+			// Convert pixel delta to normalized coordinates
+			float deltaNormX = (imgSize.x > 0.0f) ? (deltaPixelX / imgSize.x) : 0.0f;
+			float deltaNormY = (imgSize.y > 0.0f) ? (deltaPixelY / imgSize.y) : 0.0f;
+
+			// Undo aspect ratio correction for width: size.x is stored in "aspect-corrected" space
+			// halfW = (size.x * 0.5 / aspectRatio) * imgSize.x, so pixel delta maps to size delta * aspectRatio
+			float deltaSizeX = deltaNormX * aspectRatio;
+			float deltaSizeY = deltaNormY;
+
+			if (m_uiGizmoActiveHandle == UIGizmoHandle::Move)
+			{
+				// Move: same logic as before
+				float newX = m_uiGizmoStartPos.x + deltaNormX;
+				float newY = m_uiGizmoStartPos.y + (-deltaNormY); // Y is flipped
+
+				if (io.KeyCtrl)
+				{
+					newX = std::round(newX * 100.0f) / 100.0f;
+					newY = std::round(newY * 100.0f) / 100.0f;
+				}
+
+				posPtr->x = std::clamp(newX, 0.0f, 1.0f);
+				posPtr->y = std::clamp(newY, 0.0f, 1.0f);
+			}
+			else if (isTextComp)
+			{
+				// UIText: resize scales fontSize proportionally
+				// "outward" dragging = bigger font, "inward" = smaller
+				auto handle = m_uiGizmoActiveHandle;
+
+				// Compute a signed scale: positive = bigger, negative = smaller
+				// Right/Bottom edges: positive pixel delta = outward = bigger
+				// Left/Top edges: negative pixel delta = outward = bigger
+				float signedScale = 0.0f;
+				switch (handle)
+				{
+				case UIGizmoHandle::Right:       signedScale =  deltaSizeX; break;
+				case UIGizmoHandle::Left:        signedScale = -deltaSizeX; break;
+				case UIGizmoHandle::Bottom:      signedScale =  deltaSizeY; break;
+				case UIGizmoHandle::Top:         signedScale = -deltaSizeY; break;
+				case UIGizmoHandle::BottomRight: signedScale = (std::abs(deltaSizeX) > std::abs(deltaSizeY)) ?  deltaSizeX :  deltaSizeY; break;
+				case UIGizmoHandle::BottomLeft:  signedScale = (std::abs(deltaSizeX) > std::abs(deltaSizeY)) ? -deltaSizeX :  deltaSizeY; break;
+				case UIGizmoHandle::TopRight:    signedScale = (std::abs(deltaSizeX) > std::abs(deltaSizeY)) ?  deltaSizeX : -deltaSizeY; break;
+				case UIGizmoHandle::TopLeft:     signedScale = (std::abs(deltaSizeX) > std::abs(deltaSizeY)) ? -deltaSizeX : -deltaSizeY; break;
+				default: break;
+				}
+
+				// Scale relative to a reference size to make the sensitivity reasonable
+				float sensitivity = 2.0f;
+				float startFontSize = m_uiGizmoStartSize.x;
+				float newFontSize = startFontSize * (1.0f + signedScale * sensitivity);
+				*fontSizePtr = std::max(newFontSize, 0.1f);
+			}
+			else
+			{
+				// Resize logic for components with width/height
+				float newW = m_uiGizmoStartSize.x;
+				float newH = m_uiGizmoStartSize.y;
+				float newPosX = m_uiGizmoStartPos.x;
+				float newPosY = m_uiGizmoStartPos.y;
+
+				auto handle = m_uiGizmoActiveHandle;
+
+				// Determine which dimensions to adjust
+				bool adjustW = (handle == UIGizmoHandle::Left || handle == UIGizmoHandle::Right ||
+				                handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::TopRight ||
+				                handle == UIGizmoHandle::BottomLeft || handle == UIGizmoHandle::BottomRight);
+				bool adjustH = (handle == UIGizmoHandle::Top || handle == UIGizmoHandle::Bottom ||
+				                handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::TopRight ||
+				                handle == UIGizmoHandle::BottomLeft || handle == UIGizmoHandle::BottomRight);
+
+				// For right/bottom edge: dragging outward increases size
+				// For left/top edge: dragging outward (negative delta) increases size
+				if (adjustW)
+				{
+					bool isLeft = (handle == UIGizmoHandle::Left || handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::BottomLeft);
+					if (isLeft)
+					{
+						newW = m_uiGizmoStartSize.x - deltaSizeX;
+						newPosX = m_uiGizmoStartPos.x + deltaNormX * 0.5f;
+					}
+					else
+					{
+						newW = m_uiGizmoStartSize.x + deltaSizeX;
+						newPosX = m_uiGizmoStartPos.x + deltaNormX * 0.5f;
+					}
+				}
+
+				if (adjustH)
+				{
+					bool isTop = (handle == UIGizmoHandle::Top || handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::TopRight);
+					// Screen Y is flipped: dragging up (negative deltaPixelY) on top edge = increase height
+					if (isTop)
+					{
+						newH = m_uiGizmoStartSize.y - deltaSizeY;
+						newPosY = m_uiGizmoStartPos.y + (-deltaNormY) * 0.5f;
+					}
+					else
+					{
+						newH = m_uiGizmoStartSize.y + deltaSizeY;
+						newPosY = m_uiGizmoStartPos.y + (-deltaNormY) * 0.5f;
+					}
+				}
+
+				// Aspect ratio maintenance for UIImageComponent corners
+				bool isCorner = (handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::TopRight ||
+				                 handle == UIGizmoHandle::BottomLeft || handle == UIGizmoHandle::BottomRight);
+				if (isImageComp && maintainAR && isCorner && m_uiGizmoStartSize.x > 0.001f && m_uiGizmoStartSize.y > 0.001f)
+				{
+					float ratioWH = m_uiGizmoStartSize.x / m_uiGizmoStartSize.y;
+					float scaleW = newW / m_uiGizmoStartSize.x;
+					float scaleH = newH / m_uiGizmoStartSize.y;
+					float uniformScale = (std::abs(scaleW - 1.0f) > std::abs(scaleH - 1.0f)) ? scaleW : scaleH;
+					newW = m_uiGizmoStartSize.x * uniformScale;
+					newH = m_uiGizmoStartSize.y * uniformScale;
+					// Recalculate position to keep opposite corner fixed
+					float deltaW = newW - m_uiGizmoStartSize.x;
+					float deltaH = newH - m_uiGizmoStartSize.y;
+					bool isLeft = (handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::BottomLeft);
+					bool isTop = (handle == UIGizmoHandle::TopLeft || handle == UIGizmoHandle::TopRight);
+					newPosX = m_uiGizmoStartPos.x + (isLeft ? -deltaW : deltaW) * 0.5f / aspectRatio;
+					newPosY = m_uiGizmoStartPos.y + (isTop ? -deltaH : deltaH) * 0.5f;
+				}
+
+				// Clamp minimum size
+				newW = std::max(newW, 0.01f);
+				newH = std::max(newH, 0.01f);
+
+				// Ctrl = snap to 0.01 grid
+				if (io.KeyCtrl)
+				{
+					newW = std::round(newW * 100.0f) / 100.0f;
+					newH = std::round(newH * 100.0f) / 100.0f;
+					newPosX = std::round(newPosX * 100.0f) / 100.0f;
+					newPosY = std::round(newPosY * 100.0f) / 100.0f;
+				}
+
+				*widthPtr = newW;
+				*heightPtr = newH;
+				posPtr->x = std::clamp(newPosX, 0.0f, 1.0f);
+				posPtr->y = std::clamp(newPosY, 0.0f, 1.0f);
+			}
+
+			return true;
+		}
+		else
+		{
+			m_uiGizmoActiveHandle = UIGizmoHandle::None;
+		}
+	}
+
+	// Set cursor based on what's hovered
+	if (hoveredHandle != UIGizmoHandle::None)
+	{
+		ImGui::SetMouseCursor(hoveredCursor);
+	}
+	else if (overCenterHandle || overRect)
+	{
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
+	}
+
+	return m_uiGizmoActiveHandle != UIGizmoHandle::None;
 }

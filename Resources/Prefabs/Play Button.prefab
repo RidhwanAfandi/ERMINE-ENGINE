@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1857c55b8e3e0e419cbbb8141fffcac5"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Play Button",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "UIButtonComponent": {
+          "text": "",
+          "position": [
+            0.1289999932050705,
+            0.4300000071525574,
+            0.0
+          ],
+          "size": [
+            0.25,
+            0.09000000357627869
+          ],
+          "normalColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "hoverColor": [
+            1.0,
+            1.0,
+            0.9882352948188782
+          ],
+          "pressedColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "textColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "textScale": 1.0,
+          "backgroundAlpha": 1.0,
+          "normalImage": "Resources/Textures/UI/MainMenu/Play_Unselected.png",
+          "hoverImage": "Resources/Textures/UI/MainMenu/Play_Selected.png",
+          "pressedImage": "Resources/Textures/UI/MainMenu/Play_Selected.png",
+          "action": 1,
+          "actionData": "../Resources/Scenes/cutscene_intro.scene",
+          "hoverSoundName": "",
+          "clickSoundName": "",
+          "soundVolume": 0.0
+        }
+      }
+    }
+  ]
+}

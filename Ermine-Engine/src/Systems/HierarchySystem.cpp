@@ -345,10 +345,9 @@ namespace Ermine
         for (auto entity : m_Entities)
         {
             // Check for active
-            if (ECS::GetInstance().HasComponent<ObjectMetaData>(entity))
+            if (const auto& meta = ECS::GetInstance().TryGetComponent<ObjectMetaData>(entity))
             {
-                const auto& meta = ECS::GetInstance().GetComponent<ObjectMetaData>(entity);
-                if (!meta.selfActive)
+                if (!meta->selfActive)
                     continue;
             }
 
@@ -360,10 +359,10 @@ namespace Ermine
                 !ECS::GetInstance().HasComponent<Transform>(entity))
                 continue;
 
-            if (!ECS::GetInstance().HasComponent<GlobalTransform>(entity))
-            {
-                ECS::GetInstance().AddComponent<GlobalTransform>(entity, GlobalTransform());
-            }
+            //if (!ECS::GetInstance().TryGetComponent<GlobalTransform>(entity))
+            //{
+            //    ECS::GetInstance().AddComponent<GlobalTransform>(entity, GlobalTransform());
+            //}
 
             auto& hierarchy = ECS::GetInstance().GetComponent<HierarchyComponent>(entity);
             auto& transform = ECS::GetInstance().GetComponent<Transform>(entity);
@@ -533,20 +532,20 @@ namespace Ermine
         if (!ecs.IsEntityValid(entity))
             return Vec3(0.0f, 0.0f, 0.0f);
 
-        // Use GlobalTransform
-        if (ecs.HasComponent<GlobalTransform>(entity)) {
-            const auto& globalTransform = ecs.GetComponent<GlobalTransform>(entity);
-            return globalTransform.GetWorldPosition();
+        // PERFORMANCE OPTIMIZATION: Use TryGetComponent to eliminate double component lookup
+        // Old approach: HasComponent + GetComponent performed 2 hash map lookups
+        // New approach: TryGetComponent performs only 1 hash map lookup
+        if (const auto* globalTransform = ecs.TryGetComponent<GlobalTransform>(entity)) {
+            return globalTransform->GetWorldPosition();
         }
-        else if (ecs.HasComponent<Transform>(entity)) {
-            // Fallback to local position if no GlobalTransform
-            const auto& transform = ecs.GetComponent<Transform>(entity);
-            return transform.position;
+
+        // Fallback to local position if no GlobalTransform
+        if (const auto* transform = ecs.TryGetComponent<Transform>(entity)) {
+            return transform->position;
         }
-        else {
-            // No transform components at all
-            return Vec3(0.0f, 0.0f, 0.0f);
-        }
+
+        // No transform components at all
+        return Vec3(0.0f, 0.0f, 0.0f);
     }
 
     /**
@@ -560,20 +559,20 @@ namespace Ermine
         if (!ecs.IsEntityValid(entity))
             return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
 
-        // FIXED: Use GlobalTransform instead of transform.transform_matrix
-        if (ecs.HasComponent<GlobalTransform>(entity)) {
-            const auto& globalTransform = ecs.GetComponent<GlobalTransform>(entity);
-            return globalTransform.GetWorldRotation();
+        // PERFORMANCE OPTIMIZATION: Use TryGetComponent to eliminate double component lookup
+        // Old approach: HasComponent + GetComponent performed 2 hash map lookups
+        // New approach: TryGetComponent performs only 1 hash map lookup
+        if (const auto* globalTransform = ecs.TryGetComponent<GlobalTransform>(entity)) {
+            return globalTransform->GetWorldRotation();
         }
-        else if (ecs.HasComponent<Transform>(entity)) {
-            // Fallback to local rotation if no GlobalTransform
-            const auto& transform = ecs.GetComponent<Transform>(entity);
-            return transform.rotation;
+
+        // Fallback to local rotation if no GlobalTransform
+        if (const auto* transform = ecs.TryGetComponent<Transform>(entity)) {
+            return transform->rotation;
         }
-        else {
-            // No transform components - return identity
-            return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
-        }
+
+        // No transform components - return identity
+        return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     /**

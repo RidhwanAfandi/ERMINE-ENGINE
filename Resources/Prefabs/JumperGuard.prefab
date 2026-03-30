@@ -1,0 +1,838 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d0bce85b6504074cba5cf0251a9d1c6e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.024996651336550714,
+            0.02500000037252903,
+            0.024996651336550714
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "JumperGuard",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Dynamic",
+          "mass": 0.0,
+          "shapeType": "Capsule",
+          "colliderpivot": [
+            0.0,
+            3.299999952316284,
+            0.0
+          ],
+          "posx": true,
+          "posy": false,
+          "posz": true,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": true,
+          "roty": true,
+          "rotz": true,
+          "collidersize": [
+            100.0,
+            170.0,
+            100.0
+          ]
+        },
+        "ModelComponent": {
+          "model": "JumperGuard.fbx",
+          "isSkinFile": false
+        },
+        "AnimationComponent": {
+          "model": "JumperGuard.fbx",
+          "graph": {
+            "playbackSpeed": 1.0,
+            "playing": true,
+            "currentTime": 0.0,
+            "states": [
+              {
+                "id": 1,
+                "name": "Idle",
+                "clipName": "Idle",
+                "isStartState": true,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": true,
+                "editorPos": [
+                  175.394775390625,
+                  46.7921142578125
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Walk",
+                "clipName": "Walk",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": true,
+                "editorPos": [
+                  175.1590576171875,
+                  422.5147705078125
+                ]
+              },
+              {
+                "id": 3,
+                "name": "Jump Start",
+                "clipName": "Jump Start",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  524.3948974609375,
+                  51.7921142578125
+                ]
+              },
+              {
+                "id": 4,
+                "name": "Jump Mid Air",
+                "clipName": "Jump Mid Air",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": true,
+                "editorPos": [
+                  895.1590576171875,
+                  49.5147705078125
+                ]
+              },
+              {
+                "id": 5,
+                "name": "Jump Land",
+                "clipName": "Jump Land",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  1304.1590576171876,
+                  47.5147705078125
+                ]
+              },
+              {
+                "id": 6,
+                "name": "Light Deactivate",
+                "clipName": "Stunned",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  531.9998779296875,
+                  426.0
+                ]
+              },
+              {
+                "id": 7,
+                "name": "Light Activate",
+                "clipName": "Recover",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  901.1590576171875,
+                  422.5147705078125
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "fromNodeId": 1,
+                "toNodeId": 2,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 1,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 2,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 2,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 6,
+                "toNodeId": 7,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 7,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": []
+              },
+              {
+                "fromNodeId": 1,
+                "toNodeId": 3,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsGrounded",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 2,
+                "toNodeId": 3,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsGrounded",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 3,
+                "toNodeId": 4,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": []
+              },
+              {
+                "fromNodeId": 4,
+                "toNodeId": 5,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsGrounded",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 5,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": []
+              },
+              {
+                "fromNodeId": 5,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              }
+            ],
+            "parameters": [
+              {
+                "name": "IsMoving",
+                "type": 0,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              },
+              {
+                "name": "IsHit",
+                "type": 0,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              },
+              {
+                "name": "IsGrounded",
+                "type": 0,
+                "boolValue": true,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              }
+            ]
+          }
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "StateMachine": {
+          "nodes": [
+            {
+              "id": 0,
+              "name": "Start",
+              "scriptClassName": "",
+              "isAttached": false,
+              "isStartNode": true,
+              "posX": 100.0,
+              "posY": 100.0
+            }
+          ],
+          "links": []
+        },
+        "NavMeshAgent": {
+          "speed": 3.0,
+          "acceleration": 8.0,
+          "stoppingDistance": 1.2498325109481812,
+          "autoRotate": true,
+          "debugDrawPath": true,
+          "radius": 1.2498325109481812,
+          "height": 4.25,
+          "centerYOffset": 2.125,
+          "autoFitFromCollider": true,
+          "destination": [
+            28.177888870239259,
+            0.30163222551345827,
+            95.06134033203125
+          ]
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "099534909b6a554795acd20b2d033fde"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_Wires_mesh11",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "43771ba5c9e8fa4fbb4acb6551195e86"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Body_mesh10",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "c607e2206bd12845a75a3794a1a9f98b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f187aff6af1bee4cbf1ff03510a7ed70"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Body_mesh9",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "bb8cf40ebae9ff48aab7c8b6d5cae947"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Needle_mesh8",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "fde4af7d82b11d4aa93fefbbb2cd1827"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_TubeRings4_mesh7",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "aeac51a0ab50fb4487fca8dd58b64c3f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_Rotation_mesh6",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a3ad19980aeaa045886701e07e1dab0e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_Hinge_mesh5",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "08946cc228095f41bbe5cb2db0fb23e6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_Rotation_Hinge_mesh4",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3d9ba2c8d08f5b42a2334f2cb4c2b6d4"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:LegGyro_mesh3",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "41e73a176699df4da3d27d17b6066f08"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_Tubes1_mesh2",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "be7f5d629e62db4883ef926639609c1c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_Enemy2_9_1:Leg_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9862d0deda623444842b6c1cb106d35f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_JumperGuard.fbx_RootNode_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "7b3d57a17af4804c992c15230cba3d3d"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d0bce85b6504074cba5cf0251a9d1c6e",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

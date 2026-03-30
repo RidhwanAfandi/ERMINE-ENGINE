@@ -50,12 +50,20 @@ void main() {
         quadPos.y *= stretch;
     }
 
-    // Billboard: face camera
-    vec3 worldPos = p.position.xyz
-                  + u_CameraRight * quadPos.x
-                  + u_CameraUp * quadPos.y;
-    if (u_RenderMode == 1) {
-        worldPos += vec3(0.0, 1.0, 0.0) * speed * u_SmokeUpBias;
+    // Billboard: face camera (or lay flat for shockwave)
+    vec3 worldPos;
+    if (u_RenderMode == 3) {
+        // Horizontal orientation: expand on XZ plane (ring lies flat on the ground)
+        worldPos = p.position.xyz
+                 + vec3(1.0, 0.0, 0.0) * quadPos.x
+                 + vec3(0.0, 0.0, 1.0) * quadPos.y;
+    } else {
+        worldPos = p.position.xyz
+                 + u_CameraRight * quadPos.x
+                 + u_CameraUp * quadPos.y;
+        if (u_RenderMode == 1) {
+            worldPos += vec3(0.0, 1.0, 0.0) * speed * u_SmokeUpBias;
+        }
     }
 
     gl_Position = u_Projection * u_View * vec4(worldPos, 1.0);

@@ -1,0 +1,122 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                0.800000011920929,
+                0.800000011920929,
+                0.800000011920929,
+                1.0
+            ]
+        },
+        "materialMetallic": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialRoughness": {
+            "type": "float",
+            "value": 0.7
+        },
+        "materialAo": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialEmissive": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "materialEmissiveIntensity": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialNormalStrength": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialShadingModel": {
+            "type": "int",
+            "value": 0
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                1.0
+            ]
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasEmissiveMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialAlbedoMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Debug-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Miscellaneous_BC.png"
+        },
+        "materialNormalMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Debug-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Miscellaneous_NRM.png"
+        },
+        "materialRoughnessMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Debug-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Miscellaneous_Roughness.png"
+        },
+        "materialMetallicMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Debug-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Miscellaneous_Metallic.png"
+        },
+        "materialAoMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Debug-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Miscellaneous_AO.png"
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

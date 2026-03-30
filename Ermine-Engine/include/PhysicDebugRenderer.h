@@ -17,7 +17,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 /* End Header **************************************************************************/
 #pragma once
 #include "PreCompile.h"
-#define JPH_DEBUG_RENDERER
 #include <Jolt/Jolt.h>
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <Jolt/Physics/Collision/Shape/ConvexShape.h>

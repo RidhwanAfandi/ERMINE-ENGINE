@@ -1,9 +1,25 @@
-﻿using ErmineEngine;
+using ErmineEngine;
 using System;
 
 public class Patrol : MonoBehaviour
 {
-    public float radius = 5f;
+    // Global VO lock - prevent multiple guards playing VO simultaneously (combat/death VOs)
+    private static float globalVOLockTime = 0f;
+    private static float globalVOLockDuration = 2.0f;
+    private static ulong lastVOGuardID = 0;
+    
+    // ScanningArea VO lock - separate lock for patrol VO (longer, less urgent)
+    private static float scanVOLockTime = 0f;
+    private static float scanVOLockDuration = 4.0f;
+    private static ulong lastScanVOGuardID = 0;
+    
+    // ScanningArea VO - plays when arriving at patrol points
+    private float lastScanVOTime = 0f;
+    private float scanVOCooldown = 10.0f; // Min seconds between scan lines per guard
+    private float scanTimeTracker = 0f; // Track time for ScanningArea VO
+    private float scanVOMaxDistance = 30.0f; // Only play if player within this distance
+    
+    public float radius = 30f;
     public int pointCount = 16;
     public float reachDist = 0.5f;
 
@@ -11,7 +27,7 @@ public class Patrol : MonoBehaviour
     public float stuckTime = 0.75f;
     public float minProgressEpsilon = 0.02f;
 
-    public float recenterDelay = 1.0f;
+    //public float recenterDelay = 1.0f;
 
     public string playerName = "Player";
 
@@ -25,11 +41,10 @@ public class Patrol : MonoBehaviour
 
     private ulong entityID;
 
-    private bool jumping = false;
     private ulong jumpLinkEntityID = 0;
-
-    private bool pendingRecenter = false;
-    private float recenterTimer = 0f;
+    private bool insideJumpArea = false;
+    public float jumpCooldown = 3.0f;
+    private float jumpCooldownTimer = 0.0f;
 
     // stun guard
     public float stunDuration = 5.0f;
@@ -37,10 +52,22 @@ public class Patrol : MonoBehaviour
     private float stunTimer = 0.0f;
     public static bool RightClickStunArmed = false;
     private float armTimer = 0.0f;
+    private bool hasPlayedPowerUpSFX = false; // Track EnemyPowerUp SFX
 
     public float viewDistance = 15.0f;
-    public float rayHeight = 0.8f;
+    public float rayHeight = 5.5f;
     public float rayForwardOffset = 2.0f;
+    public float closeDetectDistance = 2.0f;
+
+    private Vector3 patrolCenter;
+
+    private Animator anim;
+    public float stunRecoverDelay = 8.0f;
+    private float recoverTimer = 0.0f;
+
+    // STUN FEEDBACK
+    private GameObject stunVFX;
+    private string stunPrefabPath = "../Resources/Prefabs/EnemyStunSpark.prefab";
 
     private void CachePlayerIfNeeded()
     {
@@ -53,11 +80,19 @@ public class Patrol : MonoBehaviour
         CachePlayerIfNeeded();
         if (playerGO == null) return false;
 
-        Vector3 origin = transform.position
+        Vector3 enemyPos = transform.position;
+        Vector3 playerPoint = playerGO.transform.position;
+
+        // fallback for very close targets on tiny platforms
+        Vector3 flatToPlayer = playerPoint - enemyPos;
+        flatToPlayer.y = 0f;
+        if (flatToPlayer.Magnitude <= closeDetectDistance)
+            return true;
+
+        Vector3 origin = enemyPos
                        + new Vector3(0f, rayHeight, 0f)
                        + transform.forward * rayForwardOffset;
 
-        Vector3 playerPoint = playerGO.transform.position + new Vector3(0f, rayHeight, 0f);
         Vector3 toPlayer = playerPoint - origin;
 
         float dist = toPlayer.Magnitude;
@@ -69,6 +104,15 @@ public class Patrol : MonoBehaviour
         RaycastHit hit;
         bool didHit = Physics.Raycast(origin, dirToPlayer, out hit, dist);
         if (!didHit) return false;
+
+        var hitGO = hit.transform.gameObject;
+
+        // Ignore self-hit
+        ulong hitID = (ulong)hitGO.GetInstanceID();
+        if (hitID == entityID) return false;
+
+        string n = hitGO.name;
+        if (n.StartsWith("SpawnPoint_")) return false;
 
         return hit.transform != null &&
                hit.transform.gameObject != null &&
@@ -84,6 +128,19 @@ public class Patrol : MonoBehaviour
 
         stuckTimer = 0f;
         lastDist = float.MaxValue;
+
+        // Play ScanningArea VO occasionally when arriving at a patrol point
+        // Only play if player is within range (so player can actually hear it)
+        float distToPlayer = (playerGO.transform.position - transform.position).Magnitude;
+        bool isScanVOLocked = (scanTimeTracker - scanVOLockTime < scanVOLockDuration) && (lastScanVOGuardID != entityID);
+
+        if (!isScanVOLocked && scanTimeTracker - lastScanVOTime >= scanVOCooldown && distToPlayer <= scanVOMaxDistance)
+        {
+            GlobalAudio.PlayVoice("ScanningArea");
+            lastScanVOTime = scanTimeTracker;
+            scanVOLockTime = scanTimeTracker;
+            lastScanVOGuardID = entityID;
+        }
 
         NavAgent.SetDestination(entityID, patrolPoints[currentIndex]);
     }
@@ -110,6 +167,30 @@ public class Patrol : MonoBehaviour
         MoveToNextPoint();
     }
 
+    private void UpdateStunVFX(bool recovering, float recoveryProgress)
+    {
+        if (stunVFX == null) return;
+
+        if (recovering)
+        {
+            float ratio = recoveryProgress;
+            stunVFX.SetActive(ratio > 0.05f);
+
+            if (stunVFX.activeSelf)
+            {
+                // Linear scale down from 1.0 to 0.0
+                stunVFX.transform.scale = new Vector3(ratio, ratio, ratio);
+                stunVFX.transform.position = transform.position + new Vector3(0, 1.0f, 0);
+            }
+        }
+        else
+        {
+             stunVFX.SetActive(true);
+             stunVFX.transform.scale = new Vector3(1.0f, 1.0f, 1.0f);
+             stunVFX.transform.position = transform.position + new Vector3(0, 1.0f, 0);
+        }
+    }
+
     private void TryStun()
     {
         if (isStunned)
@@ -117,22 +198,54 @@ public class Patrol : MonoBehaviour
 
         isStunned = true;
         stunTimer = stunDuration;
+        hasPlayedPowerUpSFX = false; // Reset for next stun
+        lastScanVOTime = 0f; // Reset ScanningArea VO
+
+        if (stunVFX != null)
+        {
+            Debug.Log("PatrolState: Activating Stun VFX");
+            stunVFX.SetActive(true);
+            stunVFX.transform.scale = new Vector3(1.0f, 1.0f, 1.0f);
+            stunVFX.transform.position = transform.position + new Vector3(0, 1.0f, 0);
+        }
+
+        if (anim != null)
+        {
+            anim.SetBool("IsMoving", false);
+            anim.SetBool("IsHit", true);
+        }
 
         // stop immediately while stunned
         NavAgent.SetDestination(entityID, transform.position);
+        
+        // Play death VO and shutdown SFX
+        GlobalAudio.PlayVoice("DieHuman");
+        GlobalAudio.PlaySFX("EnemyPowerDown");
     }
 
     void Start()
     {
         entityID = (ulong)gameObject.GetInstanceID();
+        anim = GetComponent<Animator>();
         CachePlayerIfNeeded();
 
+        // Instantiate Stun VFX
+        stunVFX = Prefab.Instantiate(stunPrefabPath);
+        if (stunVFX != null)
+        {
+            stunVFX.SetActive(false);
+        }
+
         // Build patrol points around the spawn position
-        BuildPatrolPoints(transform.position);
+        patrolCenter = transform.position;
+        BuildPatrolPoints(patrolCenter);
     }
 
     void Update()
     {
+        // Update ScanningArea time tracker
+        scanTimeTracker += Time.deltaTime;
+    
         if (Input.GetMouseButtonDown(1))
             armTimer = 0.3f;
 
@@ -141,13 +254,28 @@ public class Patrol : MonoBehaviour
 
         RightClickStunArmed = armTimer > 0f;
 
+        if (jumpCooldownTimer > 0.0f)
+            jumpCooldownTimer -= Time.deltaTime;
+
         if (isStunned)
         {
+            if (anim != null)
+            {
+                anim.SetBool("IsMoving", false);
+                anim.SetBool("IsHit", true);
+            }
+
+            // Keep VFX attached
+            UpdateStunVFX(false, 1.0f);
+
             //Debug.Log("stunned");
             stunTimer -= Time.deltaTime;
             if (stunTimer <= 0.0f)
             {
                 isStunned = false;
+                recoverTimer = stunRecoverDelay;
+
+                if (anim != null) anim.SetBool("IsHit", false);
 
                 // Resume the current target after stun ends
                 if (patrolPoints != null && patrolPoints.Length > 0 && currentIndex >= 0)
@@ -155,6 +283,43 @@ public class Patrol : MonoBehaviour
             }
             return; // do NOTHING while stunned
         }
+        if (recoverTimer > 0.0f)
+        {
+            recoverTimer -= Time.deltaTime;
+
+            // Trigger EnemyPowerUp at the halfway point of recovery
+            if (!hasPlayedPowerUpSFX && recoverTimer <= stunRecoverDelay * 0.5f)
+            {
+                GlobalAudio.PlaySFX("EnemyPowerUp");
+                hasPlayedPowerUpSFX = true;
+            }
+
+            // End 6.0s earlier to avoid lingering effect
+            float visibleTime = Math.Max(0.0f, stunRecoverDelay - 6.0f);
+            float currentVisibleTime = Math.Max(0.0f, recoverTimer - 6.0f);
+
+            float ratio = 0.0f;
+            if (visibleTime > 0.001f)
+                ratio = currentVisibleTime / visibleTime;
+
+            // Aggressive ramp down (squared)
+            ratio = ratio * ratio;
+
+            UpdateStunVFX(true, ratio);
+
+            if (anim != null)
+                anim.SetBool("IsMoving", false);
+
+            if (ratio <= 0.01f && stunVFX != null)
+                 stunVFX.SetActive(false);
+
+            NavAgent.SetDestination(entityID, transform.position);
+
+            return;
+        }
+
+        if (anim != null)
+            anim.SetBool("IsMoving", true);
 
         if (HasLineOfSightToPlayer())
         {
@@ -162,36 +327,16 @@ public class Patrol : MonoBehaviour
             return;
         }
 
-        if (jumping)
+        if (insideJumpArea && jumpCooldownTimer <= 0.0f)
         {
-            //Debug.Log("CALL StartJump: me=" + entityID + " link=" + jumpLinkEntityID);
             NavAgent.StartJump(entityID, jumpLinkEntityID);
-
-            jumping = false;
-            jumpLinkEntityID = 0;
-
-            // Schedule a patrol recenter after the jump likely finishes
-            pendingRecenter = true;
-            recenterTimer = recenterDelay;
-
+            jumpCooldownTimer = jumpCooldown;
             return;
-        }
-
-        // after landing, rebuild patrol points around current position
-        if (pendingRecenter)
-        {
-            recenterTimer -= Time.deltaTime;
-            if (recenterTimer <= 0f)
-            {
-                pendingRecenter = false;
-                BuildPatrolPoints(transform.position);
-                return;
-            }
         }
 
         if (patrolPoints == null || patrolPoints.Length == 0 || currentIndex < 0)
         {
-            BuildPatrolPoints(transform.position);
+            BuildPatrolPoints(patrolCenter);
             return;
         }
 
@@ -224,10 +369,9 @@ public class Patrol : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (jumping) return;
         if (col.gameObject.name == "JumpArea")
         {
-            jumping = true;
+            insideJumpArea = true;
             jumpLinkEntityID = (ulong)col.gameObject.GetInstanceID();
         }
 
@@ -243,10 +387,9 @@ public class Patrol : MonoBehaviour
 
     void OnCollisionStay(Collision col)
     {
-        if (jumping) return;
         if (col.gameObject.name == "JumpArea")
         {
-            jumping = true;
+            insideJumpArea = true;
             jumpLinkEntityID = (ulong)col.gameObject.GetInstanceID();
         }
 
@@ -262,12 +405,13 @@ public class Patrol : MonoBehaviour
 
     void OnCollisionExit(Collision col)
     {
-        if (jumping) return;
         if (col.gameObject.name == "JumpArea")
         {
-            jumping = true;
-            jumpLinkEntityID = (ulong)col.gameObject.GetInstanceID();
+            if (jumpLinkEntityID == (ulong)col.gameObject.GetInstanceID())
+            {
+                insideJumpArea = false;
+                jumpLinkEntityID = 0;
+            }
         }
     }
 }
-

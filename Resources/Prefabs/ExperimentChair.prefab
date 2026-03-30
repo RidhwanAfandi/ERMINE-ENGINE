@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f25ac19823be7644b26a4c9af7e8d904"
+        },
+        "Transform": {
+          "position": [
+            -12.542540550231934,
+            -0.01410907506942749,
+            0.8595410585403442
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.030000001192092897,
+            0.029999999329447748,
+            0.03000001050531864
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ExperimentChair",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_experiment chair_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "10a58e170e054c4ead0351e59febca02"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_experiment chair_low.fbx_pCube6_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "105008ee3dda5e4f9174665b32c9ee2f"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f25ac19823be7644b26a4c9af7e8d904",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

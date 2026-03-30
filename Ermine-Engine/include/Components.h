@@ -1095,6 +1095,7 @@ namespace Ermine
 
 		//Physic mesh collider
 		std::vector<glm::vec3> cpuVertices;
+		std::vector<uint32_t> cpuIndices;
 
 		Mesh() = default;
 
@@ -1189,6 +1190,7 @@ namespace Ermine
 		float cacheEmissiveIntensity = 1.0f;
 		std::string customFragmentShader = "";   // Custom fragment shader path (empty = use standard PBR)
 		bool cacheCastsShadows = true;           // Whether this material casts shadows
+		bool flickerEmissive = false;            // Upload via DrawInfo flags, not material SSBO
 
 		//// Cached texture paths (only what we set by path)
 		//bool hasAlbedoMapPath = false;   std::string albedoMapPath;
@@ -1200,8 +1202,9 @@ namespace Ermine
 		 * @brief Constructor taking a modular material.
 		 * @param material A shared pointer to a `graphics::Material` object that will be used to initialize the Material.
 		 */
-		Material(std::shared_ptr<graphics::Material> material, Guid guid = {}) : m_material(std::move(material)), materialGuid(guid)
+		Material(std::shared_ptr<graphics::Material> material, Guid guid = {})
 		{
+			SetMaterial(material, guid);
 		}
 
 		/**
@@ -1230,6 +1233,7 @@ namespace Ermine
 		 */
 		Material(const Material& other) : m_material(other.m_material), materialGuid(other.materialGuid)
 		{
+			CopyCachedAuthoringState(other);
 			// Shared ownership - multiple entities can share the same material
 		}
 
@@ -1244,6 +1248,7 @@ namespace Ermine
 			{
 				m_material = other.m_material; // Shared ownership
 				materialGuid = other.materialGuid;
+				CopyCachedAuthoringState(other);
 			}
 			return *this;
 		}
@@ -1254,6 +1259,7 @@ namespace Ermine
 		 */
 		Material(Material&& other) noexcept : m_material(std::move(other.m_material)), materialGuid(other.materialGuid)
 		{
+			MoveCachedAuthoringState(std::move(other));
 		}
 
 		/**
@@ -1267,6 +1273,7 @@ namespace Ermine
 			{
 				m_material = std::move(other.m_material);
 				materialGuid = other.materialGuid;
+				MoveCachedAuthoringState(std::move(other));
 			}
 			return *this;
 		}
@@ -1296,7 +1303,62 @@ namespace Ermine
 		void SetMaterial(const std::shared_ptr<graphics::Material>& material, Guid guid) {
 			m_material = material;
 			materialGuid = guid;
+			if (m_material) {
+				SyncFromMaterial();
+			}
+			SyncCustomFragmentShaderCache();
 		}
+
+	private:
+		void CopyCachedAuthoringState(const Material& other)
+		{
+			materialTemplate = other.materialTemplate;
+			hasAlbedo = other.hasAlbedo;
+			cacheAlbedo = other.cacheAlbedo;
+			hasRough = other.hasRough;
+			cacheRoughness = other.cacheRoughness;
+			hasMetal = other.hasMetal;
+			cacheMetallic = other.cacheMetallic;
+			hasEmiss = other.hasEmiss;
+			cacheEmissive = other.cacheEmissive;
+			cacheEmissiveIntensity = other.cacheEmissiveIntensity;
+			customFragmentShader = other.customFragmentShader;
+			cacheCastsShadows = other.cacheCastsShadows;
+			flickerEmissive = other.flickerEmissive;
+		}
+
+		void MoveCachedAuthoringState(Material&& other) noexcept
+		{
+			materialTemplate = std::move(other.materialTemplate);
+			hasAlbedo = other.hasAlbedo;
+			cacheAlbedo = other.cacheAlbedo;
+			hasRough = other.hasRough;
+			cacheRoughness = other.cacheRoughness;
+			hasMetal = other.hasMetal;
+			cacheMetallic = other.cacheMetallic;
+			hasEmiss = other.hasEmiss;
+			cacheEmissive = other.cacheEmissive;
+			cacheEmissiveIntensity = other.cacheEmissiveIntensity;
+			customFragmentShader = std::move(other.customFragmentShader);
+			cacheCastsShadows = other.cacheCastsShadows;
+			flickerEmissive = other.flickerEmissive;
+		}
+
+		void SyncCustomFragmentShaderCache()
+		{
+			if (!materialGuid.IsValid()) {
+				return;
+			}
+
+			if (const std::string* frag = AssetManager::GetInstance().GetMaterialCustomFragmentShader(materialGuid)) {
+				customFragmentShader = *frag;
+			}
+			else {
+				customFragmentShader.clear();
+			}
+		}
+
+	public:
 
 		/**
 		* @brief Sets the albedo color for the material.
@@ -1442,10 +1504,14 @@ namespace Ermine
 			out.AddMember("guid",
 				rapidjson::Value(guidStr.c_str(), (rapidjson::SizeType)guidStr.size(), alloc),
 				alloc);
+			out.AddMember("flickerEmissive", flickerEmissive, alloc);
 		}
 
 		void Deserialize(const rapidjson::Value& in) {
 			if (!in.IsObject()) return;
+			flickerEmissive = (in.HasMember("flickerEmissive") && in["flickerEmissive"].IsBool())
+				? in["flickerEmissive"].GetBool()
+				: false;
 			if (in.HasMember("guid") && in["guid"].IsString()) {
 				std::string guidStr = in["guid"].GetString();
 				if (!guidStr.empty()) {
@@ -1708,7 +1774,8 @@ namespace Ermine
 
 			xproperty::obj_member<"hasEmiss", &Material::hasEmiss>,
 			xproperty::obj_member<"emissive", &Material::cacheEmissive>,
-			xproperty::obj_member<"emissiveIntensity", &Material::cacheEmissiveIntensity>
+			xproperty::obj_member<"emissiveIntensity", &Material::cacheEmissiveIntensity>,
+			xproperty::obj_member<"flickerEmissive", &Material::flickerEmissive>
 		)
 	};
 
@@ -1753,6 +1820,11 @@ namespace Ermine
 		float gamma = 2.2f;
 		float vignetteIntensity = 0.3f;
 		float vignetteRadius = 0.8f;
+		float vignetteCoverage = 0.0f;
+		float vignetteFalloff = 0.2f;
+		float vignetteMapStrength = 1.0f;
+		Vec3 vignetteMapRGBModifier = Vec3{ 0.0f, 0.0f, 0.0f };
+		std::string vignetteMapPath{};
 		float bloomStrength = 0.04f;
 
 		// Film grain and chromatic aberration
@@ -1761,6 +1833,11 @@ namespace Ermine
 		float grainScale = 1.5f;
 		bool chromaticAberrationEnabled = false;
 		float chromaticAmount = 0.003f;
+		bool radialBlurEnabled = false;
+		float radialBlurStrength = 0.0f;
+		int radialBlurSamples = 12;
+		float radialBlurCenterX = 0.5f;
+		float radialBlurCenterY = 0.5f;
 
 		// FXAA parameters
 		float fxaaSpanMax = 8.0f;
@@ -1836,6 +1913,11 @@ namespace Ermine
 			xproperty::obj_member<"gamma", &GlobalGraphics::gamma>,
 			xproperty::obj_member<"vignetteIntensity", &GlobalGraphics::vignetteIntensity>,
 			xproperty::obj_member<"vignetteRadius", &GlobalGraphics::vignetteRadius>,
+			xproperty::obj_member<"vignetteCoverage", &GlobalGraphics::vignetteCoverage>,
+			xproperty::obj_member<"vignetteFalloff", &GlobalGraphics::vignetteFalloff>,
+			xproperty::obj_member<"vignetteMapStrength", &GlobalGraphics::vignetteMapStrength>,
+			xproperty::obj_member<"vignetteMapRGBModifier", &GlobalGraphics::vignetteMapRGBModifier>,
+			xproperty::obj_member<"vignetteMapPath", &GlobalGraphics::vignetteMapPath>,
 			xproperty::obj_member<"bloomStrength", &GlobalGraphics::bloomStrength>,
 
 			// Film grain and chromatic aberration
@@ -1844,6 +1926,11 @@ namespace Ermine
 			xproperty::obj_member<"grainScale", &GlobalGraphics::grainScale>,
 			xproperty::obj_member<"chromaticAberrationEnabled", &GlobalGraphics::chromaticAberrationEnabled>,
 			xproperty::obj_member<"chromaticAmount", &GlobalGraphics::chromaticAmount>,
+			xproperty::obj_member<"radialBlurEnabled", &GlobalGraphics::radialBlurEnabled>,
+			xproperty::obj_member<"radialBlurStrength", &GlobalGraphics::radialBlurStrength>,
+			xproperty::obj_member<"radialBlurSamples", &GlobalGraphics::radialBlurSamples>,
+			xproperty::obj_member<"radialBlurCenterX", &GlobalGraphics::radialBlurCenterX>,
+			xproperty::obj_member<"radialBlurCenterY", &GlobalGraphics::radialBlurCenterY>,
 
 			// FXAA
 			xproperty::obj_member<"fxaaSpanMax", &GlobalGraphics::fxaaSpanMax>,
@@ -1966,15 +2053,17 @@ namespace Ermine
 	*************************************************************************/
 	struct GlobalAudioComponent
 	{
-		std::vector<AudioSource> music; // Music category
-		std::vector<AudioSource> sfx;   // SFX category
+		std::vector<AudioSource> music;   // Music category
+		std::vector<AudioSource> sfx;     // SFX category
 		std::vector<AudioSource> ambience;
+		std::vector<AudioSource> voice;   // Voiceover category
 
 		// Global volume controls
 		float masterVolume{ 1.0f };
 		float musicVolume{ 1.0f };
 		float sfxVolume{ 1.0f };
-		float ambienceVolume{ 1.0f };  // *** NEW ***
+		float ambienceVolume{ 1.0f };
+		float voiceVolume{ 1.0f };
 
 		bool autoPlay{true};
 
@@ -1985,6 +2074,13 @@ namespace Ermine
 		// *** NEW: Ambience tracking ***
 		int currentAmbienceIndex{ -1 };
 		int currentAmbienceChannelId{ -1 };
+
+		// Voice tracking
+		int currentVoiceIndex{ -1 };
+		int currentVoiceChannelId{ -1 };
+
+		// SFX channel tracking (name -> channel ID) for stoppable SFX
+		std::unordered_map<std::string, int> sfxChannels;
 
 		GlobalAudioComponent() = default;
 
@@ -2005,9 +2101,22 @@ namespace Ermine
 		const AudioSource* GetAmbienceSource(int index) const;
 		int FindAmbienceIndex(const std::string& name) const;
 
+		// Voice management
+		void PlayVoice(int index);
+		void PlayVoice(const std::string& name);
+		void StopVoice();
+		void SetVoiceVolume(float volume);
+		int GetVoiceIndex(const std::string& name) const;
+		void AddVoiceSource(const std::string& name, const std::string& path);
+		void UpdateVoiceSource(int index, const std::string& name, const std::string& path);
+		void RemoveVoiceSource(int index);
+		const AudioSource* GetVoiceSource(int index) const;
+		int FindVoiceIndex(const std::string& name) const;
+
 		// SFX management
 		void PlaySFX(int index);
 		void PlaySFX(const std::string& name);
+		void StopSFX(const std::string& name);
 		void SetSFXVolume(float volume);
 
 		// Utility functions
@@ -2023,7 +2132,7 @@ namespace Ermine
 				// Stop current music if we're updating the currently playing track
 				if (currentMusicIndex == index && currentMusicChannelId != -1)
 				{
-					CAudioEngine::StopChannel(currentMusicChannelId);
+					CAudioEngine::StopChannel(currentMusicChannelId, true, 0.3f); // Fade out
 					currentMusicChannelId = -1;
 				}
 
@@ -2076,7 +2185,7 @@ namespace Ermine
 				// Stop current music if we're removing the currently playing track
 				if (currentMusicIndex == index && currentMusicChannelId != -1)
 				{
-					CAudioEngine::StopChannel(currentMusicChannelId);
+					CAudioEngine::StopChannel(currentMusicChannelId, true, 0.3f); // Fade out
 					currentMusicChannelId = -1;
 					currentMusicIndex = -1;
 				}
@@ -2155,6 +2264,7 @@ namespace Ermine
 			out.AddMember("musicVolume", musicVolume, alloc);
 			out.AddMember("sfxVolume", sfxVolume, alloc);
 			out.AddMember("ambienceVolume", ambienceVolume, alloc);
+			out.AddMember("voiceVolume", voiceVolume, alloc);
 			out.AddMember("autoPlay", autoPlay, alloc);
 
 			auto writeList = [&](const std::vector<AudioSource>& list, const char* key) {
@@ -2171,12 +2281,14 @@ namespace Ermine
 			writeList(music, "music");
 			writeList(sfx, "sfx");
 			writeList(ambience, "ambience");
+			writeList(voice, "voice");
 		}
 		void Deserialize(const rapidjson::Value& in) {
 			if (in.HasMember("masterVolume")) masterVolume = in["masterVolume"].GetFloat();
 			if (in.HasMember("musicVolume")) musicVolume = in["musicVolume"].GetFloat();
 			if (in.HasMember("sfxVolume"))   sfxVolume = in["sfxVolume"].GetFloat();
 			if (in.HasMember("ambienceVolume")) ambienceVolume = in["ambienceVolume"].GetFloat();
+			if (in.HasMember("voiceVolume")) voiceVolume = in["voiceVolume"].GetFloat();
 			if (in.HasMember("autoPlay"))    autoPlay = in["autoPlay"].GetBool();
 
 			auto readList = [&](const char* key, std::vector<AudioSource>& list) {
@@ -2194,10 +2306,13 @@ namespace Ermine
 			readList("music", music);
 			readList("sfx", sfx);
 			readList("ambience", ambience);
+			readList("voice", voice);
 
 			currentMusicIndex = -1; currentMusicChannelId = -1;
 			currentAmbienceIndex = -1;      // *** NEW ***
 			currentAmbienceChannelId = -1;  // *** NEW ***
+			currentVoiceIndex = -1;
+			currentVoiceChannelId = -1;
 		}
 
 		XPROPERTY_DEF(
@@ -2206,6 +2321,7 @@ namespace Ermine
 			xproperty::obj_member<"musicVolume", &GlobalAudioComponent::musicVolume>,
 			xproperty::obj_member<"sfxVolume", &GlobalAudioComponent::sfxVolume>,
 			xproperty::obj_member<"ambienceVolume", &GlobalAudioComponent::ambienceVolume>,
+			xproperty::obj_member<"voiceVolume", &GlobalAudioComponent::voiceVolume>,
 			xproperty::obj_member<"autoPlay", &GlobalAudioComponent::autoPlay>
 		)
 	};
@@ -2242,6 +2358,13 @@ namespace Ermine
 		bool followTransform{ true }; // Should audio follow entity position?
 		float minDistance{ 1.0f }; // 3D audio rolloff settings
 		float maxDistance{ 100.0f };
+
+		// Reverb settings
+		bool useReverb{ false }; // Enable/disable reverb for this sound
+		int reverbPreset{ 0 };   // Index to ReverbPresets (0=None, 1=SmallRoom, etc.)
+		float reverbWetLevel{ -12.0f }; // Reverb wet level in dB (-80 to 20)
+		float reverbDryLevel{ 0.0f };   // Reverb dry level in dB (-80 to 20)
+		float reverbDecayTime{ 1.0f };  // Reverb decay time (0.1 to 20)
 
 		// FMOD Studio event parameters (optional)
 		std::map<std::string, float> eventParameters{};
@@ -2289,7 +2412,7 @@ namespace Ermine
 		XPROPERTY_DEF(
 			"AudioComponent", AudioComponent,
 			xproperty::obj_member<"soundName", &AudioComponent::soundName>,
-			xproperty::obj_member<"eventName", &AudioComponent::eventName>,   
+			xproperty::obj_member<"eventName", &AudioComponent::eventName>,
 			xproperty::obj_member<"useRandomVariation", &AudioComponent::useRandomVariation>,
 			xproperty::obj_member<"is3D", &AudioComponent::is3D>,
 			xproperty::obj_member<"isLooping", &AudioComponent::isLooping>,
@@ -2298,7 +2421,11 @@ namespace Ermine
 			xproperty::obj_member<"followTransform", &AudioComponent::followTransform>,
 			xproperty::obj_member<"minDistance", &AudioComponent::minDistance>,
 			xproperty::obj_member<"maxDistance", &AudioComponent::maxDistance>,
-			xproperty::obj_member<"playOnStart", &AudioComponent::playOnStart>
+			xproperty::obj_member<"playOnStart", &AudioComponent::playOnStart>,
+			xproperty::obj_member<"useReverb", &AudioComponent::useReverb>,
+			xproperty::obj_member<"reverbWetLevel", &AudioComponent::reverbWetLevel>,
+			xproperty::obj_member<"reverbDryLevel", &AudioComponent::reverbDryLevel>,
+			xproperty::obj_member<"reverbDecayTime", &AudioComponent::reverbDecayTime>
 		)
 	};
 
@@ -2657,6 +2784,7 @@ namespace Ermine
 		JPH::BodyID bodyID{ JPH::BodyID::cInvalidBodyID };
 		JPH::Body* body{ nullptr };
 		std::vector<glm::vec3> customMeshVertices;   // For custom mesh
+		std::vector<uint32_t> customMeshIndices;
 		JPH::RefConst<JPH::Shape> shapeRef;
 		bool isDead = false;
 
@@ -2837,6 +2965,7 @@ namespace Ermine
 						js.AddMember("isAttached", s.isAttached, alloc);
 						js.AddMember("speed", s.speed, alloc);
 						js.AddMember("blendWeight", s.blendWeight, alloc);
+						js.AddMember("loop", s.loop, alloc);
 
 						// editorPos as [x, y]
 						rapidjson::Value posArr(rapidjson::kArrayType);
@@ -3008,17 +3137,27 @@ namespace Ermine
 					if (js.HasMember("blendWeight") && js["blendWeight"].IsNumber())
 						s->blendWeight = js["blendWeight"].GetFloat();
 
+					if (js.HasMember("loop") && js["loop"].IsBool())
+						s->loop = js["loop"].GetBool();
+
+#if defined(EE_EDITOR)
 					if (js.HasMember("editorPos") && js["editorPos"].IsArray() && js["editorPos"].Size() == 2)
 					{
 						s->editorPos.x = js["editorPos"][0].GetFloat();
 						s->editorPos.y = js["editorPos"][1].GetFloat();
+#ifdef EE_EDITOR
 						ImNodes::SetNodeEditorSpacePos(s->id, s->editorPos);
+#endif // EE_EDITOR
 					}
 					else
 					{
 						s->editorPos = ImVec2{ 100.f, 100.f };
+#ifdef EE_EDITOR
 						ImNodes::SetNodeEditorSpacePos(s->id, s->editorPos);
+#endif // EE_EDITOR
+
 					}
+#endif
 
 					m_animationGraph->states.push_back(s);
 
@@ -3460,19 +3599,20 @@ namespace Ermine
 	struct NavMeshComponent
 	{
 		// Recast build config
-		float cellSize = 0.05f;
-		float cellHeight = 0.05f;
+		float cellSize = 1.0f;
+		float cellHeight = 0.5f;
 		float agentHeight = 1.0f;
 		float agentRadius = 0.5f;
 		float bakedAgentRadius = 0.0f;
 		float bakedAgentHeight = 0.0f;
-		float agentMaxClimb = 0.0f;
+		float agentMaxClimb = 0.5f;
 		float agentMaxSlope = 45.0f;
 
 		// Debug toggles
 		bool  drawInputTri = false;
 		bool  drawWalkable = true;
 		bool  drawNavMesh = false;
+		bool bakeUsingCustomMesh = false;
 
 		// Recast transient build data
 		struct BuildData;
@@ -3582,6 +3722,7 @@ namespace Ermine
 			out.AddMember("drawInputTri", drawInputTri, alloc);
 			out.AddMember("drawWalkable", drawWalkable, alloc);
 			out.AddMember("drawNavMesh", drawNavMesh, alloc);
+			out.AddMember("bakeUsingCustomMesh", bakeUsingCustomMesh, alloc);
 
 			rapidjson::Value bakedObj(rapidjson::kObjectType);
 
@@ -3624,6 +3765,7 @@ namespace Ermine
 			if (in.HasMember("drawInputTri")) drawInputTri = in["drawInputTri"].GetBool();
 			if (in.HasMember("drawWalkable")) drawWalkable = in["drawWalkable"].GetBool();
 			if (in.HasMember("drawNavMesh")) drawNavMesh = in["drawNavMesh"].GetBool();
+			if (in.HasMember("bakeUsingCustomMesh")) bakeUsingCustomMesh = in["bakeUsingCustomMesh"].GetBool();
 
 			bakedTiles.clear();
 
@@ -3702,6 +3844,8 @@ namespace Ermine
 		bool hasPostJumpDestination = false;
 
 		EntityID lastJumpFromNavMesh = 0;
+
+		float postJumpPauseTimer = 0.0f;
 
 		template<typename Alloc>
 		void Serialize(rapidjson::Value& out, Alloc& alloc) const {
@@ -4033,6 +4177,7 @@ namespace Ermine
 		Vec3 textColor = { 1.0f, 1.0f, 1.0f };
 		float textScale = 1.0f;
 		float backgroundAlpha = 1.0f;  // Button background transparency (0.0 = invisible, 1.0 = opaque)
+		int renderOrder = 0;           // Render order (lower = behind, higher = on top)
 
 		// Button state images (optional - if set, overrides color-based rendering)
 		std::string normalImage = "";   // Image shown in normal state
@@ -4047,6 +4192,9 @@ namespace Ermine
 		std::string hoverSoundName = "";  // Sound to play on hover
 		std::string clickSoundName = "";  // Sound to play on click
 		float soundVolume = 1.0f;         // Volume for button sounds (0.0 - 1.0)
+
+		// Button interaction
+		bool disabled = false;  // If true, button is visible but not clickable
 
 		// Button state (runtime - don't serialize)
 		bool isHovered = false;
@@ -4090,6 +4238,8 @@ namespace Ermine
 			rapidjson::Value clickSoundVal(clickSoundName.c_str(), alloc);
 			out.AddMember("clickSoundName", clickSoundVal, alloc);
 			out.AddMember("soundVolume", soundVolume, alloc);
+			out.AddMember("renderOrder", renderOrder, alloc);
+			out.AddMember("disabled", disabled, alloc);
 		}
 
 		void Deserialize(const rapidjson::Value& in)
@@ -4140,6 +4290,10 @@ namespace Ermine
 				clickSoundName = in["clickSoundName"].GetString();
 			if (in.HasMember("soundVolume") && in["soundVolume"].IsNumber())
 				soundVolume = in["soundVolume"].GetFloat();
+			if (in.HasMember("renderOrder") && in["renderOrder"].IsInt())
+				renderOrder = in["renderOrder"].GetInt();
+			if (in.HasMember("disabled") && in["disabled"].IsBool())
+				disabled = in["disabled"].GetBool();
 		}
 
 		XPROPERTY_DEF("UIButtonComponent", UIButtonComponent)
@@ -4172,6 +4326,7 @@ namespace Ermine
 		Vec3 handleHoverColor = { 0.9f, 0.9f, 0.5f }; // Handle color when hovered
 		float trackAlpha = 0.9f;
 		float handleSize = 0.04f;  // Handle diameter (normalized)
+		int renderOrder = 0;       // Render order (lower = behind, higher = on top)
 
 		// Slider images (optional - overrides color-based rendering)
 		std::string trackImage = "";   // Background track image
@@ -4196,6 +4351,13 @@ namespace Ermine
 		// Label images (optional - shows image next to slider label)
 		std::string labelImagePath = "";        // Normal/unselected image
 		std::string labelActiveImagePath = "";  // Active/selected image (shown when dragging)
+
+		// Value display
+		bool showValue = true;
+		Vec3 valueColor = { 1.0f, 1.0f, 1.0f };
+		float valueScale = 0.5f;
+		Vec2 valueOffset = { 0.22f, 0.0f };  // Right of slider
+		bool valueAsPercentage = true;        // true = "75%", false = raw value
 
 		// State (runtime - don't serialize)
 		bool isHovered = false;
@@ -4248,6 +4410,18 @@ namespace Ermine
 			out.AddMember("labelImagePath", labelImagePathVal, alloc);
 			rapidjson::Value labelActiveImagePathVal(labelActiveImagePath.c_str(), alloc);
 			out.AddMember("labelActiveImagePath", labelActiveImagePathVal, alloc);
+
+			out.AddMember("showValue", showValue, alloc);
+			out.AddMember("valueColor", Vec3ToJson(valueColor, alloc), alloc);
+			out.AddMember("valueScale", valueScale, alloc);
+
+			rapidjson::Value valueOffsetVal(rapidjson::kArrayType);
+			valueOffsetVal.PushBack(valueOffset.x, alloc);
+			valueOffsetVal.PushBack(valueOffset.y, alloc);
+			out.AddMember("valueOffset", valueOffsetVal, alloc);
+
+			out.AddMember("valueAsPercentage", valueAsPercentage, alloc);
+			out.AddMember("renderOrder", renderOrder, alloc);
 		}
 
 		void Deserialize(const rapidjson::Value& in)
@@ -4314,6 +4488,26 @@ namespace Ermine
 				labelImagePath = in["labelImagePath"].GetString();
 			if (in.HasMember("labelActiveImagePath") && in["labelActiveImagePath"].IsString())
 				labelActiveImagePath = in["labelActiveImagePath"].GetString();
+
+			if (in.HasMember("showValue") && in["showValue"].IsBool())
+				showValue = in["showValue"].GetBool();
+			if (in.HasMember("valueColor") && in["valueColor"].IsArray())
+				valueColor = JsonToVec3(in["valueColor"]);
+			if (in.HasMember("valueScale") && in["valueScale"].IsNumber())
+				valueScale = in["valueScale"].GetFloat();
+			if (in.HasMember("valueOffset") && in["valueOffset"].IsArray())
+			{
+				const auto& arr = in["valueOffset"].GetArray();
+				if (arr.Size() >= 2)
+				{
+					valueOffset.x = arr[0].GetFloat();
+					valueOffset.y = arr[1].GetFloat();
+				}
+			}
+			if (in.HasMember("valueAsPercentage") && in["valueAsPercentage"].IsBool())
+				valueAsPercentage = in["valueAsPercentage"].GetBool();
+			if (in.HasMember("renderOrder") && in["renderOrder"].IsInt())
+				renderOrder = in["renderOrder"].GetInt();
 		}
 
 		XPROPERTY_DEF("UISliderComponent", UISliderComponent)
@@ -5312,6 +5506,7 @@ namespace Ermine
 		Ermine::Vec3 tintColor = { 1.0f, 1.0f, 1.0f }; ///< Color tint (1,1,1 = no tint)
 		float alpha = 1.0f;                   ///< Alpha transparency (0-1)
 		bool maintainAspectRatio = true;      ///< Preserve image aspect ratio
+		int renderOrder = 0;                  ///< Render order (lower = behind, higher = on top)
 
 		// Caption/Text overlay
 		std::string caption = "";             ///< Caption text to display
@@ -5337,6 +5532,7 @@ namespace Ermine
 			out.AddMember("captionColor", Vec3ToJson(captionColor, alloc), alloc);
 			out.AddMember("captionFontSize", captionFontSize, alloc);
 			out.AddMember("captionPosition", Vec3ToJson(captionPosition, alloc), alloc);
+			out.AddMember("renderOrder", renderOrder, alloc);
 		}
 
 		void Deserialize(const rapidjson::Value& in)
@@ -5367,6 +5563,8 @@ namespace Ermine
 				captionFontSize = in["captionFontSize"].GetFloat();
 			if (in.HasMember("captionPosition") && in["captionPosition"].IsArray())
 				captionPosition = JsonToVec3(in["captionPosition"]);
+			if (in.HasMember("renderOrder") && in["renderOrder"].IsInt())
+				renderOrder = in["renderOrder"].GetInt();
 		}
 
 		XPROPERTY_DEF(
@@ -5383,7 +5581,67 @@ namespace Ermine
 			xproperty::obj_member<"showCaption", &UIImageComponent::showCaption>,
 			xproperty::obj_member<"captionColor", &UIImageComponent::captionColor>,
 			xproperty::obj_member<"captionFontSize", &UIImageComponent::captionFontSize>,
-			xproperty::obj_member<"captionPosition", &UIImageComponent::captionPosition>
+			xproperty::obj_member<"captionPosition", &UIImageComponent::captionPosition>,
+			xproperty::obj_member<"renderOrder", &UIImageComponent::renderOrder>
+		)
+	};
+
+	/*!***********************************************************************
+	\brief
+		UI Text Component for standalone text display (labels, subtitles, HUD text).
+		Supports left, center, and right alignment.
+	*************************************************************************/
+	struct UITextComponent
+	{
+		std::string text = "";
+		Vec3 position = { 0.5f, 0.5f, 0.0f };  // Normalized screen position
+		float fontSize = 1.0f;
+		Vec3 color = { 1.0f, 1.0f, 1.0f };
+		float alpha = 1.0f;
+		int alignment = 1;  // 0 = Left, 1 = Center, 2 = Right
+		int renderOrder = 0;  // Render order (lower = behind, higher = on top)
+
+		template<typename Alloc>
+		void Serialize(rapidjson::Value& out, Alloc& alloc) const
+		{
+			out.SetObject();
+			rapidjson::Value textVal(text.c_str(), alloc);
+			out.AddMember("text", textVal, alloc);
+			out.AddMember("position", Vec3ToJson(position, alloc), alloc);
+			out.AddMember("fontSize", fontSize, alloc);
+			out.AddMember("color", Vec3ToJson(color, alloc), alloc);
+			out.AddMember("alpha", alpha, alloc);
+			out.AddMember("alignment", alignment, alloc);
+			out.AddMember("renderOrder", renderOrder, alloc);
+		}
+
+		void Deserialize(const rapidjson::Value& in)
+		{
+			if (in.HasMember("text") && in["text"].IsString())
+				text = in["text"].GetString();
+			if (in.HasMember("position") && in["position"].IsArray())
+				position = JsonToVec3(in["position"]);
+			if (in.HasMember("fontSize") && in["fontSize"].IsNumber())
+				fontSize = in["fontSize"].GetFloat();
+			if (in.HasMember("color") && in["color"].IsArray())
+				color = JsonToVec3(in["color"]);
+			if (in.HasMember("alpha") && in["alpha"].IsNumber())
+				alpha = in["alpha"].GetFloat();
+			if (in.HasMember("alignment") && in["alignment"].IsInt())
+				alignment = in["alignment"].GetInt();
+			if (in.HasMember("renderOrder") && in["renderOrder"].IsInt())
+				renderOrder = in["renderOrder"].GetInt();
+		}
+
+		XPROPERTY_DEF(
+			"UITextComponent", UITextComponent,
+			xproperty::obj_member<"text", &UITextComponent::text>,
+			xproperty::obj_member<"position", &UITextComponent::position>,
+			xproperty::obj_member<"fontSize", &UITextComponent::fontSize>,
+			xproperty::obj_member<"color", &UITextComponent::color>,
+			xproperty::obj_member<"alpha", &UITextComponent::alpha>,
+			xproperty::obj_member<"alignment", &UITextComponent::alignment>,
+			xproperty::obj_member<"renderOrder", &UITextComponent::renderOrder>
 		)
 	};
 

@@ -1,0 +1,118 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "170886db284f2248983bd92888164293"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.7071068286895752,
+            0.0,
+            0.7071067094802856
+          ],
+          "scale": [
+            0.0999981090426445,
+            0.10000000149011612,
+            0.0999981090426445
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "JailConnector",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_jail_connector_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "50f160fe8ba9934190d2b0be586e4a40"
+        },
+        "Transform": {
+          "position": [
+            2868.44580078125,
+            -684.7125854492188,
+            681.6981811523438
+          ],
+          "rotation": [
+            0.0,
+            -0.7071067094802856,
+            0.0,
+            0.7071068286895752
+          ],
+          "scale": [
+            25.000003814697267,
+            25.0,
+            25.000003814697267
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_jail_connector_low.fbx_chainedlink9_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6c0ffb4a2959914fae25a48533f76817"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "170886db284f2248983bd92888164293",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c0f90b75bea642408696d172549c2dc7"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_jail_connector_low.fbx_chainedlink9_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6c0ffb4a2959914fae25a48533f76817"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "170886db284f2248983bd92888164293",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

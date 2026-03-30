@@ -2,13 +2,13 @@
 /*!
 \file       Animator.h
 \author     Lum Ko Sand, kosand.lum, 2301263, kosand.lum\@digipen.edu
-\date       28/10/2025
+\date       28/02/2026
 \brief      This file contains the declaration of the animator class. It is responsible for
             loading animation clips from an Assimp scene, managing playback state,
             updating bone transforms per frame, providing final matrices for GPU skinning
             in the renderer.
 
-Copyright (C) 2025 DigiPen Institute of Technology.
+Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
@@ -18,7 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "AnimationClip.h"   // For AnimationClip definition
 #include "Model.h"           // For Model definition
-#include "ECS.h"
+#include "ECS.h"             // For EntityID and ECS access
 #include <assimp/scene.h>    // For aiScene
 
 namespace Ermine::graphics
@@ -70,7 +70,7 @@ namespace Ermine::graphics
          * @param index The index of the clip in the internal clips list.
          * @param loop Whether the animation should loop after finishing.
          */
-        void PlayAnimation(size_t index, bool loop = true);
+        void PlayAnimation(size_t index, bool loop);
 
         /**
          * @brief Play an animation clip by name.
@@ -80,7 +80,7 @@ namespace Ermine::graphics
          * @param name The name of the animation clip.
          * @param loop Whether the animation should loop after finishing.
          */
-        void PlayAnimation(const std::string& name, bool loop = true);
+        void PlayAnimation(const std::string& name, bool loop);
         
         /**
          * @brief Stop the current animation.
@@ -197,5 +197,14 @@ namespace Ermine::graphics
          * @param parentTransform The accumulated transform of the parent node.
          */
         void CalculateBoneTransform(const aiNode* node, const glm::mat4& parentTransform);
+
+        /**
+         * @brief Check if the current animation clip has finished playing.
+         * 
+         * Determines if the playback time has exceeded the clip's duration.
+         * 
+         * @return True if the current clip is finished, false otherwise.
+         */
+        bool IsCurrentClipFinished() const;
     };
 }

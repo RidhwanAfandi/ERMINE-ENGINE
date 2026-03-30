@@ -62,7 +62,7 @@
             0.0
           ],
           "healthbarBgTexture": "./Resources/Textures/UI/Health_Bar_Backing.png",
-          "healthbarFillTexture": "./Resources/Textures/UI/Health_Bar_Fill.png",
+          "healthbarFillTexture": "./Resources/Textures/UI/Updated_Health_Bar_Fill.png",
           "healthbarFrameTexture": "./Resources/Textures/UI/Health_Bar_GearBar.png",
           "healthbarShineColor": [
             1.0,

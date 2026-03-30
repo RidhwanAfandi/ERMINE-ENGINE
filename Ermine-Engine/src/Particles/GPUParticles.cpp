@@ -129,6 +129,14 @@ namespace Ermine {
 
         m_Initialized = true;
         EE_CORE_INFO("GPU Orb Particle System initialized");
+
+        // Load Swirl01.png for shockwave effect (renderMode 3)
+        m_Swirl01TexRef = AssetManager::GetInstance().LoadTexture("../Resources/Textures/Swirl01.png");
+        if (m_Swirl01TexRef && m_Swirl01TexRef->IsValid()) {
+            m_Swirl01Tex = m_Swirl01TexRef->GetRendererID();
+        } else {
+            EE_CORE_WARN("Failed to load Swirl01.png for shockwave effect.");
+        }
     }
 
     void GPUParticleSystem::InitializeEmitter(GPUParticleEmitter& emitter)
@@ -196,6 +204,10 @@ namespace Ermine {
 
             auto& emitter = ecs.GetComponent<GPUParticleEmitter>(entity);
             if (!emitter.active) continue;
+
+            if (ecs.HasComponent<ObjectMetaData>(entity)) {
+                if (!ecs.GetComponent<ObjectMetaData>(entity).selfActive) continue;
+            }
 
             // Initialize if needed
             if (!emitter.initialized) {
@@ -300,14 +312,16 @@ namespace Ermine {
             glUniform1f(glGetUniformLocation(program, "u_ConeInnerAngle"), emitter.coneInnerAngle);
             glUniform1i(glGetUniformLocation(program, "u_BoundsMode"), emitter.boundsMode);
             glUniform1i(glGetUniformLocation(program, "u_BoundsShape"), emitter.boundsShape);
-            
-            // Apply overall scale to bounds parameters
+
+            float avgScale = (transform.scale.x + transform.scale.y + transform.scale.z) / 3.0f;
+
+            // Apply overall scale AND entity transform scale to bounds parameters
             glUniform3f(glGetUniformLocation(program, "u_BoundsBoxExtents"),
-                        emitter.boundsBoxExtents.x * emitter.overallScale, 
-                        emitter.boundsBoxExtents.y * emitter.overallScale, 
-                        emitter.boundsBoxExtents.z * emitter.overallScale);
-            glUniform1f(glGetUniformLocation(program, "u_BoundsRadius"), emitter.boundsRadius * emitter.overallScale);
-            glUniform1f(glGetUniformLocation(program, "u_BoundsRadiusInner"), emitter.boundsRadiusInner * emitter.overallScale);
+                        emitter.boundsBoxExtents.x * emitter.overallScale * transform.scale.x, 
+                        emitter.boundsBoxExtents.y * emitter.overallScale * transform.scale.y, 
+                        emitter.boundsBoxExtents.z * emitter.overallScale * transform.scale.z);
+            glUniform1f(glGetUniformLocation(program, "u_BoundsRadius"), emitter.boundsRadius * emitter.overallScale * avgScale);
+            glUniform1f(glGetUniformLocation(program, "u_BoundsRadiusInner"), emitter.boundsRadiusInner * emitter.overallScale * avgScale);
             
             glUniform1f(glGetUniformLocation(program, "u_SpeedMin"), emitter.speedMin);
             glUniform1f(glGetUniformLocation(program, "u_SpeedMax"), emitter.speedMax);
@@ -323,11 +337,11 @@ namespace Ermine {
             glUniform1f(glGetUniformLocation(program, "u_AlphaStart"), emitter.alphaStart);
             glUniform1f(glGetUniformLocation(program, "u_AlphaEnd"), emitter.alphaEnd);
             
-            // Apply overall scale to particle sizes
-            glUniform1f(glGetUniformLocation(program, "u_SizeStartMin"), emitter.sizeStartMin * emitter.overallScale);
-            glUniform1f(glGetUniformLocation(program, "u_SizeStartMax"), emitter.sizeStartMax * emitter.overallScale);
-            glUniform1f(glGetUniformLocation(program, "u_SizeEndMin"), emitter.sizeEndMin * emitter.overallScale);
-            glUniform1f(glGetUniformLocation(program, "u_SizeEndMax"), emitter.sizeEndMax * emitter.overallScale);
+            // Apply overall scale AND entity transform scale to particle sizes
+            glUniform1f(glGetUniformLocation(program, "u_SizeStartMin"), emitter.sizeStartMin * emitter.overallScale * avgScale);
+            glUniform1f(glGetUniformLocation(program, "u_SizeStartMax"), emitter.sizeStartMax * emitter.overallScale * avgScale);
+            glUniform1f(glGetUniformLocation(program, "u_SizeEndMin"), emitter.sizeEndMin * emitter.overallScale * avgScale);
+            glUniform1f(glGetUniformLocation(program, "u_SizeEndMax"), emitter.sizeEndMax * emitter.overallScale * avgScale);
             glUniform1f(glGetUniformLocation(program, "u_LifetimeMin"), emitter.lifetimeMin);
             glUniform1f(glGetUniformLocation(program, "u_LifetimeMax"), emitter.lifetimeMax);
 
@@ -412,6 +426,10 @@ namespace Ermine {
             auto& emitter = ecs.GetComponent<GPUParticleEmitter>(entity);
             if (!emitter.active || !emitter.initialized) continue;
 
+            if (ecs.HasComponent<ObjectMetaData>(entity)) {
+                if (!ecs.GetComponent<ObjectMetaData>(entity).selfActive) continue;
+            }
+
             // Bind particle buffer
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, emitter.particleBuffer);
 
@@ -455,6 +473,12 @@ namespace Ermine {
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             } else if (emitter.renderMode == 2) {
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE); // Additive for electric
+            } else if (emitter.renderMode == 3) {
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE); // Additive for shockwave sprite
+                // Bind Swirl01.png to texture unit 7
+                glActiveTexture(GL_TEXTURE7);
+                glBindTexture(GL_TEXTURE_2D, m_Swirl01Tex);
+                glUniform1i(glGetUniformLocation(program, "u_SpriteTexture"), 7);
             } else {
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             }
@@ -527,6 +551,10 @@ namespace Ermine {
             glDeleteTextures(1, &m_SmokePuffTex);
             m_SmokePuffTex = 0;
         }
+
+        // Release Swirl01 reference (AssetManager owns the GL texture, don't delete it)
+        m_Swirl01TexRef = nullptr;
+        m_Swirl01Tex = 0;
 
         m_Initialized = false;
         EE_CORE_INFO("GPU Orb Particle System cleaned up");

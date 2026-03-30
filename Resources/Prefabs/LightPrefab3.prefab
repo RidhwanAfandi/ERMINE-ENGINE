@@ -1,0 +1,2047 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1686be5f8fb5cb478c518c17e6f35020"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "LightPrefab3",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e29a64fb2733d8478285073dc8d9a2ed"
+        },
+        "Transform": {
+          "position": [
+            -50.36064910888672,
+            48.895599365234378,
+            108.09051513671875
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.2880001068115236,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (36)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "16165ad03070e94aaa51f97db25452d3"
+        },
+        "Transform": {
+          "position": [
+            -50.36064910888672,
+            48.895599365234378,
+            142.3346710205078
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (35)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e10fced5a026c14c85015d5b926bdd75"
+        },
+        "Transform": {
+          "position": [
+            -50.36064910888672,
+            48.895599365234378,
+            168.1913299560547
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.2880001068115236,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (34)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "17d41f7475f98e47bd8d56b535914f7e"
+        },
+        "Transform": {
+          "position": [
+            140.42701721191407,
+            38.04326629638672,
+            135.18002319335938
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (33)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2206567b0734db43955480daf383ac96"
+        },
+        "Transform": {
+          "position": [
+            128.6934814453125,
+            66.69510650634766,
+            135.18002319335938
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (32)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "5ba2d85ec0ce9e47ba96019742e747ee"
+        },
+        "Transform": {
+          "position": [
+            106.62972259521485,
+            60.86912155151367,
+            166.84095764160157
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (31)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2b9beb02d42d8e44b6d49e5c8684b149"
+        },
+        "Transform": {
+          "position": [
+            89.26123046875,
+            60.86912155151367,
+            166.84095764160157
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (30)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "388e0103d8587041ad9710cf7e176bdb"
+        },
+        "Transform": {
+          "position": [
+            70.92350769042969,
+            60.86912155151367,
+            166.84095764160157
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (28)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a3b2e5a205b3394b88fda92573088446"
+        },
+        "Transform": {
+          "position": [
+            70.92350769042969,
+            60.86912155151367,
+            98.87593078613281
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (27)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7b3781ee3646a74c9cfbf5bf6d819a6c"
+        },
+        "Transform": {
+          "position": [
+            88.20425415039063,
+            60.86912155151367,
+            98.87593078613281
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (26)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "563d96f4053e96468f2fce0f8cf449d2"
+        },
+        "Transform": {
+          "position": [
+            106.95117950439453,
+            60.86912155151367,
+            98.87593078613281
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 40.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (29)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f99d448b46e8e942b88dd98d1dcfdadc"
+        },
+        "Transform": {
+          "position": [
+            45.47782516479492,
+            48.895599365234378,
+            118.73956298828125
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (25)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ad3283294c1b7049a41ac48aa03472fe"
+        },
+        "Transform": {
+          "position": [
+            45.47782516479492,
+            48.895599365234378,
+            150.82498168945313
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (24)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9406bdbf3ec8e64e9d4d22f143a74563"
+        },
+        "Transform": {
+          "position": [
+            16.737781524658204,
+            48.895599365234378,
+            185.34970092773438
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (23)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c9d00ff87390944ca235a01a7ec96b59"
+        },
+        "Transform": {
+          "position": [
+            -26.989036560058595,
+            48.895599365234378,
+            185.34970092773438
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (22)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "36af27b933ba16469109ba0e3bc4b472"
+        },
+        "Transform": {
+          "position": [
+            -10.45300579071045,
+            34.4234619140625,
+            150.35304260253907
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 5.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (21)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4fd8a3916fdb4d40891c1ff098da80c0"
+        },
+        "Transform": {
+          "position": [
+            -3.9350364208221437,
+            34.4234619140625,
+            150.35304260253907
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 5.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (20)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "719c5ae61e0b9e4792f3dfb5ed2bda57"
+        },
+        "Transform": {
+          "position": [
+            -6.9396491050720219,
+            27.366992950439454,
+            144.7870635986328
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 8.786999702453614,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (19)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d1bdbe79e6ce434ab4d4fbeb33b36d21"
+        },
+        "Transform": {
+          "position": [
+            -7.404246807098389,
+            58.98666000366211,
+            149.73760986328126
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (18)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7801a3c8413ca34a995ee41b7a4b41cd"
+        },
+        "Transform": {
+          "position": [
+            12.745956420898438,
+            19.37581443786621,
+            86.96176147460938
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.1510000228881838,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (17)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b30d27d4e373524db61cf4b25502b60c"
+        },
+        "Transform": {
+          "position": [
+            -6.88814640045166,
+            19.37581443786621,
+            102.03810119628906
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.1510000228881838,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (16)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "76e2b16ccf8a2340b5a065623b531b9c"
+        },
+        "Transform": {
+          "position": [
+            -26.224123001098634,
+            13.00186824798584,
+            76.36811828613281
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.1510000228881838,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (15)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "25b78b6b25614a45a57dbbecd4d06fe4"
+        },
+        "Transform": {
+          "position": [
+            -14.01679515838623,
+            -3.8089513778686525,
+            84.14521026611328
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (14)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "23a90f0280c7d141bb0c43c017132266"
+        },
+        "Transform": {
+          "position": [
+            -0.8454874753952026,
+            -3.8089513778686525,
+            84.14521026611328
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (13)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dddb917825c45d4caecc4c1c7fea6dd1"
+        },
+        "Transform": {
+          "position": [
+            -13.18198013305664,
+            21.55301856994629,
+            84.14521026611328
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (12)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c80af6561fe50a479fb58c0fd6325585"
+        },
+        "Transform": {
+          "position": [
+            -0.8454874753952026,
+            21.55301856994629,
+            84.14521026611328
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (11)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e56fac10e421bf4a9f9dfe9e15e499b6"
+        },
+        "Transform": {
+          "position": [
+            -26.224123001098634,
+            9.120195388793946,
+            52.419185638427737
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.1510000228881838,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (10)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c702e9cad2cca2418ed9d37dfd88187a"
+        },
+        "Transform": {
+          "position": [
+            16.438655853271486,
+            9.120195388793946,
+            53.11043930053711
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 0.9150000214576721,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (9)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f3c11ebd211fda47823d2018140f67c4"
+        },
+        "Transform": {
+          "position": [
+            -7.828360557556152,
+            -0.8120400905609131,
+            52.14945602416992
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (8)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "69081463b7c8904d802251f612f2a47d"
+        },
+        "Transform": {
+          "position": [
+            -7.828360557556152,
+            21.55301856994629,
+            52.14945602416992
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (7)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0dce8ec938e09b4da5614d56dfefd3a3"
+        },
+        "Transform": {
+          "position": [
+            -10.854660987854004,
+            15.983039855957032,
+            -3.1648969650268556
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dfdb670c87c7bf4da013649dd058a8b4"
+        },
+        "Transform": {
+          "position": [
+            -1.0820385217666627,
+            15.983039855957032,
+            -3.1648969650268556
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "fbf0a2dd8eefa64e9acf4103e92398f4"
+        },
+        "Transform": {
+          "position": [
+            16.92656898498535,
+            10.764022827148438,
+            4.880721092224121
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 4.142000198364258,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 50.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "fd0e3e3fbdf4a04c9aa242f47674d42b"
+        },
+        "Transform": {
+          "position": [
+            -26.224123001098634,
+            10.764022827148438,
+            4.880721092224121
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 4.142000198364258,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 50.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (3)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4d4877d792c7f54a95e5e617222c5bf5"
+        },
+        "Transform": {
+          "position": [
+            -5.730712890625,
+            -4.673593997955322,
+            5.257627487182617
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 4.142000198364258,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 50.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (4)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "66a3cacb201df74fb35167210c9339a0"
+        },
+        "Transform": {
+          "position": [
+            4.6581573486328129,
+            13.26375961303711,
+            38.671382904052737
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.9216461181640625,
+            0.559259295463562
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightTesting2",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3a71a631ddb7a04595f010cc62a3ce39"
+        },
+        "Transform": {
+          "position": [
+            6.536795616149902,
+            19.160785675048829,
+            46.74192810058594
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.9216461181640625,
+            0.559259295463562
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightTesting2 (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f7e31c3eb2b6114ea2d67622e69a5ca0"
+        },
+        "Transform": {
+          "position": [
+            4.729866027832031,
+            17.691652297973634,
+            39.18423080444336
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.9216461181640625,
+            0.559259295463562
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightTesting2 (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9790ce48ce1e4d4eb4924acc6260ccc5"
+        },
+        "Transform": {
+          "position": [
+            -22.331390380859376,
+            19.160785675048829,
+            46.74192810058594
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.9216461181640625,
+            0.559259295463562
+          ],
+          "intensity": 10.0,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightTesting2 (3)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "04443754c48b9642b45a5a1dfeca21b9"
+        },
+        "Transform": {
+          "position": [
+            -26.224123001098634,
+            9.120195388793946,
+            29.598358154296876
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 2.1510000228881838,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (5)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0acbc48d0149914fb3832fd34f493c91"
+        },
+        "Transform": {
+          "position": [
+            16.438655853271486,
+            9.120195388793946,
+            29.598358154296876
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Light": {
+          "color": [
+            0.9925103187561035,
+            1.0,
+            0.6629629731178284
+          ],
+          "intensity": 0.9150000214576721,
+          "type": "Point",
+          "castsShadows": false,
+          "castsRays": false,
+          "innerAngle": -1.0,
+          "outerAngle": -1.0,
+          "radius": 100.0
+        },
+        "ObjectMetaData": {
+          "name": "LightSource (6)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1686be5f8fb5cb478c518c17e6f35020",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

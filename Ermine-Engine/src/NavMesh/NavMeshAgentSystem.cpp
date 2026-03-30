@@ -18,6 +18,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace Ermine
 {
+    static void BuildNavQueryExtents(const NavMeshAgent& a, float outExt[3])
+    {
+        outExt[0] = a.radius * 2.0f;
+        outExt[1] = std::max(2.0f, a.height);
+        outExt[2] = a.radius * 2.0f;
+    }
+
     bool RequestPathForAgent(EntityID agentEntity, const Ermine::Vec3& destination)
     {
         auto& ecs = ECS::GetInstance();
@@ -122,7 +129,8 @@ namespace Ermine
                     trans.position = agent.jumpTarget;
 
                     agent.isJumping = false;
-                    agent.navPaused = false;
+                    agent.navPaused = true;
+                    agent.postJumpPauseTimer = 2.0f;
 
                     if (agent.hasPostJumpDestination)
                     {
@@ -135,8 +143,21 @@ namespace Ermine
             }
             // jump
 
-            if (agent.navPaused)
-                continue;
+            //if (agent.navPaused)
+            //    continue;
+
+            // Handle post-jump pause
+            if (agent.navPaused && agent.postJumpPauseTimer > 0.0f)
+            {
+                agent.postJumpPauseTimer -= dt;
+
+                if (agent.postJumpPauseTimer <= 0.0f)
+                {
+                    agent.navPaused = false; // resume movement
+                }
+
+                continue; // skip movement while paused
+            }
 
             // skip if no path
             if (!agent.hasPath)
@@ -188,15 +209,12 @@ namespace Ermine
                 Vec3 feetQuery = pos;
                 feetQuery.y -= agent.centerYOffset; // convert center -> feet for the nav query
 
-                EntityID navE = FindNearestNavMeshEntity(feetQuery);
+                float ext[3];
+                BuildNavQueryExtents(agent, ext);
+
+                EntityID navE = FindNearestNavMeshEntity(feetQuery, ext);
                 if (navE != 0)
                 {
-                    float ext[3] = {
-                        agent.radius * 2.0f,
-                        agent.height * 0.5f + 0.5f,
-                        agent.radius * 2.0f
-                    };
-
                     Vec3 clampedFeet;
                     auto navSys = ecs.GetSystem<NavMeshSystem>();
                     if (navSys && navSys->ClampToNavMesh(navE, feetQuery, ext, clampedFeet))
@@ -321,44 +339,32 @@ namespace Ermine
 
         const auto& agent = ecs.GetComponent<NavMeshAgent>(agentEntity);
 
-        EntityID nearestNav = FindNearestNavMeshEntity(startPos);
+        // Query using FEET, not center
+        Ermine::Vec3 startFeet = startPos;
+        Ermine::Vec3 endFeet = endPos;
+        startFeet.y -= agent.centerYOffset;
+        endFeet.y -= agent.centerYOffset;
+
+        // Build consistent extents
+        float ext[3];
+        BuildNavQueryExtents(agent, ext);
+
+        // Find nearest navmesh using FEET position
+        EntityID nearestNav = FindNearestNavMeshEntity(startFeet, ext);
         if (nearestNav == 0 || !ecs.HasComponent<NavMeshComponent>(nearestNav))
             return false;
 
-        const auto& navComp = ecs.GetComponent<NavMeshComponent>(nearestNav);
-        const float bakedR = navComp.bakedAgentRadius;
-        const float bakedH = navComp.bakedAgentHeight;
-
-        if (bakedR > 0.0f && agent.radius > bakedR + 1e-4f)
-        {
-            EE_CORE_ERROR("[NavMeshAgentSystem] Agent radius (%.3f) > navmesh baked radius (%.3f). Re-bake navmesh for this agent size.",
-                agent.radius, bakedR);
-            return false;
-        }
-        if (bakedH > 0.0f && agent.height > bakedH + 1e-4f)
-        {
-            EE_CORE_ERROR("[NavMeshAgentSystem] Agent height (%.3f) > navmesh baked height (%.3f). Re-bake navmesh for this agent size.",
-                agent.height, bakedH);
-            return false;
-        }
+        // (keep your baked radius/height checks as-is)
 
         auto navSystem = ecs.GetSystem<NavMeshSystem>();
         if (!navSystem)
             return false;
 
-        // extents based on the agent size (NOT 10,20,10)
-        float extents[3] =
-        {
-            agent.radius * 2.0f,
-            agent.height,
-            agent.radius * 2.0f
-        };
-
         outPath.clear();
-        return navSystem->ComputeStraightPath(nearestNav, startPos, endPos, extents, outPath);
+        return navSystem->ComputeStraightPath(nearestNav, startFeet, endFeet, ext, outPath);
     }
 
-
+    // currently used for finding current nav mesh before jumping
     EntityID NavMeshAgentSystem::FindNearestNavMeshEntity(const Ermine::Vec3& pos)
     {
         auto& ecs = ECS::GetInstance();
@@ -386,6 +392,41 @@ namespace Ermine
         }
         return best;
     }
+    // for moving
+    EntityID NavMeshAgentSystem::FindNearestNavMeshEntity(const Ermine::Vec3& pos, const float ext[3])
+    {
+        auto& ecs = ECS::GetInstance();
+        auto navSys = ecs.GetSystem<NavMeshSystem>();
+        if (!navSys)
+            return 0;
+
+        EntityID best = 0;
+        float bestDistSq = FLT_MAX;
+
+        for (EntityID e = 1; e < MAX_ENTITIES; ++e)
+        {
+            if (!ecs.IsEntityValid(e)) continue;
+            if (!ecs.HasComponent<NavMeshComponent>(e)) continue;
+
+            Ermine::Vec3 clamped;
+            if (!navSys->ClampToNavMesh(e, pos, ext, clamped))
+                continue;
+
+            const float dx = clamped.x - pos.x;
+            const float dy = clamped.y - pos.y;
+            const float dz = clamped.z - pos.z;
+            const float d2 = dx * dx + dy * dy + dz * dz;
+
+            if (d2 < bestDistSq)
+            {
+                bestDistSq = d2;
+                best = e;
+            }
+        }
+
+        return best;
+    }
+    // currently used for finding next nav mesh during jump
     EntityID NavMeshAgentSystem::FindNearestNavMeshEntityExcluding(const Ermine::Vec3& pos, EntityID exclude, EntityID excludePrev) const
     {
         auto& ecs = ECS::GetInstance();

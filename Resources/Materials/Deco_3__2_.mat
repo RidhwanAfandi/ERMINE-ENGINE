@@ -1,0 +1,118 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                0.800000011920929,
+                0.800000011920929,
+                0.800000011920929,
+                1.0
+            ]
+        },
+        "materialAlbedoMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_3_BC.png"
+        },
+        "materialAo": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialAoMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_3_AO.png"
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialEmissive": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "materialEmissiveIntensity": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                1.0
+            ]
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasEmissiveMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialMetallic": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialNormalMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_3_NRM.png"
+        },
+        "materialNormalStrength": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialRoughness": {
+            "type": "float",
+            "value": 0.30000001192092898
+        },
+        "materialRoughnessMap": {
+            "type": "texture2d",
+            "value": "D:\\UNI study notes\\Year 3\\GAM300\\Github\\Ermine Editor\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\ART1_Decor_3_Roughness.png"
+        },
+        "materialShadingModel": {
+            "type": "int",
+            "value": 0
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

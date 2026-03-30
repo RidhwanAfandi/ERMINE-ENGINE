@@ -99,6 +99,7 @@ namespace Ermine
          or 0 if none are found.
         *************************************************************************/
         EntityID FindNearestNavMeshEntity(const Ermine::Vec3& pos);
+        EntityID FindNearestNavMeshEntity(const Ermine::Vec3& pos, const float ext[3]);
         /*!***********************************************************************
         \brief
          Same Function as before now with 2 more parameters. Use to find nearest Nav

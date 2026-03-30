@@ -1,4 +1,4 @@
-#version 410
+#version 430
 
 in vec2 TexCoord;
 in vec3 Normal;
@@ -26,16 +26,21 @@ struct Material {
     float Shininess;
 };
 
-// Light structure (existing Lights SSBO)
-layout(std130, binding = 1) restrict readonly buffer LightsSSBO
-{
+const int NUM_CASCADES = 4;
+
+struct LightData {
+    vec4 position_type;     // xyz = position (world space), w = type
+    vec4 color_intensity;   // rgb = color, a = intensity
+    vec4 direction_range;   // xyz = direction (world space), w = range
+    vec4 spot_angles_castshadows_startOffset;
+    mat4 lightSpaceMatrix[NUM_CASCADES];
+    mat4 pointLightMatrices[6];
+    vec4 splitDepths[(NUM_CASCADES + 3) / 4];
+};
+
+layout(std430, binding = 4) restrict readonly buffer LightsSSBO { // Matches LIGHT_SSBO_BINDING in SSBO_Bindings.h
     vec4 lightCount;
-    struct LightData {
-        vec4 position_type;     // xyz = position (view space), w = type
-        vec4 color_intensity;   // rgb = color, a = intensity
-        vec4 direction_range;   // xyz = direction (view space), w = range
-        vec4 spot_angles;       // x = innerCos, y = outerCos, z,w = padding
-    } lights[];
+    LightData lights[];
 };
 
 uniform PBRMaterial pbrMaterial = PBRMaterial(vec3(0.5, 0.5, 0.5), 0.0, 0.5, 1.0);
@@ -99,7 +104,7 @@ vec3 calculatePBR(vec3 N, vec3 V)
     
     // Calculate lighting for each light
     int numLights = int(lightCount.x);
-    for(int i = 0; i < numLights && i < 16; ++i) {
+    for(int i = 0; i < numLights; ++i) {
         vec3 lightPos = lights[i].position_type.xyz;
         vec3 lightColor = lights[i].color_intensity.rgb;
         float lightIntensity = lights[i].color_intensity.a;
@@ -141,7 +146,7 @@ vec3 calculateBlinnPhong(vec3 N, vec3 V)
     
     // Calculate lighting for each light
     int numLights = int(lightCount.x);
-    for(int i = 0; i < numLights && i < 16; ++i) {
+    for(int i = 0; i < numLights; ++i) {
         vec3 lightPos = lights[i].position_type.xyz;
         vec3 lightColor = lights[i].color_intensity.rgb;
         float lightIntensity = lights[i].color_intensity.a;
@@ -182,4 +187,4 @@ void main()
     }
     
     FragColor = vec4(color, 1.0);
-}}
+}

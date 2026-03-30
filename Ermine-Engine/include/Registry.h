@@ -63,7 +63,7 @@ namespace Ermine
 		 * @return True if the entity has the component, false otherwise
 		 */
 		bool HasEntity(EntityID entity) const {
-			return m_EntityToIndexMap.find(entity) != m_EntityToIndexMap.end();
+			return m_EntityToIndexMap.contains(entity);
 		}
 
 	private:

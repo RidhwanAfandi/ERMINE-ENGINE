@@ -20,6 +20,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "glad/glad.h"
 #include "AssetBrowser.h" // For forwarding dropped files to the asset browser
 #include "EditorGUI.h"
+#include "Input.h"
 #include "SettingsGUI.h"
 #include "UIButtonSystem.h"
 
@@ -373,6 +374,7 @@ void Ermine::Window::SetVisibleCursor(const bool& value)
 
 void Ermine::Window::SetCursorLockState(CursorLockState state)
 {
+    const CursorLockState previousState = s_cursorLockState;
     s_cursorLockState = state;
     
     if (!s_window)
@@ -395,11 +397,16 @@ void Ermine::Window::SetCursorLockState(CursorLockState state)
 #endif
         glfwSetInputMode(s_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         break;
-	case CursorLockState::Confined:
+    case CursorLockState::Confined:
         glfwSetInputMode(s_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #ifdef _WIN32
 		ConfineCursorToGLFWWindow(s_window, true);
 #endif
         break;
+    }
+
+    if (previousState == CursorLockState::None && s_cursorLockState != CursorLockState::None)
+    {
+        Input::ResetGameMouseDelta();
     }
 }

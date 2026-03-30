@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a0a24dc242b66e40b24c5c06a4368205"
+        },
+        "Transform": {
+          "position": [
+            -0.009164229035377503,
+            0.43464720249176028,
+            6.410954475402832
+          ],
+          "rotation": [
+            0.0,
+            -0.24192209541797639,
+            0.0,
+            0.970295786857605
+          ],
+          "scale": [
+            0.030000001192092897,
+            0.029999999329447748,
+            0.030000008642673494
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "ChainPile",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Chain_pile_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4ed7e65efc8b034fb1c41057522071aa"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Chain_pile_low.fbx_chain_pile_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "51afae3478d1a746ad2360d56ef11f40"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "a0a24dc242b66e40b24c5c06a4368205",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

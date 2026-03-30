@@ -60,14 +60,19 @@ uniform float pbrAO = 1.0;
 uniform vec3 pbrEmissive = vec3(0.0);
 uniform float pbrEmissiveIntensity = 0.0;
 
+const int NUM_CASCADES = 4;
+
 struct Light {
     vec4 position_type;
     vec4 color_intensity;
     vec4 direction_range;
-    vec4 spot_angles;
+    vec4 spot_angles_castshadows_startOffset;
+    mat4 lightSpaceMatrix[NUM_CASCADES];
+    mat4 pointLightMatrices[6];
+    vec4 splitDepths[(NUM_CASCADES + 3) / 4];
 };
 
-layout (std430, binding = 1) restrict readonly buffer LightsSSBO {
+layout (std430, binding = 4) restrict readonly buffer LightsSSBO { // Matches LIGHT_SSBO_BINDING in SSBO_Bindings.h
     vec4 lightCount;
     Light lights[];
 };
@@ -77,14 +82,21 @@ const int POINT_LIGHT = 0;
 const int DIRECTIONAL_LIGHT = 1;
 const int SPOT_LIGHT = 2;
 
+vec3 decodeTangentNormal()
+{
+    vec2 tangentXY = texture(materialNormalMap, TexCoord).rg * 2.0 - 1.0;
+    tangentXY *= material.normalStrength;
+    float tangentZ = sqrt(max(1.0 - dot(tangentXY, tangentXY), 0.0));
+    return normalize(vec3(tangentXY, tangentZ));
+}
+
 // Normal mapping function
 vec3 calculateNormal()
 {
     vec3 normal = normalize(Normal);
 
     if ((material.textureFlags & MAT_FLAG_NORMAL_MAP) != 0u) {
-        vec3 normalMap = texture(materialNormalMap, TexCoord).rgb * 2.0 - 1.0;
-        normalMap.xy *= material.normalStrength;
+        vec3 normalMap = decodeTangentNormal();
 
         vec3 T = normalize(Tangent);
         vec3 B = normalize(Bitangent);
@@ -222,8 +234,8 @@ float calculateAttenuation(int lightIndex, vec3 fragPosView, out vec3 lightDir)
         if (lightType == SPOT_LIGHT) {
             vec3 spotDir = normalize(lights[lightIndex].direction_range.xyz);
             float cosAngle = dot(-lightDir, spotDir);
-            float innerCos = lights[lightIndex].spot_angles.x;
-            float outerCos = lights[lightIndex].spot_angles.y;
+            float innerCos = lights[lightIndex].spot_angles_castshadows_startOffset.x;
+            float outerCos = lights[lightIndex].spot_angles_castshadows_startOffset.y;
             
             float spotFactor = clamp((cosAngle - outerCos) / (innerCos - outerCos), 0.0, 1.0);
             attenuation *= spotFactor;
@@ -314,7 +326,7 @@ void main()
         result += ambient;
 
         // Add contribution from each light
-        for (int i = 0; i < numLights && i < 16; ++i) {
+        for (int i = 0; i < numLights; ++i) {
             result += calculateBlinnPhong(i, norm, viewDir, ViewPos, albedo);
         }
         
@@ -331,7 +343,7 @@ void main()
         result += ambient;
 
         // Add contribution from each light
-        for (int i = 0; i < numLights && i < 16; ++i) {
+        for (int i = 0; i < numLights; ++i) {
             result += calculatePBR(i, norm, viewDir, ViewPos, albedo, F0, roughness, metallic);
         }
         

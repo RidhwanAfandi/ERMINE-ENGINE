@@ -1,0 +1,577 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1a0c5b30876eae498d8531a7a6b37408"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "GearPrefab1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7a45575ac18f094a831b6acaa301e2c6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            -0.04116460308432579,
+            1.1981666088104249
+          ],
+          "rotation": [
+            1.0,
+            0.0,
+            0.0,
+            -4.371138828673793e-8
+          ],
+          "scale": [
+            0.07999999821186066,
+            0.07999999821186066,
+            0.03999999910593033
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (6)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Gear_connect_2.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9047299f2a97964a92530f6ad115e376"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Gear_connect_2.fbx_polySurface47_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2a480c76dcda3b4996d8d713b3febb64"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "7a45575ac18f094a831b6acaa301e2c6",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d360aba135f5aa4790bc6cf19e498a54"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.9829010367393494
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            -0.23344536125659944,
+            0.972369909286499
+          ],
+          "scale": [
+            0.07999999821186066,
+            0.07999999821186066,
+            0.03999999910593033
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (5)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_GearBig.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "859404b5d1afd74f8696350506ee3f03"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_GearBig.fbx_Gear.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6afc8b99f869fc4b923eef7cfe8a60ce"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "d360aba135f5aa4790bc6cf19e498a54",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b8b53dddbf6a7b44a92127bb1e7e9e63"
+        },
+        "Transform": {
+          "position": [
+            0.15276478230953217,
+            2.0326572780504649e-7,
+            1.686388373374939
+          ],
+          "rotation": [
+            3.805470427843552e-15,
+            -7.592531505343161e-22,
+            -1.995162506318593e-7,
+            1.0
+          ],
+          "scale": [
+            0.029999999329447748,
+            0.029999999329447748,
+            0.029999999329447748
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "GearConnect",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Gear_connect_1.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d82b39f5824fb848ad7ede50690f4078"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Gear_connect_1.fbx_polySurface80_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "edb0d2e46a5c304ebe38c9042634a211"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "b8b53dddbf6a7b44a92127bb1e7e9e63",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "992204d6895a7549a970365e1e881569"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.6553851962089539
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            -0.12186934053897858,
+            0.9925461411476135
+          ],
+          "scale": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (4)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_GearBig.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c2d389903fd88f4588fbe46aaa1debac"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_GearBig.fbx_Gear.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6afc8b99f869fc4b923eef7cfe8a60ce"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "992204d6895a7549a970365e1e881569",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7b18fa25b58b0944ab8317f88437d28f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.40134790539741518
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.03999999910593033,
+            0.03999999910593033,
+            0.03999999910593033
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (3)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_GearBig.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "37a85589157a894ca6c126565bef23a7"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_GearBig.fbx_Gear.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6afc8b99f869fc4b923eef7cfe8a60ce"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "7b18fa25b58b0944ab8317f88437d28f",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0f75ba5a10dd48428535830b7b381dff"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.20280231535434724
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            -0.16504763066768647,
+            0.9862856268882752
+          ],
+          "scale": [
+            0.029999997466802598,
+            0.029999997466802598,
+            0.029999999329447748
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (2)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_GearBig.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a022b4e410c48847be8365e676ba72f2"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_GearBig.fbx_Gear.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6afc8b99f869fc4b923eef7cfe8a60ce"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "0f75ba5a10dd48428535830b7b381dff",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "5a19ec68f0573840a3c76eefbcc22d3f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.03999999910593033,
+            0.03999999910593033,
+            0.03999999910593033
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Gear (1)",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "C_GearBig.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "1a0c5b30876eae498d8531a7a6b37408",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "fb23ca618a0d73459901f7937311070f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_C_GearBig.fbx_Gear.001_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "6afc8b99f869fc4b923eef7cfe8a60ce"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "5a19ec68f0573840a3c76eefbcc22d3f",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

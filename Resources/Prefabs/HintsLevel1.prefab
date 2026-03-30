@@ -1,0 +1,935 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f86acead6c38594e834bca1c02d141c9"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "HintsLevel1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dd9f02f088b84841b45f457e06e8f493"
+        },
+        "Transform": {
+          "position": [
+            19.27797508239746,
+            -1.8855280876159669,
+            -161.3485870361328
+          ],
+          "rotation": [
+            0.5136571526527405,
+            -0.4861603081226349,
+            0.4756140410900116,
+            0.5230638384819031
+          ],
+          "scale": [
+            0.010000358335673809,
+            0.010000176727771759,
+            0.010000206530094147
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Paper4",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "CustomMesh",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Material": {
+          "guid": "6a1aae84c4e88348a2d00ec475605dbc"
+        },
+        "ModelComponent": {
+          "model": "ART1_paper_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "26879c8a6f1c824081f92c6186d51c3b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            -21.361392974853517
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_paper_low.fbx_Paper_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "0d899e0b1725494599ab1acfd8c31043"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "dd9f02f088b84841b45f457e06e8f493",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "89906c0e9ceac0408fc3450f4fe4709d"
+        },
+        "Transform": {
+          "position": [
+            33.43601608276367,
+            3.819937229156494,
+            -85.39546203613281
+          ],
+          "rotation": [
+            -0.03363301232457161,
+            0.7133455872535706,
+            -0.6992283463478088,
+            -0.032964084297418597
+          ],
+          "scale": [
+            0.010000327602028847,
+            0.010000135749578476,
+            0.01000018697232008
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Paper3",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "CustomMesh",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Material": {
+          "guid": "6a1aae84c4e88348a2d00ec475605dbc"
+        },
+        "ModelComponent": {
+          "model": "ART1_paper_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4279a6e9b591124c89eb76563e4dd46e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            -21.361392974853517
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_paper_low.fbx_Paper_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "0d899e0b1725494599ab1acfd8c31043"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "89906c0e9ceac0408fc3450f4fe4709d",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4978f3f4831b6e4bbafe7b12d2cc98f1"
+        },
+        "Transform": {
+          "position": [
+            -33.497039794921878,
+            5.015307426452637,
+            -47.485374450683597
+          ],
+          "rotation": [
+            0.7141396403312683,
+            0.0,
+            0.0,
+            0.7000032663345337
+          ],
+          "scale": [
+            0.009999999776482582,
+            0.010000021196901799,
+            0.010000012814998627
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Paper2",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "CustomMesh",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Material": {
+          "guid": "6a1aae84c4e88348a2d00ec475605dbc"
+        },
+        "ModelComponent": {
+          "model": "ART1_paper_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "44836df649d7484fb1a71556abdce75f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            -21.361392974853517
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_paper_low.fbx_Paper_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "0d899e0b1725494599ab1acfd8c31043"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "4978f3f4831b6e4bbafe7b12d2cc98f1",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0d2a3720f1bd5c418db53a3fa4cc2557"
+        },
+        "Transform": {
+          "position": [
+            -2.305211067199707,
+            3.9407637119293215,
+            6.255634784698486
+          ],
+          "rotation": [
+            0.7141396403312683,
+            0.0,
+            0.0,
+            0.7000032663345337
+          ],
+          "scale": [
+            0.009999999776482582,
+            0.010000021196901799,
+            0.010000012814998627
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Paper1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "CustomMesh",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Material": {
+          "guid": "6a1aae84c4e88348a2d00ec475605dbc"
+        },
+        "ModelComponent": {
+          "model": "ART1_paper_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ff7bdf80ca19d74299029d3c81a7102b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            -21.361392974853517
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_paper_low.fbx_Paper_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "0d899e0b1725494599ab1acfd8c31043"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "0d2a3720f1bd5c418db53a3fa4cc2557",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c7acc91516cc024684361f880954bd6b"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Hint3",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\aft_weapon.png",
+          "fullscreen": false,
+          "position": [
+            0.800000011920929,
+            0.6850000023841858,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 0.23000000417232514,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9d2a863f2edbaf4c88203ec78f4e3c83"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Hint2",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\aft_note.png",
+          "fullscreen": false,
+          "position": [
+            0.800000011920929,
+            0.7099999785423279,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 0.18000000715255738,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a3d40e5609dc0245a17ce9b9b3b1f950"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Hint1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\Spawn_UI.png",
+          "fullscreen": false,
+          "position": [
+            0.800000011920929,
+            0.7099999785423279,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 0.18000000715255738,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ce0247db90bac946b4030fbc7218fe3c"
+        },
+        "Transform": {
+          "position": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.7320507764816285,
+            1.7320507764816285,
+            1.7320507764816285
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clue4",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\4thClue.png",
+          "fullscreen": true,
+          "position": [
+            0.5,
+            0.5,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c515ea9bfb6f944aaa1490e877e11eb7"
+        },
+        "Transform": {
+          "position": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.7320507764816285,
+            1.7320507764816285,
+            1.7320507764816285
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clue3",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\3rdClue.png",
+          "fullscreen": true,
+          "position": [
+            0.5,
+            0.5,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "432209e70f9673489949ba2a9b89b939"
+        },
+        "Transform": {
+          "position": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.7320507764816285,
+            1.7320507764816285,
+            1.7320507764816285
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clue2",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\2ndClue.png",
+          "fullscreen": true,
+          "position": [
+            0.5,
+            0.5,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "30f0f9f5cccf93458d3a8da44cebb650"
+        },
+        "Transform": {
+          "position": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.7320507764816285,
+            1.7320507764816285,
+            1.7320507764816285
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Clue1",
+          "tag": "Untagged",
+          "selfActive": false
+        },
+        "HierarchyComponent": {
+          "parentGuid": "f86acead6c38594e834bca1c02d141c9",
+          "depth": 1
+        },
+        "UIImageComponent": {
+          "imagePath": "G:\\Projects\\Ermine-Engine\\Build\\bin\\Editor-Release-windows-x86_64\\Ermine-Editor\\../Resources\\Textures\\UI\\Hints\\1stClue.png",
+          "fullscreen": true,
+          "position": [
+            0.5,
+            0.5,
+            0.0
+          ],
+          "width": 1.0,
+          "height": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "alpha": 1.0,
+          "maintainAspectRatio": true,
+          "caption": "",
+          "showCaption": false,
+          "captionColor": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "captionFontSize": 24.0,
+          "captionPosition": [
+            0.5,
+            0.10000000149011612,
+            0.0
+          ],
+          "renderOrder": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

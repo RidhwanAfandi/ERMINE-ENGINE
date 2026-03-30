@@ -1,0 +1,102 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                0.6265560388565064,
+                1.0,
+                0.9395670890808106,
+                0.9559999704360962
+            ]
+        },
+        "materialMetallic": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialRoughness": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialAo": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialEmissive": {
+            "type": "vec3",
+            "value": [
+                0.5148148536682129,
+                0.9568725228309631,
+                1.0
+            ]
+        },
+        "materialEmissiveIntensity": {
+            "type": "float",
+            "value": 0.27799999713897707
+        },
+        "materialNormalStrength": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialShadingModel": {
+            "type": "int",
+            "value": 0
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                1.0
+            ]
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasEmissiveMap": {
+            "type": "bool",
+            "value": false
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            1.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    }
+}

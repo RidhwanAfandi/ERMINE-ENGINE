@@ -80,6 +80,7 @@ namespace Ermine::editor {
 
 	static bool FieldAppliesToType(const std::string& key, LightType t) {
 		if (key == "innerAngle" || key == "outerAngle") return t == LightType::SPOT;
+		if (key == "castsShadows") return t != LightType::POINT;
 		if (key == "castsRays") return t == LightType::SPOT; // Only show for spotlights
 		if (key == "radius") return t == LightType::SPOT || t == LightType::POINT;
 		// color, intensity, castsShadows, type are always shown
@@ -400,6 +401,37 @@ namespace Ermine::editor {
 		return shaders;
 	}
 
+	static std::string ResolveCustomVertexShaderPath(const std::string& fragmentPath) {
+		constexpr const char* kDefaultVertex = "../Resources/Shaders/vertex.glsl";
+		if (fragmentPath.empty()) {
+			return kDefaultVertex;
+		}
+
+		std::filesystem::path fragmentFile(fragmentPath);
+		std::string fragmentName = fragmentFile.filename().string();
+		std::string vertexName = fragmentName;
+
+		const size_t fragmentPos = vertexName.find("fragment");
+		if (fragmentPos != std::string::npos) {
+			vertexName.replace(fragmentPos, std::string("fragment").size(), "vertex");
+		}
+		else if (fragmentFile.extension() == ".frag") {
+			vertexName = fragmentFile.stem().string() + ".vert";
+		}
+		else {
+			return kDefaultVertex;
+		}
+
+		std::filesystem::path vertexPath = fragmentFile.has_parent_path()
+			? (fragmentFile.parent_path() / vertexName)
+			: (std::filesystem::path("../Resources/Shaders") / vertexName);
+
+		if (std::filesystem::exists(vertexPath)) {
+			return vertexPath.generic_string();
+		}
+		return kDefaultVertex;
+	}
+
 	template<typename T>
 	static bool ComponentHeaderWithRemove(const char* headerLabel, EntityID entity,
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen)
@@ -684,6 +716,9 @@ namespace Ermine::editor {
 
 		if (ECS::GetInstance().HasComponent<UISliderComponent>(selected))
 			DrawUISliderComponent(selected);
+
+		if (ECS::GetInstance().HasComponent<UITextComponent>(selected))
+			DrawUITextComponent(selected);
 
 		ImGui::PopID();
 
@@ -1078,6 +1113,14 @@ namespace Ermine::editor {
 			refreshMaterialAssets();
 		}
 
+		bool flickerEmissive = matComp.flickerEmissive;
+		if (ImGui::Checkbox("Flicker Emissive", &flickerEmissive)) {
+			matComp.flickerEmissive = flickerEmissive;
+			if (auto renderer = ECS::GetInstance().GetSystem<graphics::Renderer>()) {
+				renderer->MarkDrawDataForRebuild();
+			}
+		}
+
 		static char newMaterialName[128] = "NewMaterial";
 		ImGui::InputText("New Material##MaterialAsset", newMaterialName, IM_ARRAYSIZE(newMaterialName));
 		if (ImGui::Button("Create Material##MaterialAsset")) {
@@ -1277,13 +1320,14 @@ namespace Ermine::editor {
 		if (!matComp.customFragmentShader.empty() &&
 			(!gm->GetShader() || gm->GetShader() == nullptr)) {
 			auto& assetManager = AssetManager::GetInstance();
+			const std::string vertexPath = ResolveCustomVertexShaderPath(matComp.customFragmentShader);
 			auto customShader = assetManager.LoadShader(
-				"../Resources/Shaders/vertex.glsl",
+				vertexPath,
 				matComp.customFragmentShader
 			);
 			if (customShader && customShader->IsValid()) {
 				gm->SetShader(customShader);
-				EE_CORE_INFO("Restored custom fragment shader from scene: {0}", matComp.customFragmentShader);
+				EE_CORE_INFO("Restored custom shader pair: vertex='{}', fragment='{}'", vertexPath, matComp.customFragmentShader);
 			}
 			else {
 				EE_CORE_WARN("Failed to restore custom fragment shader: {0}", matComp.customFragmentShader);
@@ -1451,6 +1495,25 @@ namespace Ermine::editor {
 
 		ImGui::SeparatorText("Rendering");
 
+        // --- Fill Amount / UV Axis ---
+        {
+            float fill = getFloat("materialFillAmount", nullptr, 1.0f);
+            if (ImGui::SliderFloat("Fill", &fill, 0.0f, 1.0f)) {
+                gm->SetFloat("materialFillAmount", std::clamp(fill, 0.0f, 1.0f));
+            }
+
+            Vec2 fillAxis = getVec2("materialFillUVAxis", nullptr, Vec2(0.0f, 1.0f));
+            float axis[2] = { fillAxis.x, fillAxis.y };
+            if (ImGui::DragFloat2("Fill UV Axis", axis, 0.01f, -1.0f, 1.0f)) {
+                Vec2 uvAxis(axis[0], axis[1]);
+                const float lenSq = uvAxis.x * uvAxis.x + uvAxis.y * uvAxis.y;
+                if (lenSq < 1e-8f) {
+                    uvAxis = Vec2(0.0f, 1.0f);
+                }
+                gm->SetVec2("materialFillUVAxis", uvAxis);
+            }
+        }
+
 		// --- Casts Shadows ---
 		{
 			bool castsShadows = getBool("materialCastsShadows", nullptr, matComp.cacheCastsShadows);
@@ -1520,14 +1583,14 @@ namespace Ermine::editor {
 
 						// Load and set the custom shader on the material
 						auto& assetManager = AssetManager::GetInstance();
-						// Use standard forward pass vertex shader with custom fragment
+						const std::string vertexPath = ResolveCustomVertexShaderPath(shaderPath);
 						auto customShader = assetManager.LoadShader(
-							"../Resources/Shaders/vertex.glsl",
+							vertexPath,
 							shaderPath
 						);
 						if (customShader && customShader->IsValid()) {
 							gm->SetShader(customShader);
-							EE_CORE_INFO("Loaded custom fragment shader: {0}", shaderPath);
+							EE_CORE_INFO("Loaded custom shader pair: vertex='{}', fragment='{}'", vertexPath, shaderPath);
 						}
 						else {
 							EE_CORE_WARN("Failed to load custom fragment shader: {0}", shaderPath);
@@ -1560,8 +1623,9 @@ namespace Ermine::editor {
 						matComp.customFragmentShader = shaderPath.string();
 
 						auto& assetManager = AssetManager::GetInstance();
+						const std::string vertexPath = ResolveCustomVertexShaderPath(matComp.customFragmentShader);
 						auto shader = assetManager.LoadShader(
-							"../Resources/Shaders/vertex.glsl",
+							vertexPath,
 							matComp.customFragmentShader
 						);
 
@@ -1626,10 +1690,13 @@ namespace Ermine::editor {
 			gm->SetUVScale(Vec2(1.0f, 1.0f));
 			gm->SetUVOffset(Vec2(0.0f, 0.0f));
 
-			gm->SetBool("materialCastsShadows", true);
-			matComp.cacheCastsShadows = true;
+            gm->SetBool("materialCastsShadows", true);
+            matComp.cacheCastsShadows = true;
+            gm->SetFloat("materialFillAmount", 1.0f);
+            gm->SetVec3("materialFillDirection", Vec3(0.0f, 1.0f, 0.0f));
+            gm->SetVec2("materialFillUVAxis", Vec2(0.0f, 1.0f));
 
-			gm->SetBool("materialHasAlbedoMap", false);
+            gm->SetBool("materialHasAlbedoMap", false);
 			setBoolBoth("materialHasNormalMap", "material.hasNormalMap", false);
 			gm->SetBool("materialHasRoughnessMap", false);
 			gm->SetBool("materialHasMetallicMap", false);
@@ -2962,6 +3029,7 @@ namespace Ermine::editor {
 		ImGui::DragFloat("Max Climb", &nav.agentMaxClimb, 0.01f, 0.0f, 2.0f);
 		ImGui::DragFloat("Max Slope", &nav.agentMaxSlope, 0.1f, 0.0f, 89.0f);
 
+		ImGui::Checkbox("Bake CustomMesh Shape", &nav.bakeUsingCustomMesh);
 		ImGui::Separator();
 
 		if (ImGui::Button("Bake Nav Mesh"))
@@ -3050,8 +3118,8 @@ namespace Ermine::editor {
 
 					a.radius = r;
 					// Total capsule height = cylinder(2*halfH) + two hemispheres(2*r)
-					a.height = 2.0f * halfH + 2.0f * r;
-					a.centerYOffset = halfH + r;
+					a.height = 2.0f * halfH;
+					a.centerYOffset = halfH;
 					break;
 				}
 
@@ -3087,6 +3155,10 @@ namespace Ermine::editor {
 				if (a.stoppingDistance < a.radius)
 					a.stoppingDistance = a.radius;
 
+				agent.radius = std::clamp(agent.radius, 0.05f, 2.0f);
+				agent.height = std::clamp(agent.height, 0.2f, 6.0f);
+				agent.centerYOffset = std::clamp(agent.centerYOffset, 0.0f, agent.height);
+
 				return true;
 		};
 
@@ -3110,6 +3182,7 @@ namespace Ermine::editor {
 		ImGui::Checkbox("Auto Fit From Collider", &agent.autoFitFromCollider);
 		ImGui::DragFloat("Radius", &agent.radius, 0.01f, 0.01f, 10.0f);
 		ImGui::DragFloat("Height", &agent.height, 0.01f, 0.01f, 20.0f);
+		agent.centerYOffset = std::max(agent.radius, agent.height * 0.5f);
 
 		if (ImGui::Button("Refit From Collider"))
 			agent.didAutoFit = false;
@@ -3996,9 +4069,9 @@ namespace Ermine::editor {
 
 		// Position (only relevant when not fullscreen)
 		if (!imageComp.fullscreen) {
-			ImGui::DragFloat3("Position", &imageComp.position.x, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Width", &imageComp.width, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Height", &imageComp.height, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat3("Position", &imageComp.position.x, 0.01f);
+			ImGui::DragFloat("Width", &imageComp.width, 0.01f);
+			ImGui::DragFloat("Height", &imageComp.height, 0.01f);
 			ImGui::Checkbox("Maintain Aspect Ratio", &imageComp.maintainAspectRatio);
 		}
 
@@ -4032,6 +4105,10 @@ namespace Ermine::editor {
 			// Caption position
 			ImGui::DragFloat2("Caption Position", &imageComp.captionPosition.x, 0.01f, 0.0f, 1.0f);
 		}
+
+		ImGui::Separator();
+		ImGui::DragInt("Render Order", &imageComp.renderOrder, 1, -100, 100);
+		ImGui::TextDisabled("Lower = behind, Higher = on top");
 	}
 
 	void HierarchyInspector::DrawAddComponentMenu(EntityID entity)
@@ -4240,11 +4317,12 @@ namespace Ermine::editor {
 			{"UI Book Counter",      [&](EntityID e) { ecs.AddComponent(e, UIBookCounterComponent{}); }},
 			{"UI Image",             [&](EntityID e) { ecs.AddComponent(e, UIImageComponent{}); }},
 			{"UI Button",            [&](EntityID e) { ecs.AddComponent(e, UIButtonComponent{}); }},
-			{"UI Slider",            [&](EntityID e) { ecs.AddComponent(e, UISliderComponent{}); }}
+			{"UI Slider",            [&](EntityID e) { ecs.AddComponent(e, UISliderComponent{}); }},
+			{"UI Text",              [&](EntityID e) { ecs.AddComponent(e, UITextComponent{}); }}
 		};
 
 		if (shouldShowMenu("UI", { "UI Component (Legacy)", "UI Healthbar","UI Crosshair",
-								   "UI Skills","UI Mana Bar","UI Book Counter","UI Image","UI Button","UI Slider" }) &&
+								   "UI Skills","UI Mana Bar","UI Book Counter","UI Image","UI Button","UI Slider","UI Text" }) &&
 			ImGui::BeginMenu("UI"))
 		{
 			for (auto& [name, addFunc] : uiComponents)
@@ -4331,24 +4409,64 @@ namespace Ermine::editor {
 	}
 
 	// Action data (scene path or custom event)
-	if (button.action != UIButtonComponent::ButtonAction::None && button.action != UIButtonComponent::ButtonAction::Quit)
+	if (button.action == UIButtonComponent::ButtonAction::LoadScene)
 	{
 		char actionDataBuffer[256];
 		strncpy_s(actionDataBuffer, button.actionData.c_str(), sizeof(actionDataBuffer) - 1);
 		actionDataBuffer[sizeof(actionDataBuffer) - 1] = '\0';
 
-		const char* label = (button.action == UIButtonComponent::ButtonAction::LoadScene)
-			? "Scene Path"
-			: "Event Name";
-
-		if (ImGui::InputText(label, actionDataBuffer, sizeof(actionDataBuffer))) {
+		if (ImGui::InputText("Scene Path", actionDataBuffer, sizeof(actionDataBuffer))) {
 			button.actionData = actionDataBuffer;
 		}
+		ImGui::TextDisabled("Example: ../Resources/Scenes/level.scene");
+	}
+	else if (button.action == UIButtonComponent::ButtonAction::Custom)
+	{
+		// Dropdown for known custom actions
+		static const char* customActions[] = {
+			"OpenControls",
+			"CloseControlsScreen",
+			"OpenSettings",
+			"CloseSettings",
+			"OpenSettingsPage",
+			"CloseSettingsPage",
+			"OpenSettingsAudio",
+			"OpenSettingsControls",
+			"OpenSettingsVideo",
+			"BackToSettingsPage",
+			"Resume",
+			"ShowTeleportInfo",
+			"ShowShootingInfo",
+			"ShowReturnInfo",
+			"ShowLightDInfo"
+		};
+		static const int numCustomActions = IM_ARRAYSIZE(customActions);
 
-		// Helper text
-		if (button.action == UIButtonComponent::ButtonAction::LoadScene) {
-			ImGui::TextDisabled("Example: ../Resources/Scenes/level.scene");
+		// Find current selection index
+		int currentCustomAction = -1;
+		for (int i = 0; i < numCustomActions; ++i)
+		{
+			if (button.actionData == customActions[i])
+			{
+				currentCustomAction = i;
+				break;
+			}
 		}
+
+		// Show dropdown
+		if (ImGui::Combo("Custom Action", &currentCustomAction, customActions, numCustomActions))
+		{
+			button.actionData = customActions[currentCustomAction];
+		}
+
+		// Also allow manual input for custom events not in the list
+		char actionDataBuffer[256];
+		strncpy_s(actionDataBuffer, button.actionData.c_str(), sizeof(actionDataBuffer) - 1);
+		actionDataBuffer[sizeof(actionDataBuffer) - 1] = '\0';
+		if (ImGui::InputText("Action (Manual)", actionDataBuffer, sizeof(actionDataBuffer))) {
+			button.actionData = actionDataBuffer;
+		}
+		ImGui::TextDisabled("Use dropdown above or type a custom event name");
 	}
 
 	// Audio settings
@@ -4372,6 +4490,10 @@ namespace Ermine::editor {
 	ImGui::TextDisabled("Example: button_click.wav");
 
 	ImGui::SliderFloat("Sound Volume", &button.soundVolume, 0.0f, 1.0f);
+
+	ImGui::Separator();
+	ImGui::DragInt("Render Order", &button.renderOrder, 1, -100, 100);
+	ImGui::TextDisabled("Lower = behind, Higher = on top");
 
 	// Show button state (read-only)
 	ImGui::Separator();
@@ -4485,12 +4607,62 @@ void HierarchyInspector::DrawUISliderComponent(EntityID entity)
 		slider.labelActiveImagePath = labelActiveImageBuffer;
 	}
 
+	// Value display settings
+	ImGui::Separator();
+	ImGui::Text("Value Display");
+
+	ImGui::Checkbox("Show Value", &slider.showValue);
+	ImGui::Checkbox("As Percentage", &slider.valueAsPercentage);
+	ImGui::ColorEdit3("Value Color", &slider.valueColor.x);
+	ImGui::DragFloat("Value Scale", &slider.valueScale, 0.1f, 0.1f, 3.0f);
+	ImGui::DragFloat2("Value Offset", &slider.valueOffset.x, 0.01f, -1.0f, 1.0f);
+
+	ImGui::Separator();
+	ImGui::DragInt("Render Order", &slider.renderOrder, 1, -100, 100);
+	ImGui::TextDisabled("Lower = behind, Higher = on top");
+
 	// Show slider state (read-only)
 	ImGui::Separator();
 	ImGui::Text("State (Read-Only)");
 	ImGui::Checkbox("Is Hovered", &slider.isHovered);
 	ImGui::SameLine();
 	ImGui::Checkbox("Is Dragging", &slider.isDragging);
+}
+
+void HierarchyInspector::DrawUITextComponent(EntityID entity)
+{
+	if (!ComponentHeaderWithRemove<UITextComponent>("UI Text Component", entity))
+		return;
+
+	auto& textComp = ECS::GetInstance().GetComponent<UITextComponent>(entity);
+
+	// Text (multiline)
+	char textBuffer[1024];
+	strncpy_s(textBuffer, textComp.text.c_str(), sizeof(textBuffer) - 1);
+	textBuffer[sizeof(textBuffer) - 1] = '\0';
+	if (ImGui::InputTextMultiline("Text", textBuffer, sizeof(textBuffer), ImVec2(-1.0f, ImGui::GetTextLineHeight() * 4))) {
+		textComp.text = textBuffer;
+	}
+
+	// Position
+	ImGui::DragFloat2("Position (X, Y)", &textComp.position.x, 0.01f, 0.0f, 1.0f);
+
+	// Font size
+	ImGui::DragFloat("Font Size", &textComp.fontSize, 0.1f, 0.1f, 10.0f);
+
+	// Color
+	ImGui::ColorEdit3("Color", &textComp.color.x);
+
+	// Alpha
+	ImGui::SliderFloat("Alpha", &textComp.alpha, 0.0f, 1.0f);
+
+	// Alignment
+	const char* alignmentNames[] = { "Left", "Center", "Right" };
+	ImGui::Combo("Alignment", &textComp.alignment, alignmentNames, IM_ARRAYSIZE(alignmentNames));
+
+	ImGui::Separator();
+	ImGui::DragInt("Render Order", &textComp.renderOrder, 1, -100, 100);
+	ImGui::TextDisabled("Lower = behind, Higher = on top");
 }
 
 } // namespace Ermine::editor

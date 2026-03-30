@@ -1,0 +1,107 @@
+{
+    "parameters": {
+        "materialAlbedo": {
+            "type": "vec4",
+            "value": [
+                0.5020747184753418,
+                1.0,
+                0.9070263504981995,
+                1.0
+            ]
+        },
+        "materialMetallic": {
+            "type": "float",
+            "value": 0.0
+        },
+        "materialRoughness": {
+            "type": "float",
+            "value": 0.30000001192092898
+        },
+        "materialAo": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialEmissive": {
+            "type": "vec3",
+            "value": [
+                0.10196078568696976,
+                1.0,
+                0.8313725590705872
+            ]
+        },
+        "materialEmissiveIntensity": {
+            "type": "float",
+            "value": 1.3279999494552613
+        },
+        "materialNormalStrength": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialShadingModel": {
+            "type": "int",
+            "value": 0
+        },
+        "materialCastsShadows": {
+            "type": "bool",
+            "value": true
+        },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 0.2849999964237213
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                -1.0
+            ]
+        },
+        "materialHasAlbedoMap": {
+            "type": "bool",
+            "value": true
+        },
+        "materialHasNormalMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasRoughnessMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasMetallicMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasAoMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialHasEmissiveMap": {
+            "type": "bool",
+            "value": false
+        },
+        "materialAlbedoMap": {
+            "type": "texture2d",
+            "value": "Resources\\Textures\\Noise\\Marble 10_Alpha.png"
+        }
+    },
+    "uvTransform": {
+        "scale": [
+            2.0,
+            1.0
+        ],
+        "offset": [
+            0.0,
+            0.0
+        ]
+    },
+    "customFragmentShader": "../Resources/Shaders/fill_emissive_scroll_fragment.glsl"
+}

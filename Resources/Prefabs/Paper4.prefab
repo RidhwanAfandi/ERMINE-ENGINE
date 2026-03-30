@@ -1,0 +1,110 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7a402d612a1afd40a195452305ea9933"
+        },
+        "Transform": {
+          "position": [
+            19.27797508239746,
+            -1.8855280876159669,
+            -161.3485870361328
+          ],
+          "rotation": [
+            0.5136571526527405,
+            -0.4861603081226349,
+            0.4756140410900116,
+            0.5230638384819031
+          ],
+          "scale": [
+            0.010000358335673809,
+            0.010000176727771759,
+            0.010000206530094147
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Paper4",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "CustomMesh",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Material": {
+          "guid": "6a1aae84c4e88348a2d00ec475605dbc"
+        },
+        "ModelComponent": {
+          "model": "ART1_paper_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f93721e3c2113e4a9fa2dbd92f71eb68"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            -21.361392974853517
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_paper_low.fbx_Paper_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "0d899e0b1725494599ab1acfd8c31043"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "7a402d612a1afd40a195452305ea9933",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

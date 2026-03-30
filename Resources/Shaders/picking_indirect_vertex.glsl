@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;      // Not used for picking, but needed for attribute layout
 layout(location = 2) in vec2 aTexCoord;    // Not used for picking, but needed for attribute layout
-layout(location = 3) in vec3 aTangent;     // Not used for picking, but needed for attribute layout
+layout(location = 3) in vec4 aTangent;     // Not used for picking, but needed for attribute layout
 
 // Draw info structure matching CPU-side DrawInfo (std430 layout)
 // Total size: 160 bytes (must match C++ DrawInfo in DrawCommands.h)

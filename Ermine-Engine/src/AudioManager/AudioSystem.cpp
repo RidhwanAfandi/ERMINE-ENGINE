@@ -17,6 +17,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MathVector.h"
 #include "AudioManager.h" // Include the CAudioEngine
 #include "EditorGUI.h"
+#include "UIButtonSystem.h" // For IsGamePaused()
 
 class ECS;
 
@@ -52,6 +53,10 @@ void GlobalAudioComponent::PlaySFX(int index) {
 
 void GlobalAudioComponent::PlaySFX(const std::string& name) {
     AudioSystem::PlayGlobalSFX(*this, name);
+}
+
+void GlobalAudioComponent::StopSFX(const std::string& name) {
+    AudioSystem::StopGlobalSFX(*this, name);
 }
 
 void GlobalAudioComponent::SetSFXVolume(float volume) {
@@ -169,7 +174,7 @@ void GlobalAudioComponent::UpdateAmbienceSource(int index, const std::string& na
     if (index >= 0 && index < static_cast<int>(ambience.size())) {
         // Stop current ambience if we're updating the currently playing track
         if (currentAmbienceIndex == index && currentAmbienceChannelId != -1) {
-            CAudioEngine::StopChannel(currentAmbienceChannelId);
+            CAudioEngine::StopChannel(currentAmbienceChannelId, true, 0.3f); // Fade out
             currentAmbienceChannelId = -1;
         }
 
@@ -192,7 +197,7 @@ void GlobalAudioComponent::RemoveAmbienceSource(int index) {
     if (index >= 0 && index < static_cast<int>(ambience.size())) {
         // Stop current ambience if we're removing the currently playing track
         if (currentAmbienceIndex == index && currentAmbienceChannelId != -1) {
-            CAudioEngine::StopChannel(currentAmbienceChannelId);
+            CAudioEngine::StopChannel(currentAmbienceChannelId, true, 0.3f); // Fade out
             currentAmbienceChannelId = -1;
             currentAmbienceIndex = -1;
         }
@@ -220,8 +225,104 @@ int GlobalAudioComponent::FindAmbienceIndex(const std::string& name) const {
     return -1;
 }
 
+// ========== Voice Methods ==========
 
-// ========== AudioSystem Static Methods ==========
+void GlobalAudioComponent::PlayVoice(int index) {
+    AudioSystem::PlayGlobalVoice(*this, index);
+}
+
+void GlobalAudioComponent::PlayVoice(const std::string& name) {
+    AudioSystem::PlayGlobalVoice(*this, name);
+}
+
+void GlobalAudioComponent::StopVoice() {
+    AudioSystem::StopGlobalVoice(*this);
+}
+
+void GlobalAudioComponent::SetVoiceVolume(float volume) {
+    voiceVolume = std::clamp(volume, 0.0f, 1.0f);
+
+    if (currentVoiceChannelId != -1 &&
+        currentVoiceIndex >= 0 &&
+        currentVoiceIndex < static_cast<int>(voice.size())) {
+        const auto& voiceSource = voice[currentVoiceIndex];
+        float finalVolume = AudioSystem::ConvertVolumeToFMOD(
+            voiceSource.volume * masterVolume * voiceVolume
+        );
+        CAudioEngine::SetChannelVolume(currentVoiceChannelId, finalVolume);
+    }
+}
+
+int GlobalAudioComponent::GetVoiceIndex(const std::string& name) const {
+    for (size_t i = 0; i < voice.size(); ++i) {
+        if (voice[i].audioName == name) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+void GlobalAudioComponent::AddVoiceSource(const std::string& name, const std::string& path) {
+    for (const auto& v : voice) {
+        if (v.audioName == name) {
+            std::cout << "Voice source '" << name << "' already exists!" << std::endl;
+            return;
+        }
+    }
+    AudioSource newVoice;
+    newVoice.audioName = name;
+    newVoice.audioPath = path;
+    newVoice.volume = 1.0f;
+    voice.push_back(newVoice);
+}
+
+void GlobalAudioComponent::UpdateVoiceSource(int index, const std::string& name, const std::string& path) {
+    if (index >= 0 && index < static_cast<int>(voice.size())) {
+        if (currentVoiceIndex == index && currentVoiceChannelId != -1) {
+            CAudioEngine::StopChannel(currentVoiceChannelId, true, 0.3f);
+            currentVoiceChannelId = -1;
+        }
+        voice[index].audioName = name;
+        voice[index].audioPath = path;
+        try {
+            CAudioEngine::LoadSound(path, false, false, true); // Not looped, streamed
+        }
+        catch (const std::exception& e) {
+            (void)e;
+            UNREFERENCED_PARAMETER(e);
+        }
+    }
+}
+
+void GlobalAudioComponent::RemoveVoiceSource(int index) {
+    if (index >= 0 && index < static_cast<int>(voice.size())) {
+        if (currentVoiceIndex == index && currentVoiceChannelId != -1) {
+            CAudioEngine::StopChannel(currentVoiceChannelId, true, 0.3f);
+            currentVoiceChannelId = -1;
+            currentVoiceIndex = -1;
+        }
+        else if (currentVoiceIndex > index) {
+            currentVoiceIndex--;
+        }
+        voice.erase(voice.begin() + index);
+    }
+}
+
+const AudioSource* GlobalAudioComponent::GetVoiceSource(int index) const {
+    if (index >= 0 && index < static_cast<int>(voice.size())) {
+        return &voice[index];
+    }
+    return nullptr;
+}
+
+int GlobalAudioComponent::FindVoiceIndex(const std::string& name) const {
+    for (size_t i = 0; i < voice.size(); ++i) {
+        if (voice[i].audioName == name) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
 
 void AudioSystem::PlayGlobalAmbience(GlobalAudioComponent& globalAudio, int index)
 {
@@ -271,10 +372,62 @@ void AudioSystem::StopGlobalAmbience(GlobalAudioComponent& globalAudio)
 {
     if (globalAudio.currentAmbienceChannelId != -1)
     {
-        CAudioEngine::StopChannel(globalAudio.currentAmbienceChannelId);
+        // Use fade-out for ambience (0.5s for smoother transition)
+        CAudioEngine::StopChannel(globalAudio.currentAmbienceChannelId, true, 0.5f);
         globalAudio.currentAmbienceChannelId = -1;
         globalAudio.currentAmbienceIndex = -1;
         std::cout << "Stopped ambience" << std::endl;
+    }
+}
+
+void AudioSystem::PlayGlobalVoice(GlobalAudioComponent& globalAudio, int index)
+{
+    if (index < 0 || index >= static_cast<int>(globalAudio.voice.size()))
+        return;
+
+    // Stop any currently playing voice line before starting the new one
+    StopGlobalVoice(globalAudio);
+
+    const auto& voiceSource = globalAudio.voice[index];
+
+    // Load as non-looping, streamed (voice lines are long but play once)
+    CAudioEngine::LoadSound(voiceSource.audioPath, false, false, true);
+
+    float finalVolume = ConvertVolumeToFMOD(
+        voiceSource.volume * globalAudio.masterVolume * globalAudio.voiceVolume
+    );
+
+    Vector3D position(0.0f, 0.0f, 0.0f);
+    globalAudio.currentVoiceChannelId = CAudioEngine::PlaySounds(
+        voiceSource.audioPath, position, finalVolume
+    );
+    globalAudio.currentVoiceIndex = index;
+
+    std::cout << "Playing voice: " << voiceSource.audioName << std::endl;
+}
+
+void AudioSystem::PlayGlobalVoice(GlobalAudioComponent& globalAudio, const std::string& name)
+{
+    for (size_t i = 0; i < globalAudio.voice.size(); ++i)
+    {
+        if (globalAudio.voice[i].audioName == name)
+        {
+            PlayGlobalVoice(globalAudio, static_cast<int>(i));
+            return;
+        }
+    }
+
+    std::cout << "Voice '" << name << "' not found in GlobalAudioComponent" << std::endl;
+}
+
+void AudioSystem::StopGlobalVoice(GlobalAudioComponent& globalAudio)
+{
+    if (globalAudio.currentVoiceChannelId != -1)
+    {
+        CAudioEngine::StopChannel(globalAudio.currentVoiceChannelId, true, 0.1f);
+        globalAudio.currentVoiceChannelId = -1;
+        globalAudio.currentVoiceIndex = -1;
+        std::cout << "Stopped voice" << std::endl;
     }
 }
 
@@ -313,6 +466,7 @@ void AudioSystem::Update()
     static bool s_HasAutoPlayed = false;
 
     bool isPlaying = (editor::EditorGUI::s_state == editor::EditorGUI::SimState::playing);
+    bool isGamePaused = UIButtonSystem::IsGamePaused();
 
     // Handle PAUSED state (different from STOPPED)
     if (editor::EditorGUI::s_state == editor::EditorGUI::SimState::paused)
@@ -326,13 +480,26 @@ void AudioSystem::Update()
         return;
     }
 
-    // Handle STOPPED state (complete stop)
+    // Handle game pause (pause menu) - pause all audio but keep updating FMOD for UI sounds
+    if (isGamePaused)
+    {
+        if (!s_isPaused)
+        {
+            PauseAll(); // Pause all game audio
+        }
+
+        CAudioEngine::Update(); // Still update FMOD (for UI sounds to work)
+        return;
+    }
+
+    // Handle STOPPED state (complete stop with fade-out)
     if (!isPlaying)
     {
         if (s_WasPlaying)
         {
-            std::cout << "=== STOPPING ALL AUDIO ===" << std::endl;
-            CAudioEngine::StopAllChannels(); // Complete stop
+            std::cout << "=== STOPPING ALL AUDIO (WITH FADE-OUT) ===" << std::endl;
+            // Use fade-out instead of hard stop (0.5s fade for smooth transition)
+            CAudioEngine::StopAllChannels(true, 0.5f);
 
             // Clear entity audio states
             for (EntityID entity : m_Entities)
@@ -368,7 +535,7 @@ void AudioSystem::Update()
                 }
             }
 
-            std::cout << "=== ALL AUDIO STOPPED ===" << std::endl;
+            std::cout << "=== ALL AUDIO STOPPED (FADED OUT) ===" << std::endl;
         }
 
         s_WasPlaying = false;
@@ -616,9 +783,20 @@ void AudioSystem::UpdateAudioComponents()
         // **NEW: Update volume if it changed while playing**
         if (audioComp.isPlaying && audioComp.channelId != -1)
         {
-            float currentVolume = ConvertVolumeToFMOD(audioComp.volume);
-            //std::cout << "Updating volume for channel " << audioComp.channelId
-            //    << " to " << audioComp.volume << " (dB: " << currentVolume << ")" << std::endl;
+            // Get GlobalAudioComponent to apply SFX volume multiplier
+            float globalSFXVolume = 1.0f;
+            for (Ermine::EntityID e = 0; e < Ermine::MAX_ENTITIES; ++e)
+            {
+                if (ecs.IsEntityValid(e) && ecs.HasComponent<GlobalAudioComponent>(e))
+                {
+                    globalSFXVolume = ecs.GetComponent<GlobalAudioComponent>(e).sfxVolume;
+                    break;
+                }
+            }
+
+            // Apply both AudioComponent volume AND global SFX volume
+            float finalVolume = audioComp.volume * globalSFXVolume;
+            float currentVolume = ConvertVolumeToFMOD(finalVolume);
             CAudioEngine::SetChannelVolume(audioComp.channelId, currentVolume);
         }
 
@@ -660,6 +838,16 @@ void AudioSystem::UpdateGlobalAudio(GlobalAudioComponent& globalAudio)
             globalAudio.currentAmbienceIndex = -1;
         }
     }
+
+    // Check if current voice line has finished playing
+    if (globalAudio.currentVoiceChannelId != -1)
+    {
+        if (!CAudioEngine::IsPlaying(globalAudio.currentVoiceChannelId))
+        {
+            globalAudio.currentVoiceChannelId = -1;
+            globalAudio.currentVoiceIndex = -1;
+        }
+    }
 }
 
 void AudioSystem::PlayGlobalMusic(GlobalAudioComponent& globalAudio, int index)
@@ -686,6 +874,11 @@ void AudioSystem::PlayGlobalMusic(GlobalAudioComponent& globalAudio, int index)
 
 void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, int index)
 {
+    PlayGlobalSFX(globalAudio, index, false, -12.0f, 0.0f, 1.0f);
+}
+
+void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, int index, bool useReverb, float wetLevel, float dryLevel, float decayTime, float earlyDelay, float lateDelay)
+{
     if (index < 0 || index >= globalAudio.sfx.size())
         return;
 
@@ -699,17 +892,43 @@ void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, int index)
 
     // Convert Vec3 to Vector3D for CAudioEngine compatibility
     Vector3D position(0.0f, 0.0f, 0.0f);
-    CAudioEngine::PlaySounds(sfxSource.audioPath, position, finalVolume);
+    // PlaySounds() creates a new channel and explicitly unpauses it,
+    // so UI sounds will play even if other channels are paused
+    int channelId = CAudioEngine::PlaySounds(sfxSource.audioPath, position, finalVolume);
+    globalAudio.sfxChannels[sfxSource.audioName] = channelId;
+
+    // Apply reverb if enabled
+    if (useReverb && channelId != -1)
+    {
+        FMOD::DSP* reverbDSP = CAudioEngine::CreateReverbDSP();
+        if (reverbDSP)
+        {
+            CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_DECAYTIME, decayTime);
+            CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_EARLYDELAY, earlyDelay);
+            CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_LATEDELAY, lateDelay);
+            CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_WETLEVEL, wetLevel);
+            CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_DRYLEVEL, dryLevel);
+            CAudioEngine::AddReverbToChannel(channelId, reverbDSP);
+            
+            // Release our reference - let channel manage DSP lifetime
+            reverbDSP->release();
+        }
+    }
 }
 
 void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, const std::string& name)
+{
+    PlayGlobalSFX(globalAudio, name, false, -12.0f, 0.0f, 1.0f);
+}
+
+void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, const std::string& name, bool useReverb, float wetLevel, float dryLevel, float decayTime, float earlyDelay, float lateDelay)
 {
     // Find the SFX by name
     for (size_t i = 0; i < globalAudio.sfx.size(); ++i)
     {
         if (globalAudio.sfx[i].audioName == name)
         {
-            PlayGlobalSFX(globalAudio, static_cast<int>(i));
+            PlayGlobalSFX(globalAudio, static_cast<int>(i), useReverb, wetLevel, dryLevel, decayTime, earlyDelay, lateDelay);
             return;
         }
     }
@@ -718,11 +937,22 @@ void AudioSystem::PlayGlobalSFX(GlobalAudioComponent& globalAudio, const std::st
     std::cout << "SFX '" << name << "' not found in GlobalAudioComponent" << std::endl;
 }
 
+void AudioSystem::StopGlobalSFX(GlobalAudioComponent& globalAudio, const std::string& name)
+{
+    auto it = globalAudio.sfxChannels.find(name);
+    if (it != globalAudio.sfxChannels.end())
+    {
+        CAudioEngine::StopChannel(it->second, false, 0.0f);
+        globalAudio.sfxChannels.erase(it);
+    }
+}
+
 void AudioSystem::StopGlobalMusic(GlobalAudioComponent& globalAudio)
 {
     if (globalAudio.currentMusicChannelId != -1)
     {
-        CAudioEngine::StopChannel(globalAudio.currentMusicChannelId);
+        // Use fade-out for music (0.5s for smoother transition)
+        CAudioEngine::StopChannel(globalAudio.currentMusicChannelId, true, 0.5f);
         globalAudio.currentMusicChannelId = -1;
         globalAudio.currentMusicIndex = -1;
     }
@@ -770,10 +1000,10 @@ void AudioSystem::PlayEntityAudio(AudioComponent& audioComp, const Transform& tr
         audioComp.isPlaying = CAudioEngine::IsEventPlaying(audioComp.eventName);
         audioComp.channelId = -1; // Events don't use channel IDs
     }
-    else if (!soundToPlay.empty())  // ← Changed from soundName to soundToPlay
+    else if (!soundToPlay.empty())
     {
         // Handle regular sounds (including variations!)
-        CAudioEngine::LoadSound(soundToPlay, audioComp.is3D, audioComp.isLooping, audioComp.isStreaming);  // ← Changed
+        CAudioEngine::LoadSound(soundToPlay, audioComp.is3D, audioComp.isLooping, audioComp.isStreaming);
 
         // Convert Vec3 to Vector3D for CAudioEngine compatibility
         Vector3D position(0.0f, 0.0f, 0.0f);
@@ -782,11 +1012,45 @@ void AudioSystem::PlayEntityAudio(AudioComponent& audioComp, const Transform& tr
             position = Vector3D(transform.position.x, transform.position.y, transform.position.z);
         }
 
-        // Convert 0-1 volume to dB
-        float volumeDB = ConvertVolumeToFMOD(audioComp.volume);
+        // Get GlobalAudioComponent to apply SFX volume multiplier
+        auto& ecs = ECS::GetInstance();
+        float globalSFXVolume = 1.0f;
+        for (Ermine::EntityID e = 0; e < Ermine::MAX_ENTITIES; ++e)
+        {
+            if (ecs.IsEntityValid(e) && ecs.HasComponent<GlobalAudioComponent>(e))
+            {
+                globalSFXVolume = ecs.GetComponent<GlobalAudioComponent>(e).sfxVolume;
+                break;
+            }
+        }
 
-        audioComp.channelId = CAudioEngine::PlaySounds(soundToPlay, position, volumeDB);  // ← Changed
+        // Apply both AudioComponent volume AND global SFX volume
+        float finalVolume = audioComp.volume * globalSFXVolume;
+        float volumeDB = ConvertVolumeToFMOD(finalVolume);
+
+        audioComp.channelId = CAudioEngine::PlaySounds(soundToPlay, position, volumeDB);
         audioComp.isPlaying = (audioComp.channelId != -1);
+
+        // Apply reverb if enabled
+        if (audioComp.useReverb && audioComp.channelId != -1)
+        {
+            FMOD::DSP* reverbDSP = CAudioEngine::CreateReverbDSP();
+            if (reverbDSP)
+            {
+                // Apply reverb settings (minimal early/late delay to avoid double sound)
+                CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_DECAYTIME, audioComp.reverbDecayTime);
+                CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_EARLYDELAY, 0.001f);
+                CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_LATEDELAY, 0.001f);
+                CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_WETLEVEL, audioComp.reverbWetLevel);
+                CAudioEngine::SetReverbParameter(reverbDSP, FMOD_DSP_SFXREVERB_DRYLEVEL, audioComp.reverbDryLevel);
+                
+                // Add reverb DSP to the channel
+                CAudioEngine::AddReverbToChannel(audioComp.channelId, reverbDSP);
+                
+                // Release our reference - let channel manage DSP lifetime
+                reverbDSP->release();
+            }
+        }
     }
 }
 
@@ -794,11 +1058,13 @@ void AudioSystem::StopEntityAudio(AudioComponent& audioComp)
 {
     if (!audioComp.eventName.empty())
     {
-        CAudioEngine::StopEvent(audioComp.eventName);
+        // Use fade-out for events (allowFadeOut = true)
+        CAudioEngine::StopEvent(audioComp.eventName, false); // false = allow fade out
     }
     else if (audioComp.channelId != -1)
     {
-        CAudioEngine::StopChannel(audioComp.channelId);
+        // Use fade-out for regular sounds (default 0.3s fade)
+        CAudioEngine::StopChannel(audioComp.channelId, true, 0.3f);
         audioComp.channelId = -1;
     }
 

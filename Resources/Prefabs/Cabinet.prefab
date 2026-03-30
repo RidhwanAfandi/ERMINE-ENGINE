@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c10c852c77d30243b55757d684f4e3fb"
+        },
+        "Transform": {
+          "position": [
+            -16.201656341552736,
+            0.4345720112323761,
+            0.5939778685569763
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.030000001192092897,
+            0.029999999329447748,
+            0.03000001050531864
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Cabinet",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Cabinet_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0fdcfa54122aba4bb86f32af1210528c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Cabinet_low.fbx_pCube37_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "ad86b89d4197934ab8aad7bd37489fd4"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "c10c852c77d30243b55757d684f4e3fb",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

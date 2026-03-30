@@ -22,7 +22,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AudioSystem.h"
 #include "GLFW/glfw3.h"
 #include "EditorGUI.h"
+#include "VideoManager.h"
 #include "Window.h"
+#include "Renderer.h"
+#include "SettingsManager.h"
 
 #ifdef EE_EDITOR
 #include "EditorGUI.h"
@@ -31,6 +34,31 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace Ermine
 {
+    void UIButtonSystem::PauseTrackedVideoForGamePause()
+    {
+        auto videoSystem = ECS::GetInstance().GetSystem<VideoManager>();
+        if (!videoSystem)
+            return;
+
+        if (!s_resumeVideoAfterPause)
+            s_resumeVideoAfterPause = videoSystem->IsVideoPlaying();
+
+        if (videoSystem->IsVideoPlaying())
+            videoSystem->Pause();
+    }
+
+    void UIButtonSystem::ResumeTrackedVideoAfterGamePause()
+    {
+        if (!s_resumeVideoAfterPause)
+            return;
+
+        auto videoSystem = ECS::GetInstance().GetSystem<VideoManager>();
+        if (videoSystem)
+            videoSystem->Play();
+
+        s_resumeVideoAfterPause = false;
+    }
+
     void UIButtonSystem::Init(int screenWidth, int screenHeight)
     {
         m_screenWidth = screenWidth;
@@ -158,6 +186,14 @@ namespace Ermine
 
             auto& button = ecs.GetComponent<UIButtonComponent>(entity);
 
+            // Skip disabled buttons (visible but not clickable)
+            if (button.disabled)
+            {
+                button.isHovered = false;
+                button.isPressed = false;
+                continue;
+            }
+
             // Calculate button bounds in normalized space
             float halfW = (button.size.x * 0.5f) / m_aspectRatio;
             float halfH = button.size.y * 0.5f;
@@ -176,8 +212,17 @@ namespace Ermine
 
                 if (globalAudio)
                 {
-                    AudioSystem::PlayGlobalSFX(*globalAudio, "Hover");
-                    EE_CORE_INFO("Playing hover sound");
+                    // Use custom hover sound if specified, otherwise use default
+                    if (!button.hoverSoundName.empty())
+                    {
+                        AudioSystem::PlayGlobalSFX(*globalAudio, button.hoverSoundName);
+                        EE_CORE_INFO("Playing custom hover sound: {0}", button.hoverSoundName);
+                    }
+                    else
+                    {
+                        AudioSystem::PlayGlobalSFX(*globalAudio, "UIHover");
+                        EE_CORE_INFO("Playing default hover sound");
+                    }
                 }
             }
             else if (!inside && button.isHovered)
@@ -192,8 +237,36 @@ namespace Ermine
                 button.isPressed = true;
                 if (globalAudio)
                 {
-                    AudioSystem::PlayGlobalSFX(*globalAudio, "Click");
-                    EE_CORE_INFO("Playing click sound");
+                    // Use custom click sound if specified, otherwise use default
+                    if (!button.clickSoundName.empty())
+                    {
+                        AudioSystem::PlayGlobalSFX(*globalAudio, button.clickSoundName);
+                        EE_CORE_INFO("Playing custom click sound: {0}", button.clickSoundName);
+                    }
+                    else
+                    {
+                        // Check if this is the Play button by entity name
+                        if (ecs.HasComponent<ObjectMetaData>(entity))
+                        {
+                            auto& meta = ecs.GetComponent<ObjectMetaData>(entity);
+                            if (meta.name == "Play Button")
+                            {
+                                // Special sound for Play button
+                                AudioSystem::PlayGlobalSFX(*globalAudio, "UIClickPlay");
+                                EE_CORE_INFO("Playing Play button click sound");
+                            }
+                            else
+                            {
+                                // Default click sound for all other buttons
+                                AudioSystem::PlayGlobalSFX(*globalAudio, "UIClick");
+                                EE_CORE_INFO("Playing default click sound");
+                            }
+                        }
+                        else
+                        {
+                            AudioSystem::PlayGlobalSFX(*globalAudio, "UIClick");
+                        }
+                    }
                 }
 
                 ExecuteButtonAction(button);
@@ -285,6 +358,11 @@ namespace Ermine
         // CRITICAL: Process pending scene load AFTER iteration completes
         if (m_HasPendingSceneLoad)
         {
+            // Unpause before loading new scene
+            s_isGamePaused = false;
+            editor::EditorGUI::s_state = editor::EditorGUI::SimState::playing;
+            Window::SetCursorLockState(Window::CursorLockState::None);
+
             EE_CORE_INFO("Executing deferred scene load: {}", m_PendingSceneToLoad);
             try
             {
@@ -386,6 +464,11 @@ namespace Ermine
                 meta.selfActive = !meta.selfActive;
                 s_isGamePaused = meta.selfActive;
 
+                if (s_isGamePaused)
+                    PauseTrackedVideoForGamePause();
+                else
+                    ResumeTrackedVideoAfterGamePause();
+
                 // ✅ CRITICAL FIX: Use the same pause mechanism as alt-tab (EditorGUI::s_state)
                 // This ensures audio and ALL systems respect the pause, not just game logic
                 editor::EditorGUI::s_state = s_isGamePaused
@@ -406,6 +489,13 @@ namespace Ermine
     bool UIButtonSystem::IsGamePaused()
     {
         return s_isGamePaused;
+    }
+
+    void UIButtonSystem::ResetRuntimeState()
+    {
+        s_isGamePaused = false;
+        s_resumeVideoAfterPause = false;
+        EE_CORE_INFO("UIButtonSystem: Reset runtime pause state");
     }
 
     void UIButtonSystem::ExecuteButtonAction(const UIButtonComponent& button)
@@ -444,104 +534,124 @@ namespace Ermine
                 TogglePauseMenu();
                 EE_CORE_INFO("Resume button clicked");
             }
+            // ===== Old Flow (Audio/Controls as separate main menu buttons) =====
             else if (button.actionData == "OpenControls")
             {
-                // Show ControlsScreen, hide main menu buttons
                 SetEntityActiveByName("ControlsScreen", true);
                 SetEntityActiveByName("Play Button", false);
-                SetEntityActiveByName("Controls", false);  // Use actual button name
+                SetEntityActiveByName("Controls", false);
                 SetEntityActiveByName("Audio", false);
                 SetEntityActiveByName("Quit Button", false);
-            }
-            else if (button.actionData == "CloseControlsScreen")
-            {
-                // Hide ControlsScreen, show main menu buttons
-                SetEntityActiveByName("ControlsScreen", false);
-                SetEntityActiveByName("Play Button", true);
-                SetEntityActiveByName("Controls", true);  // Use actual button name
-                SetEntityActiveByName("Audio", true);
-                SetEntityActiveByName("Quit Button", true);
+                SetEntityActiveByName("Title", false);
             }
             else if (button.actionData == "OpenSettings")
             {
-                auto& ecs = ECS::GetInstance();
-
-                // Show SettingsMenu
                 SetEntityActiveByName("SettingsMenu", true);
-
-                // Hide all buttons EXCEPT Back Button (which is inside SettingsMenu)
-                for (EntityID e = 0; e < MAX_ENTITIES; ++e)
-                {
-                    if (!ecs.IsEntityValid(e)) continue;
-                    if (!ecs.HasComponent<ObjectMetaData>(e)) continue;
-                    if (!ecs.HasComponent<UIButtonComponent>(e)) continue;
-
-                    auto& meta = ecs.GetComponent<ObjectMetaData>(e);
-
-                    // Don't hide buttons that are inside SettingsMenu
-                    if (ecs.HasComponent<HierarchyComponent>(e))
-                    {
-                        auto& hierarchy = ecs.GetComponent<HierarchyComponent>(e);
-                        EntityID parent = hierarchy.parent;
-
-                        // Check if parent is SettingsMenu
-                        if (ecs.IsEntityValid(parent) && ecs.HasComponent<ObjectMetaData>(parent))
-                        {
-                            auto& parentMeta = ecs.GetComponent<ObjectMetaData>(parent);
-                            if (parentMeta.name == "SettingsMenu")
-                            {
-                                continue; // Skip hiding this button
-                            }
-                        }
-                    }
-
-                    // Hide all other buttons
-                    meta.selfActive = false;
-                }
-
-                // Also hide backgrounds
-                SetEntityActiveByName("PauseBackground", false);
-                //SetEntityActiveByName("MenuBackground", false);
+                SetEntityActiveByName("Play Button", false);
+                SetEntityActiveByName("Controls", false);
+                SetEntityActiveByName("Audio", false);
+                SetEntityActiveByName("Quit Button", false);
+                SetEntityActiveByName("Title", false);
             }
             else if (button.actionData == "CloseSettings")
             {
-                auto& ecs = ECS::GetInstance();
-
-                // Hide SettingsMenu
                 SetEntityActiveByName("SettingsMenu", false);
+                SetEntityActiveByName("Play Button", true);
+                SetEntityActiveByName("Controls", true);
+                SetEntityActiveByName("Audio", true);
+                SetEntityActiveByName("Quit Button", true);
+                SetEntityActiveByName("Title", true);
+            }
+            // ===== New Settings Page Flow =====
+            else if (button.actionData == "OpenSettingsPage")
+            {
+                // Hide main menu buttons
+                SetEntityActiveByName("Play Button", false);
+                SetEntityActiveByName("Settings Button", false);
+                SetEntityActiveByName("Settings_Button", false);
+                SetEntityActiveByName("Quit Button", false);
+                SetEntityActiveByName("Title", false);
 
-                // Show all buttons that were hidden
-                for (EntityID e = 0; e < MAX_ENTITIES; ++e)
-                {
-                    if (!ecs.IsEntityValid(e)) continue;
-                    if (!ecs.HasComponent<ObjectMetaData>(e)) continue;
-                    if (!ecs.HasComponent<UIButtonComponent>(e)) continue;
+                // Hide pause menu buttons
+                SetEntityActiveByName("ResumeButton", false);
+                SetEntityActiveByName("Exit_Game", false);
+                SetEntityActiveByName("PauseBackground", false);
 
-                    auto& meta = ecs.GetComponent<ObjectMetaData>(e);
+                // Show settings page (Audio/Controls/Video buttons)
+                SetEntityActiveByName("SettingsPage", true);
+            }
+            // Settings Page -> Main Menu
+            else if (button.actionData == "CloseSettingsPage")
+            {
+                // Hide settings page
+                SetEntityActiveByName("SettingsPage", false);
 
-                    // Don't show buttons that are inside SettingsMenu
-                    if (ecs.HasComponent<HierarchyComponent>(e))
-                    {
-                        auto& hierarchy = ecs.GetComponent<HierarchyComponent>(e);
-                        EntityID parent = hierarchy.parent;
+                // Show main menu buttons
+                SetEntityActiveByName("Play Button", true);
+                SetEntityActiveByName("Settings Button", true);
+                SetEntityActiveByName("Settings_Button", true);
+                SetEntityActiveByName("Quit Button", true);
+                SetEntityActiveByName("Title", true);
 
-                        if (ecs.IsEntityValid(parent) && ecs.HasComponent<ObjectMetaData>(parent))
-                        {
-                            auto& parentMeta = ecs.GetComponent<ObjectMetaData>(parent);
-                            if (parentMeta.name == "SettingsMenu")
-                            {
-                                continue; // Skip showing this button
-                            }
-                        }
-                    }
-
-                    // Show all other buttons
-                    meta.selfActive = true;
-                }
-
-                // Show backgrounds
+                // Show pause menu buttons
+                SetEntityActiveByName("ResumeButton", true);
+                SetEntityActiveByName("Exit_Game", true);
                 SetEntityActiveByName("PauseBackground", true);
-                //SetEntityActiveByName("MenuBackground", true);
+            }
+            // Exit Game -> Show Return to Main Menu confirmation (overlay on top of pause menu)
+            else if (button.actionData == "ShowReturnConfirm")
+            {
+                // Disable pause menu buttons (still visible, just not clickable)
+                SetButtonDisabledByName("ResumeButton", true);
+                SetButtonDisabledByName("Exit_Game", true);
+                SetButtonDisabledByName("Settings_Button", true);
+
+                // Show confirmation panel on top
+                SetEntityActiveByName("ReturnConfirmBG", true);
+                SetEntityActiveByName("LeaveButton", true);
+                SetEntityActiveByName("ResumeConfirmButton", true);
+            }
+            // Return Confirm -> Resume (go back to pause menu)
+            else if (button.actionData == "HideReturnConfirm")
+            {
+                // Hide confirmation panel
+                SetEntityActiveByName("ReturnConfirmBG", false);
+                SetEntityActiveByName("LeaveButton", false);
+                SetEntityActiveByName("ResumeConfirmButton", false);
+
+                // Re-enable pause menu buttons
+                SetButtonDisabledByName("ResumeButton", false);
+                SetButtonDisabledByName("Exit_Game", false);
+                SetButtonDisabledByName("Settings_Button", false);
+            }
+            // Settings Page -> Audio (existing SettingsMenu with sliders)
+            else if (button.actionData == "OpenSettingsAudio")
+            {
+                SetEntityActiveByName("SettingsPage", false);
+                SetEntityActiveByName("SettingsMenu", true);
+            }
+            // Settings Page -> Controls
+            else if (button.actionData == "OpenSettingsControls")
+            {
+                SetEntityActiveByName("SettingsPage", false);
+                SetEntityActiveByName("ControlsScreen", true);
+            }
+            // Settings Page -> Video (gamma, brightness, etc.)
+            else if (button.actionData == "OpenSettingsVideo")
+            {
+                SetEntityActiveByName("SettingsPage", false);
+                SetEntityActiveByName("VideoSettings", true);
+            }
+            // Back from any sub-page -> Settings Page
+            else if (button.actionData == "BackToSettingsPage")
+            {
+                // Hide all sub-pages
+                SetEntityActiveByName("SettingsMenu", false);
+                SetEntityActiveByName("ControlsScreen", false);
+                SetEntityActiveByName("VideoSettings", false);
+
+                // Show settings page
+                SetEntityActiveByName("SettingsPage", true);
             }
             else if (button.actionData == "ShowTeleportInfo")
             {
@@ -650,6 +760,7 @@ namespace Ermine
             {
                 meta.selfActive = true;
                 s_isGamePaused = true;
+                PauseTrackedVideoForGamePause();
                 EE_CORE_INFO("Pause menu shown (alt-tab)");
                 Window::SetCursorLockState(Window::CursorLockState::None);
                 return;
@@ -658,6 +769,7 @@ namespace Ermine
 
         // No pause menu found - just pause gameplay
         s_isGamePaused = true;
+        PauseTrackedVideoForGamePause();
         EE_CORE_INFO("No pause menu in scene - gameplay paused only");
     }
 
@@ -688,6 +800,7 @@ namespace Ermine
             {
                 editor::EditorGUI::s_state = editor::EditorGUI::SimState::playing;
                 s_isGamePaused = false;
+                ResumeTrackedVideoAfterGamePause();
                 EE_CORE_INFO("Auto-resumed (no pause menu in scene)");
             }
 #else
@@ -695,6 +808,7 @@ namespace Ermine
             {
                 editor::EditorGUI::s_state = editor::EditorGUI::SimState::playing;
                 s_isGamePaused = false;
+                ResumeTrackedVideoAfterGamePause();
                 EE_CORE_INFO("Auto-resumed (no pause menu in scene)");
             }
 #endif
@@ -754,6 +868,29 @@ namespace Ermine
 #endif
     }
 
+    void UIButtonSystem::SetButtonDisabledByName(const std::string& name, bool disabled)
+    {
+        auto& ecs = ECS::GetInstance();
+
+        for (EntityID e = 0; e < MAX_ENTITIES; ++e)
+        {
+            if (!ecs.IsEntityValid(e)) continue;
+            if (!ecs.HasComponent<ObjectMetaData>(e)) continue;
+            if (!ecs.HasComponent<UIButtonComponent>(e)) continue;
+
+            auto& meta = ecs.GetComponent<ObjectMetaData>(e);
+            if (meta.name == name)
+            {
+                auto& btn = ecs.GetComponent<UIButtonComponent>(e);
+                btn.disabled = disabled;
+                EE_CORE_INFO("Set button '{}' (ID: {}) disabled = {}", name, e, disabled);
+                return;
+            }
+        }
+
+        EE_CORE_WARN("Button '{}' not found!", name);
+    }
+
     void UIButtonSystem::SetEntityActiveByName(const std::string& name, bool active)
     {
         auto& ecs = ECS::GetInstance();
@@ -795,6 +932,8 @@ namespace Ermine
 
             auto& globalAudio = ecs.GetComponent<GlobalAudioComponent>(globalAudioEntity);
 
+            auto& settings = Ermine::SettingsManager::GetInstance();
+
             switch (slider.target)
             {
             case UISliderComponent::SliderTarget::MasterVolume:
@@ -803,18 +942,26 @@ namespace Ermine
                 globalAudio.SetMusicVolume(globalAudio.musicVolume);
                 globalAudio.SetSFXVolume(globalAudio.sfxVolume);
                 globalAudio.SetAmbienceVolume(globalAudio.ambienceVolume);
+                settings.masterVolume = slider.value;
+                settings.Save();
                 break;
 
             case UISliderComponent::SliderTarget::MusicVolume:
                 globalAudio.SetMusicVolume(slider.value);
+                settings.musicVolume = slider.value;
+                settings.Save();
                 break;
 
             case UISliderComponent::SliderTarget::SFXVolume:
                 globalAudio.SetSFXVolume(slider.value);
+                settings.sfxVolume = slider.value;
+                settings.Save();
                 break;
 
             case UISliderComponent::SliderTarget::AmbienceVolume:
                 globalAudio.SetAmbienceVolume(slider.value);
+                settings.ambienceVolume = slider.value;
+                settings.Save();
                 break;
 
             default:
@@ -823,8 +970,23 @@ namespace Ermine
         }
         else if (slider.target == UISliderComponent::SliderTarget::Custom)
         {
-            // Custom target handling can be extended here
-            EE_CORE_INFO("Custom slider '{}' value: {}", slider.customTarget, slider.value);
+            if (slider.customTarget == "Gamma")
+            {
+                // Gamma range: slider 0.0-1.0 maps to gamma 2.8-1.6
+                // 2.2 is standard, lower gamma = brighter, higher gamma = darker
+                // Inverted so sliding right = brighter (lower gamma)
+                float gamma = 2.8f - (slider.value * 1.2f);
+                ecs.GetSystem<graphics::Renderer>()->m_Gamma = gamma;
+                EE_CORE_INFO("Gamma slider: value={}, gamma={}", slider.value, gamma);
+
+                auto& settings = Ermine::SettingsManager::GetInstance();
+                settings.gammaSliderValue = slider.value;
+                settings.Save();
+            }
+            else
+            {
+                EE_CORE_INFO("Custom slider '{}' value: {}", slider.customTarget, slider.value);
+            }
         }
     }
 }

@@ -734,10 +734,7 @@ namespace Ermine::ImguiUI
 
             // Hover highlight
             if (ImGui::IsItemHovered() && !asset->IsSelected)
-            {
                 dl->AddRect(cursor, { cursor.x + iconSize, cursor.y + iconSize }, IM_COL32(80, 150, 255, 180), 0, 0, 4.0f);
-                isSelectedFile = asset->realName.empty() ? (currentDirectory / asset->Name).string() : asset->realName;
-            }
 
             // --- Handle click behaviours ---
             // Single-click to select
@@ -768,9 +765,9 @@ namespace Ermine::ImguiUI
 
             // Drag-and-drop support
             if (ImGui::BeginDragDropSource()) {
-                ImGui::SetDragDropPayload("ASSET_BROWSER_FILE", isSelectedFile.c_str(), isSelectedFile.size() + 1);
-                //auto& metadata = ECS::GetInstance().GetComponent<ObjectMetaData>(entity);
-                ImGui::Text("Moving File");
+                std::string fullPath = asset->realName.empty() ? (currentDirectory / asset->Name).string() : asset->realName;
+                ImGui::SetDragDropPayload("ASSET_BROWSER_FILE", fullPath.c_str(), fullPath.size() + 1);
+                ImGui::Text("%s", asset->Name.c_str());
                 ImGui::EndDragDropSource();
             }
 

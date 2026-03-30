@@ -1,0 +1,128 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "4ad95ad8c462394e9f7aa4e31f8abc96"
+        },
+        "Transform": {
+          "position": [
+            -3.557157516479492,
+            7.194057464599609,
+            -17.846206665039064
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "LightSource",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Trigger",
+          "motionType": "Static",
+          "mass": 0.0,
+          "shapeType": "Box",
+          "colliderpivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            3.0,
+            2.0,
+            3.0
+          ]
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "DisableLightCone"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1c415a49b58faa4d8efd39860c02771b"
+        },
+        "Transform": {
+          "position": [
+            0.06800000369548798,
+            -1.2559523582458497,
+            -0.398468017578125
+          ],
+          "rotation": [
+            0.3171173930168152,
+            0.000007229962648125365,
+            -0.00029479037038981915,
+            0.9483862519264221
+          ],
+          "scale": [
+            1.0000001192092896,
+            36.2242317199707,
+            63.782222747802737
+          ]
+        },
+        "Light": {
+          "color": [
+            1.0,
+            0.22549021244049073,
+            0.22549021244049073
+          ],
+          "intensity": 6.4710001945495609,
+          "type": "Spot",
+          "castsShadows": true,
+          "castsRays": true,
+          "innerAngle": 13.300000190734864,
+          "outerAngle": 37.0,
+          "radius": 18.09000015258789
+        },
+        "ObjectMetaData": {
+          "name": "VolumeLight",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "HierarchyComponent": {
+          "parentGuid": "4ad95ad8c462394e9f7aa4e31f8abc96",
+          "depth": 1
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "SpotLightTrigger"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

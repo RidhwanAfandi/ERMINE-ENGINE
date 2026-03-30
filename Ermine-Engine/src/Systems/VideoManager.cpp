@@ -24,6 +24,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "AssetManager.h"
 #include "AudioManager.h"
+#include "SettingsManager.h"
 #include "fmod.h"
 #include "fmod.hpp"
 
@@ -241,7 +242,7 @@ namespace Ermine
                         exinfo.format = FMOD_SOUND_FORMAT_PCMFLOAT;
                         exinfo.length = static_cast<unsigned int>(video->audioPcm.size() * sizeof(float));
 
-                        const FMOD_MODE mode = static_cast<FMOD_MODE>(FMOD_OPENRAW | FMOD_OPENMEMORY | FMOD_OPENMEMORY_POINT | FMOD_CREATESAMPLE | (video->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
+                        const FMOD_MODE mode = static_cast<FMOD_MODE>(FMOD_OPENRAW | FMOD_OPENMEMORY | FMOD_CREATESAMPLE | (video->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
                         FMOD::Sound* sound = nullptr;
                         if (core->createSound(reinterpret_cast<const char*>(video->audioPcm.data()), mode, &exinfo, &sound) == FMOD_OK && sound)
                         {
@@ -349,6 +350,12 @@ namespace Ermine
                     }
                     if (it->second->audioChannel)
                         it->second->audioChannel->setMode(it->second->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+                    // Apply master volume from user settings on playback start
+                    if (it->second->audioChannel)
+                    {
+                        float masterVol = SettingsManager::GetInstance().masterVolume;
+                        it->second->audioChannel->setVolume(std::max(0.0f, std::min(1.0f, masterVol)));
+                    }
                     if (it->second->audioChannel)
                     {
                         unsigned long long channelClock = 0;
@@ -588,6 +595,9 @@ namespace Ermine
             m_videos.clear();
             m_currentVideo.clear();
             m_isPlaying = false;
+            m_renderEnabled = true;
+            m_fitMode = VideoFitMode::AspectFit;
+            m_quadDirty = true;
         }
 
         m_decodeCv.notify_all();
@@ -598,6 +608,22 @@ namespace Ermine
                 continue;
             std::lock_guard<std::mutex> decodeLock(video->decodeMutex);
             ReleaseVideoResources(*video);
+        }
+    }
+
+    void VideoManager::SetAudioVolume(const std::string& name, float volume)
+    {
+        std::lock_guard<std::mutex> lock(m_stateMutex);
+        auto it = m_videos.find(name);
+        if (it == m_videos.end() || !it->second)
+            return;
+        auto& video = it->second;
+        if (video->audioChannel)
+        {
+            // Apply master volume from user settings so cutscene audio respects the player's volume preference
+            float masterVol = SettingsManager::GetInstance().masterVolume;
+            float finalVolume = std::max(0.0f, std::min(1.0f, volume * masterVol));
+            video->audioChannel->setVolume(finalVolume);
         }
     }
 
@@ -1086,6 +1112,7 @@ namespace Ermine
             video.audioSound = nullptr;
         }
         video.audioPcm.clear();
+        video.audioPcm.shrink_to_fit();
 
         if (video.tex_y)
         {

@@ -373,6 +373,7 @@ copy /B /Y "$(SolutionDir)ThirdParty\DirectXTex\lib\DirectXTex.pdb" "$(SolutionD
     <ClInclude Include="include\Registry.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\ResourcePipe.h" />
+    <ClInclude Include="include\SettingsManager.h" />
     <ClInclude Include="include\SSBO_Bindings.h" />
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\SceneManager.h" />
@@ -387,6 +388,7 @@ copy /B /Y "$(SolutionDir)ThirdParty\DirectXTex\lib\DirectXTex.pdb" "$(SolutionD
     <ClInclude Include="include\SkeletalSSBO.h" />
     <ClInclude Include="include\Skybox.h" />
     <ClInclude Include="include\Systems.h" />
+    <ClInclude Include="include\TangentSpace.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\TransformMode.h" />
     <ClInclude Include="include\UIButtonSystem.h" />
@@ -480,6 +482,7 @@ copy /B /Y "$(SolutionDir)ThirdParty\DirectXTex\lib\DirectXTex.pdb" "$(SolutionD
     <ClCompile Include="src\Utility\GuidRegistry.cpp" />
     <ClCompile Include="src\Utility\Input.cpp" />
     <ClCompile Include="src\Utility\JobSystem.cpp" />
+    <ClCompile Include="src\Utility\SettingsManager.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
   </ItemGroup>

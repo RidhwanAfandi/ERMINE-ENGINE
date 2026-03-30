@@ -123,6 +123,10 @@ namespace Ermine
          * @return The mouse delta for game
          */
         static std::pair<float, float> GetMouseDeltaGame();
+        /**
+         * @brief Reset the next game mouse delta sample after cursor/input mode changes
+         */
+        static void ResetGameMouseDelta();
         
         // Initialization
         /**

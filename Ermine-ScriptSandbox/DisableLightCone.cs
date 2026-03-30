@@ -9,6 +9,7 @@ public class DisableLightCone : MonoBehaviour
     private bool orbInside = false;
     private bool currentlyColliding = false;
 
+    private Animator anim;
     private GameObject lightCone = null;
 
     private void Start()
@@ -19,6 +20,8 @@ public class DisableLightCone : MonoBehaviour
         //lightCone = FindMatchingCone();
         //if (lightCone != null)
         //    oldConePos = lightCone.transform.position;
+
+        anim = GameObject.Find("PlayerAnim").GetComponent<Animator>();
 
         if (transform.childCount > 0)
             lightCone = gameObject.transform.GetChild(0).gameObject;
@@ -37,11 +40,24 @@ public class DisableLightCone : MonoBehaviour
             GameObject sphere = GameObject.Find("Sphere");
             if (sphere != null)
             {
+                // Capture world position before the light cone is moved off-world
+                Rigidbody rb = GetComponent<Rigidbody>();
+                Vector3 shockwavePos = rb != null ? rb.position : transform.position;
+
                 DisableLight();
-                sphere.transform.position = new Vector3(0, -100, 0);
-                Physics.SetPosition((ulong)sphere.GetInstanceID(), sphere.transform.position);
-                Physics.RemovePhysic((ulong)sphere.GetInstanceID());
-                GameObject.Destroy(sphere);
+                Sphere sphereComponent = sphere.GetComponent<Sphere>();
+                if (sphereComponent != null)
+                    sphereComponent.Deactivate();
+                else
+                    sphere.SetActive(false);
+
+                // Spawn shockwave ring at the light cone's position
+                GameObject shockwave = Prefab.Instantiate("../Resources/Prefabs/LightConeShockwave.prefab");
+                if (shockwave != null)
+                    shockwave.transform.position = shockwavePos;
+
+                // Play explode animation
+                anim.SetTrigger("explode");
             }
         }
 
@@ -67,9 +83,12 @@ public class DisableLightCone : MonoBehaviour
         if (lightCone.activeSelf)
         {
             lightCone.transform.position = new Vector3(0, -100, 0);
-            Physics.SetPosition((ulong)lightCone.GetInstanceID(), lightCone.transform.position);
+            //Physics.SetPosition((ulong)lightCone.GetInstanceID(), lightCone.transform.position);
             lightCone.SetActive(false);
         }
+
+        GlobalAudio.StopSFX("LightDamageLoop");
+        GlobalAudio.PlaySFX("LightDisable");
     }
 
     void RespawnLight()

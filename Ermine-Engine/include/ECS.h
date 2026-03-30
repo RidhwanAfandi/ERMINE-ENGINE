@@ -139,6 +139,15 @@ namespace Ermine
 		T& GetComponent(EntityID entity) const;
 
 		/**
+		 * @brief Try to get a pointer to a component of type T for an entity.
+		 * @tparam T The component type to get
+		 * @param entity The entity to get the component from
+		 * @return Pointer to the component if it exists, nullptr otherwise
+		 */
+		template<typename T>
+		T* TryGetComponent(EntityID entity) const;
+
+		/**
 		 * @brief Get a component type ID
 		 * @tparam T The component type to get the ID of
 		 * @return The component type ID

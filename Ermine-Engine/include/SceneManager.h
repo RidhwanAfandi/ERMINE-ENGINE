@@ -171,4 +171,5 @@ private:
     std::shared_ptr<Ermine::Scene> m_ActiveScene;
 
     std::optional<std::string> m_PendingSceneRequest;
+    std::optional<std::string> m_TempSceneRestorePath;
 };

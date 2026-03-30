@@ -100,6 +100,39 @@ namespace ErmineEngine
             set;
         }
 
+        // Reverb properties
+        public bool useReverb
+        {
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            get;
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            set;
+        }
+
+        public float reverbWetLevel
+        {
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            get;
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            set;
+        }
+
+        public float reverbDryLevel
+        {
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            get;
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            set;
+        }
+
+        public float reverbDecayTime
+        {
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            get;
+            [MethodImpl(MethodImplOptions.InternalCall)]
+            set;
+        }
+
         // Convenience methods
         public void Play()
         {
@@ -109,6 +142,28 @@ namespace ErmineEngine
         public void Stop()
         {
             shouldStop = true;
+        }
+
+        /// <summary>
+        /// Enable reverb with custom settings
+        /// </summary>
+        /// <param name="wetLevel">Reverb wet level in dB (-80 to 20)</param>
+        /// <param name="dryLevel">Reverb dry level in dB (-80 to 20)</param>
+        /// <param name="decayTime">Reverb decay time (0.1 to 20)</param>
+        public void SetReverb(float wetLevel = -12.0f, float dryLevel = 0.0f, float decayTime = 1.0f)
+        {
+            useReverb = true;
+            reverbWetLevel = wetLevel;
+            reverbDryLevel = dryLevel;
+            reverbDecayTime = decayTime;
+        }
+
+        /// <summary>
+        /// Disable reverb effect
+        /// </summary>
+        public void ClearReverb()
+        {
+            useReverb = false;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 public class GearRotateAnimation : MonoBehaviour
 {
-    public float rotationSpeed = 30f;
+    public float rotationSpeed = 0.8f;
 
     void Update()
     {

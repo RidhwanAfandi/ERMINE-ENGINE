@@ -3,13 +3,13 @@
 \file       Animator.cpp
 \author     Lum Ko Sand, kosand.lum, 2301263, kosand.lum\@digipen.edu
 \co-author  Ridhwan Afandi, mohamedridhwan.b, 2301367, mohamedridhwan.b\@digipen.edu
-\date       28/10/2025
+\date       28/02/2026
 \brief      This file contains the definition of the animator class. It is responsible for
             loading animation clips from an Assimp scene, managing playback state,
             updating bone transforms per frame, providing final matrices for GPU skinning
             in the renderer.
 
-Copyright (C) 2025 DigiPen Institute of Technology.
+Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
@@ -32,12 +32,12 @@ namespace Ermine::graphics
     Animator::Animator(std::shared_ptr<Model> model) : m_Model(std::move(model))
     {
         EE_CORE_WARN("Animator::Constructor - Model ptr: {}, Model name: '{}'",
-                     (void*)m_Model.get(), m_Model->GetName());
+            (void*)m_Model.get(), m_Model->GetName());
 
         m_Scene = m_Model->GetAssimpScene(); // cache scene for hierarchy traversal
 
         EE_CORE_WARN("Animator::Constructor - m_Scene: {}, mRootNode: {}",
-                     (void*)m_Scene, (m_Scene ? (void*)m_Scene->mRootNode : nullptr));
+            (void*)m_Scene, (m_Scene ? (void*)m_Scene->mRootNode : nullptr));
 
         m_FinalBoneMatrices.resize(m_Model->GetBoneCount(), glm::mat4(1.0f));
 
@@ -349,9 +349,11 @@ namespace Ermine::graphics
         if (!graph || !graph->current) return;
 
         for (auto& transition : graph->transitions) {
+
             // Match transition source node
-            if (transition.fromNodeId != graph->current->id)
-                continue;
+            if (transition.fromNodeId != graph->current->id) continue;
+
+            if (transition.conditions.empty()) continue; // skip exit transitions in pass 1
 
             // Evaluate all conditions for this transition
             bool allTrue = true;
@@ -409,7 +411,7 @@ namespace Ermine::graphics
 
                 if (nextNode != graph->states.end() && (*nextNode)->isAttached) {
                     graph->current = *nextNode;
-                    PlayAnimation(graph->current->clipName);
+                    PlayAnimation(graph->current->clipName, graph->current->loop);
 
                     // Reset trigger parameters
                     for (auto& p : graph->parameters)
@@ -419,6 +421,30 @@ namespace Ermine::graphics
                     EE_CORE_INFO("Transitioned to state: {}", graph->current->name);
                     break;
                 }
+            }
+        }
+
+        // Handle exit transitions (no conditions) only if current clip has finished
+        if (!IsCurrentClipFinished()) return;
+
+        // Check for exit transitions from the current state
+        for (auto& transition : graph->transitions)
+        {
+            if (transition.fromNodeId != graph->current->id) continue;
+
+            if (!transition.conditions.empty()) continue; // skip condition transitions in pass 2
+
+            auto nextNode = std::find_if(graph->states.begin(), graph->states.end(),
+                [&](auto& s) { return s->id == transition.toNodeId; });
+
+            // Only transition if the next node is attached and valid
+            if (nextNode != graph->states.end() && (*nextNode)->isAttached)
+            {
+                graph->current = *nextNode;
+                PlayAnimation(graph->current->clipName, graph->current->loop);
+
+                EE_CORE_INFO("Exit transition -> {}", graph->current->name);
+                return;
             }
         }
     }
@@ -530,5 +556,20 @@ namespace Ermine::graphics
         for (unsigned int i = 0; i < node->mNumChildren; ++i) {
             CalculateBoneTransform(node->mChildren[i], globalTransform);
         }
+    }
+
+    /**
+     * @brief Check if the current animation clip has finished playing.
+     *
+     * Determines if the playback time has exceeded the clip's duration.
+     *
+     * @return True if the current clip is finished, false otherwise.
+     */
+    bool Animator::IsCurrentClipFinished() const
+    {
+        if (!m_CurrentClip)
+            return false;
+
+        return !m_Loop && m_CurrentTime >= m_CurrentClip->duration;
     }
 }

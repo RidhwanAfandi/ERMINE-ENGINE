@@ -1,7 +1,6 @@
 #version 460 core
 #extension GL_ARB_bindless_texture : require
 
-const int MAX_LIGHTS = 32;
 const int NUM_CASCADES = 4;
 
 in vec2 TexCoord;
@@ -61,9 +60,9 @@ struct Light {
     vec4 splitDepths[(NUM_CASCADES + 3) / 4]; // Split depths for cascaded shadow maps
 };
 
-layout (std140, binding = 1) uniform LightsUBO {
+layout (std430, binding = 4) readonly buffer LightsSSBO { // Matches LIGHT_SSBO_BINDING in SSBO_Bindings.h
     vec4 lightCount;
-    Light lights[MAX_LIGHTS]; // Fixed-size array required for UBO
+    Light lights[];
 };
 
 // Light Probe structure
@@ -313,9 +312,16 @@ float calculateAttenuation(int lightIndex, vec3 fragPosView, out vec3 lightDir)
         lightDir = normalize(dirView4.xyz);
         attenuation = 1.0;
     } else {
-        // Point or spot: direction from light to fragment (both now in view space)
-        lightDir = normalize(lightPosView - fragPosView);
-        float distance = length(lightPosView - fragPosView);
+        // Point or spot: reject fragments outside the light radius before the expensive work.
+        vec3 lightToFrag = lightPosView - fragPosView;
+        float distanceSq = dot(lightToFrag, lightToFrag);
+        if (distanceSq > range * range) {
+            lightDir = vec3(0.0);
+            return 0.0;
+        }
+
+        float distance = sqrt(max(distanceSq, 0.0001));
+        lightDir = lightToFrag / distance;
         distance = max(distance, 0.01); // Prevent division issues
 
         // Attenuation
@@ -411,15 +417,25 @@ vec3 calculatePBR(int lightIndex, vec3 normal, vec3 viewDir, vec3 fragPosView,
 
 // Unpack albedo from RT0 (RGB16F format)
 vec3 unpackAlbedo(vec3 packedAlbedo) {
-    // Direct read - RGB16F stores albedo directly
+    // Direct read - RGBA8 stores albedo in [0,1]
     return packedAlbedo;
 }
 
-// Unpack normal from RT1 (RGB16F format)
-vec3 unpackNormal(vec3 packedNormal) {
-    // Convert from [0,1] back to [-1,1] range and normalize
-    vec3 normal = packedNormal * 2.0 - 1.0;
-    return normalize(normal);
+// Octahedral decode: reconstruct unit normal from two [0,1] values (RT1 is RG16F)
+vec2 signNotZero(vec2 v) {
+    return vec2(v.x >= 0.0 ? 1.0 : -1.0, v.y >= 0.0 ? 1.0 : -1.0);
+}
+
+vec3 octDecode(vec2 e) {
+    e = e * 2.0 - 1.0;  // [0,1] -> [-1,1]
+    vec3 n = vec3(e.xy, 1.0 - abs(e.x) - abs(e.y));
+    if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * signNotZero(n.xy);
+    return normalize(n);
+}
+
+// Unpack normal from RT1 (RG16F format, oct-encoded)
+vec3 unpackNormal(vec2 packedNormal) {
+    return octDecode(packedNormal);
 }
 
 // Unpack emissive from RT2 (RGBA8 format)
@@ -440,17 +456,16 @@ void unpackMaterialProperties(vec4 packedMaterial, out float roughness,
     roughness = packedMaterial.r;
     metallic = packedMaterial.g;
     ao = packedMaterial.b;
-    // packedMaterial.a contains motion blur flag (not used in lighting pass)
 }
 
 // Main G-Buffer reading function (call this in lighting fragment shader)
 void readGBuffer(sampler2D gBuffer0, sampler2D gBuffer1, sampler2D gBuffer2, sampler2D gBuffer3,
-                 vec2 texCoords, out vec3 albedo, out vec3 normal, out vec3 emissive, 
+                 vec2 texCoords, out vec3 albedo, out vec3 normal, out vec3 emissive,
                  out float emissiveIntensity, out float roughness, out float metallic, out float ao) {
 
     // Sample all G-Buffer textures
-    vec3 packedAlbedo = texture(gBuffer0, texCoords).rgb;
-    vec3 packedNormal = texture(gBuffer1, texCoords).rgb;
+    vec3 packedAlbedo   = texture(gBuffer0, texCoords).rgb;  // RGBA8, take .rgb
+    vec2 packedNormal   = texture(gBuffer1, texCoords).rg;   // RG16F oct-encoded
     vec4 packedEmissive = texture(gBuffer2, texCoords);
     vec4 packedMaterial = texture(gBuffer3, texCoords);
 
@@ -766,6 +781,9 @@ void main()
             float shininess = (1.0 - roughness) * 128.0;
             // Compute light contribution
             vec3 lightContrib = calculateBlinnPhong(i, normalView, viewDir, fragPosView, albedo, 1.0, shininess);
+            if (lightContrib == vec3(0.0)) {
+                continue;
+            }
 
             // Shadow factor (1.0 = lit, 0.0 = shadowed)
             float shadowFactor = 1.0;
@@ -856,6 +874,9 @@ void main()
         vec3 F0 = mix(vec3(0.04), albedo, metallic);
         for (int i = 0; i < numLights; ++i) {
             vec3 lightContrib = calculatePBR(i, normalView, viewDir, fragPosView, albedo, metallic, roughness, F0, worldPos);
+            if (lightContrib == vec3(0.0)) {
+                continue;
+            }
 
             float shadowFactor = 1.0;
             int lightType = int(lights[i].position_type.w);

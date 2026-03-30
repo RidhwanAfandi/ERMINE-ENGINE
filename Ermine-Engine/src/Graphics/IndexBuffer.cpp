@@ -21,12 +21,15 @@ using namespace Ermine::graphics;
 IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count)
     : m_Count(count)
 {
+    if (data && count > 0)
+        m_CPUData.assign(data, data + count);
+
     glGenBuffers(1, &m_RendererID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
 
 	const unsigned int sizeBytes = count * sizeof(unsigned int);
     GPUProfiler::TrackMemoryAllocation(sizeBytes, "Buffer");
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, data, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeBytes, data, GL_STATIC_DRAW);
 }
 
 IndexBuffer::~IndexBuffer()

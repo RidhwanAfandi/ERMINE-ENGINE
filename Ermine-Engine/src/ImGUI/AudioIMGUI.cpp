@@ -559,7 +559,7 @@ namespace Ermine
         auto& audioComp = ecs.GetComponent<AudioComponent>(entity);
         if (audioComp.isPlaying && audioComp.channelId != -1)
         {
-            CAudioEngine::StopChannel(audioComp.channelId);
+            CAudioEngine::StopChannel(audioComp.channelId, true, 0.3f); // Fade out
         }
 
         // Remove the component
@@ -669,7 +669,7 @@ namespace Ermine
             // Stop current audio if playing
             if (m_TestChannelId != -1 && CAudioEngine::IsPlaying(m_TestChannelId))
             {
-                CAudioEngine::StopChannel(m_TestChannelId);
+                CAudioEngine::StopChannel(m_TestChannelId, true, 0.3f); // Fade out
                 m_TestChannelId = -1;
             }
 
@@ -1455,6 +1455,155 @@ namespace Ermine
             ImGui::Text("Ambience Playing: %s", isAmbiencePlaying ? "Yes" : "No");
         }
 
+        // === VOICE SECTION ===
+        if (ImGui::CollapsingHeader("Voice", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("Voice Tracks: %zu", globalAudio.voice.size());
+
+            ImGui::InputText("Voice Name##GlobalVoice", m_GlobalVoiceName, sizeof(m_GlobalVoiceName));
+            ImGui::Text("Voice Path:");
+
+            if (ImGui::Button("Browse##GlobalVoiceBrowse"))
+                m_ShowGlobalVoiceBrowser = true;
+
+            ImGui::InputText("##GlobalVoicePath", m_GlobalVoicePath, sizeof(m_GlobalVoicePath));
+
+            if (m_ShowGlobalVoiceBrowser)
+                ImGui::OpenPopup("Select Audio File##GlobalVoice");
+
+            if (ImGui::BeginPopupModal("Select Audio File##GlobalVoice", &m_ShowGlobalVoiceBrowser))
+            {
+                RenderAudioBrowser();
+                if (ImGui::Button("Select") && !m_SelectedAudioFile.empty())
+                {
+                    strncpy_s(m_GlobalVoicePath, sizeof(m_GlobalVoicePath), m_SelectedAudioFile.c_str(), sizeof(m_GlobalVoicePath) - 1);
+                    m_GlobalVoicePath[sizeof(m_GlobalVoicePath) - 1] = '\0';
+                    m_ShowGlobalVoiceBrowser = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel"))
+                {
+                    m_ShowGlobalVoiceBrowser = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::Button("Add Voice Track"))
+            {
+                if (strlen(m_GlobalVoiceName) > 0 && strlen(m_GlobalVoicePath) > 0)
+                {
+                    globalAudio.AddVoiceSource(m_GlobalVoiceName, m_GlobalVoicePath);
+                    SetStatusMessage("Added voice track: " + std::string(m_GlobalVoiceName));
+                    memset(m_GlobalVoiceName, 0, sizeof(m_GlobalVoiceName));
+                    memset(m_GlobalVoicePath, 0, sizeof(m_GlobalVoicePath));
+                }
+            }
+
+            // Voice volume control
+            if (ImGui::SliderFloat("Voice Volume", &globalAudio.voiceVolume, 0.0f, 1.0f))
+                globalAudio.SetVoiceVolume(globalAudio.voiceVolume);
+
+            if (ImGui::Button("Stop Voice"))
+                globalAudio.StopVoice();
+
+            // List existing voice tracks
+            if (!globalAudio.voice.empty())
+            {
+                ImGui::Text("Existing Voice Tracks:");
+                for (size_t i = 0; i < globalAudio.voice.size(); ++i)
+                {
+                    const auto& voiceTrack = globalAudio.voice[i];
+                    ImGui::PushID(("voice_" + std::to_string(i)).c_str());
+
+                    if (m_EditingVoiceIndex == static_cast<int>(i))
+                    {
+                        ImGui::Text("Editing Voice %zu:", i);
+                        ImGui::InputText("Name##EditVoice", m_EditVoiceName, sizeof(m_EditVoiceName));
+
+                        if (ImGui::Button("Browse##EditVoiceBrowse"))
+                            m_ShowEditVoiceBrowser = true;
+
+                        ImGui::InputText("##EditVoicePath", m_EditVoicePath, sizeof(m_EditVoicePath));
+
+                        if (ImGui::Button("Save##EditVoice"))
+                        {
+                            if (strlen(m_EditVoiceName) > 0 && strlen(m_EditVoicePath) > 0)
+                            {
+                                globalAudio.UpdateVoiceSource(i, m_EditVoiceName, m_EditVoicePath);
+                                SetStatusMessage("Updated voice track: " + std::string(m_EditVoiceName));
+                                m_EditingVoiceIndex = -1;
+                            }
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Cancel##EditVoice"))
+                            m_EditingVoiceIndex = -1;
+                    }
+                    else
+                    {
+                        ImGui::Text("[%zu] %s", i, voiceTrack.audioName.c_str());
+                        ImGui::Text("  Path: %s", voiceTrack.audioPath.c_str());
+
+                        if (ImGui::Button(("Play##Voice" + std::to_string(i)).c_str()))
+                            globalAudio.PlayVoice(static_cast<int>(i));
+
+                        ImGui::SameLine();
+                        if (ImGui::Button(("Edit##Voice" + std::to_string(i)).c_str()))
+                        {
+                            m_EditingVoiceIndex = static_cast<int>(i);
+                            strncpy_s(m_EditVoiceName, sizeof(m_EditVoiceName), voiceTrack.audioName.c_str(), sizeof(m_EditVoiceName) - 1);
+                            strncpy_s(m_EditVoicePath, sizeof(m_EditVoicePath), voiceTrack.audioPath.c_str(), sizeof(m_EditVoicePath) - 1);
+                            m_EditVoiceName[sizeof(m_EditVoiceName) - 1] = '\0';
+                            m_EditVoicePath[sizeof(m_EditVoicePath) - 1] = '\0';
+                        }
+
+                        ImGui::SameLine();
+                        if (ImGui::Button(("Delete##Voice" + std::to_string(i)).c_str()))
+                        {
+                            m_ShowDeleteConfirmation = true;
+                            m_DeleteTargetIndex = static_cast<int>(i);
+                            m_DeleteTargetType = 3; // Voice
+                        }
+                    }
+
+                    ImGui::PopID();
+                    ImGui::Separator();
+                }
+            }
+
+            // Edit voice browser popup
+            if (m_ShowEditVoiceBrowser)
+                ImGui::OpenPopup("Select Audio File##EditVoice");
+
+            if (ImGui::BeginPopupModal("Select Audio File##EditVoice", &m_ShowEditVoiceBrowser))
+            {
+                RenderAudioBrowser();
+                if (ImGui::Button("Select") && !m_SelectedAudioFile.empty())
+                {
+                    strncpy_s(m_EditVoicePath, sizeof(m_EditVoicePath), m_SelectedAudioFile.c_str(), sizeof(m_EditVoicePath) - 1);
+                    m_EditVoicePath[sizeof(m_EditVoicePath) - 1] = '\0';
+                    m_ShowEditVoiceBrowser = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel"))
+                {
+                    m_ShowEditVoiceBrowser = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
+            // Current voice status
+            ImGui::Separator();
+            ImGui::Text("Current Voice Index: %d", globalAudio.currentVoiceIndex);
+            ImGui::Text("Current Voice Channel: %d", globalAudio.currentVoiceChannelId);
+            bool isVoicePlaying = (globalAudio.currentVoiceChannelId != -1 &&
+                CAudioEngine::IsPlaying(globalAudio.currentVoiceChannelId));
+            ImGui::Text("Voice Playing: %s", isVoicePlaying ? "Yes" : "No");
+        }
+
         // === DELETE CONFIRMATION POPUP ===
         if (m_ShowDeleteConfirmation)
         {
@@ -1464,11 +1613,13 @@ namespace Ermine
         if (ImGui::BeginPopupModal("Confirm Delete", &m_ShowDeleteConfirmation, ImGuiWindowFlags_AlwaysAutoResize))
         {
             const char* itemType = (m_DeleteTargetType == 0) ? "music track" :
-                (m_DeleteTargetType == 1) ? "SFX track" : "ambience track";
+                (m_DeleteTargetType == 1) ? "SFX track" :
+                (m_DeleteTargetType == 2) ? "ambience track" : "voice track";
 
             const auto& targetItem = (m_DeleteTargetType == 0) ? globalAudio.music[m_DeleteTargetIndex] :
                 (m_DeleteTargetType == 1) ? globalAudio.sfx[m_DeleteTargetIndex] :
-                globalAudio.ambience[m_DeleteTargetIndex];
+                (m_DeleteTargetType == 2) ? globalAudio.ambience[m_DeleteTargetIndex] :
+                globalAudio.voice[m_DeleteTargetIndex];
 
             ImGui::Text("Are you sure you want to delete this %s?", itemType);
             ImGui::Text("Name: %s", targetItem.audioName.c_str());
@@ -1500,7 +1651,7 @@ namespace Ermine
                     else if (m_EditingSFXIndex > m_DeleteTargetIndex)
                         m_EditingSFXIndex--;
                 }
-                else // Ambience
+                else if (m_DeleteTargetType == 2) // Ambience
                 {
                     if (globalAudio.currentAmbienceIndex == m_DeleteTargetIndex)
                         globalAudio.StopAmbience();
@@ -1512,6 +1663,19 @@ namespace Ermine
                         m_EditingAmbienceIndex = -1;
                     else if (m_EditingAmbienceIndex > m_DeleteTargetIndex)
                         m_EditingAmbienceIndex--;
+                }
+                else if (m_DeleteTargetType == 3) // Voice
+                {
+                    if (globalAudio.currentVoiceIndex == m_DeleteTargetIndex)
+                        globalAudio.StopVoice();
+
+                    globalAudio.RemoveVoiceSource(m_DeleteTargetIndex);
+                    SetStatusMessage("Deleted voice track: " + targetItem.audioName);
+
+                    if (m_EditingVoiceIndex == m_DeleteTargetIndex)
+                        m_EditingVoiceIndex = -1;
+                    else if (m_EditingVoiceIndex > m_DeleteTargetIndex)
+                        m_EditingVoiceIndex--;
                 }
 
                 m_ShowDeleteConfirmation = false;
@@ -1770,7 +1934,7 @@ namespace Ermine
 
     void AudioImGUI::StopAllAudio()
     {
-        CAudioEngine::StopAllChannels();
+        CAudioEngine::StopAllChannels(true, 0.5f); // Fade out
         SetStatusMessage("All audio channels stopped");
     }
 
@@ -1778,7 +1942,7 @@ namespace Ermine
     {
         if (m_TestChannelId != -1)
         {
-            CAudioEngine::StopChannel(m_TestChannelId);
+            CAudioEngine::StopChannel(m_TestChannelId, true, 0.3f); // Fade out
             m_TestChannelId = -1;
             SetStatusMessage("Test audio stopped");
         }

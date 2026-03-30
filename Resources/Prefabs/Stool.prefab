@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9b2e209d83fb454b87f31297236e5a66"
+        },
+        "Transform": {
+          "position": [
+            -16.201656341552736,
+            0.4345720112323761,
+            3.7569034099578859
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.030000001192092897,
+            0.029999999329447748,
+            0.03000001050531864
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Stool",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_Stool.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "ca32ae11478ae34a90f01f89ab90fd3f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_Stool.fbx_pCylinder29_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "3071347def83b7429df78df2330117ff"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "9b2e209d83fb454b87f31297236e5a66",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

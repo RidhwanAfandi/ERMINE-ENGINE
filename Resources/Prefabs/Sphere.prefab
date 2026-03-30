@@ -47,9 +47,9 @@
           "primitive": {
             "type": "Sphere",
             "size": [
-              5.0,
-              5.0,
-              5.0
+              1.0,
+              1.0,
+              1.0
             ]
           }
         },
@@ -81,47 +81,69 @@
           ]
         },
         "Material": {
-          "hasMaterial": true,
-          "params": {
-            "materialAlbedo": [
-              1.0,
-              1.0,
-              1.0,
-              0.0
-            ],
-            "materialAlpha": 0.0,
-            "materialTransparency": 1.0,
-            "materialMetallic": 0.0,
-            "materialRoughness": 0.5,
-            "materialEmissive": [
-              0.0,
-              0.5607843399047852,
-              1.0
-            ],
-            "materialEmissiveIntensity": 0.0,
-            "materialHasAlbedoMap": true,
-            "materialHasEmissiveMap": false
-          },
-          "textures": [
-            {
-              "slot": "materialAlbedoMap",
-              "path": "../Resources/Textures/Icons/refresh.png"
-            },
-            {
-              "slot": "material.albedoMap",
-              "path": "../Resources/Textures/Icons/refresh.png"
-            }
-          ],
-          "uvScale": [
-            1.0,
-            1.0
-          ],
-          "uvOffset": [
+          "guid": "6a4a6d1a5d3f4b26b9f8c0a1e2d7f314"
+        },
+        "GPUParticleEmitter": {
+          "active": true,
+          "maxParticles": 500,
+          "emissionShape": 1,
+          "localPositionOffset": [
+            0.0,
             0.0,
             0.0
           ],
-          "customFragmentShader": "../Resources/Shaders/volumetric_orb_fragment.glsl",
-          "castsShadows": false
+          "overallScale": 1.0,
+          "spawnBoxExtents": [
+            0.1,
+            0.1,
+            0.1
+          ],
+          "spawnRadius": 0.65,
+          "spawnRadiusInner": 0.55,
+          "spawnRate": 40.0,
+          "burstCountMin": 0,
+          "burstCountMax": 0,
+          "burstInterval": 0.0,
+          "burstOnStart": false,
+          "directionMode": 2,
+          "direction": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "coneAngle": 180.0,
+          "coneInnerAngle": 0.0,
+          "speedMin": 2.5,
+          "speedMax": 6.5,
+          "gravity": [
+            0.0,
+            -6.0,
+            0.0
+          ],
+          "drag": 3.5,
+          "turbulenceStrength": 0.5,
+          "turbulenceScale": 1.0,
+          "boundsMode": 0,
+          "renderMode": 0,
+          "colorStart": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "colorEnd": [
+            0.0,
+            0.4,
+            1.4
+          ],
+          "alphaStart": 1.0,
+          "alphaEnd": 0.0,
+          "sizeStartMin": 0.04,
+          "sizeStartMax": 0.12,
+          "sizeEndMin": 0.0,
+          "sizeEndMax": 0.02,
+          "lifetimeMin": 0.2,
+          "lifetimeMax": 0.55,
+          "sparkleShape": 1
         },
         "HierarchyComponent": {
           "depth": 0

@@ -30,36 +30,64 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <set>
 #include "NavMesh.h"
 
 namespace {
+    std::string CanonicalMaterialParameterName(const std::string& name)
+    {
+        if (name == "material.albedo") return "materialAlbedo";
+        if (name == "material.albedoMap") return "materialAlbedoMap";
+        if (name == "material.normalMap") return "materialNormalMap";
+        if (name == "material.metallic") return "materialMetallic";
+        if (name == "material.roughness") return "materialRoughness";
+        if (name == "material.emissive") return "materialEmissive";
+        if (name == "material.emissiveIntensity") return "materialEmissiveIntensity";
+        if (name == "material.ao") return "materialAo";
+        if (name == "material.normalStrength") return "materialNormalStrength";
+        if (name == "material.hasNormalMap") return "materialHasNormalMap";
+        if (name == "material.metallicMap") return "materialMetallicMap";
+        if (name == "materialAlpha" || name == "materialTransparency")
+            return {};
+        return name;
+    }
+
+    std::string ResolveCustomVertexShaderPath(const std::string& fragmentPath)
+    {
+        constexpr const char* kDefaultVertex = "../Resources/Shaders/vertex.glsl";
+        if (fragmentPath.empty()) {
+            return kDefaultVertex;
+        }
+
+        std::filesystem::path fragmentFile(fragmentPath);
+        std::string fragmentName = fragmentFile.filename().string();
+        std::string vertexName = fragmentName;
+
+        const size_t fragmentPos = vertexName.find("fragment");
+        if (fragmentPos != std::string::npos) {
+            vertexName.replace(fragmentPos, std::string("fragment").size(), "vertex");
+        }
+        else if (fragmentFile.extension() == ".frag") {
+            vertexName = fragmentFile.stem().string() + ".vert";
+        }
+        else {
+            return kDefaultVertex;
+        }
+
+        std::filesystem::path vertexPath = fragmentFile.has_parent_path()
+            ? (fragmentFile.parent_path() / vertexName)
+            : (std::filesystem::path("../Resources/Shaders") / vertexName);
+
+        if (std::filesystem::exists(vertexPath)) {
+            return vertexPath.generic_string();
+        }
+        return kDefaultVertex;
+    }
+
     std::string BuildMaterialSignature(const Ermine::graphics::Material& material,
         std::string_view customFragmentShader,
         std::string_view meshName = {})
     {
-        auto canonicalName = [](const std::string& name) -> std::string {
-            if (name == "material.albedo") return "materialAlbedo";
-            if (name == "material.albedoMap") return "materialAlbedoMap";
-            if (name == "material.normalMap") return "materialNormalMap";
-            if (name == "material.metallic") return "materialMetallic";
-            if (name == "material.roughness") return "materialRoughness";
-            if (name == "material.emissive") return "materialEmissive";
-            if (name == "material.emissiveIntensity") return "materialEmissiveIntensity";
-            if (name == "material.ao") return "materialAo";
-            if (name == "material.normalStrength") return "materialNormalStrength";
-            if (name == "material.hasNormalMap") return "materialHasNormalMap";
-            if (name == "material.metallicMap") return "materialMetallicMap";
-            if (name == "materialAlbedoMap") return "materialAlbedoMap";
-            if (name == "materialNormalMap") return "materialNormalMap";
-            if (name == "materialMetallicMap") return "materialMetallicMap";
-            if (name == "materialRoughnessMap") return "materialRoughnessMap";
-            if (name == "materialAoMap") return "materialAoMap";
-            if (name == "materialEmissiveMap") return "materialEmissiveMap";
-            if (name == "materialAlpha" || name == "materialTransparency")
-                return {};
-            return name;
-        };
-
         auto normalizePath = [](std::string path) -> std::string {
             for (char& c : path) {
                 if (c == '\\') c = '/';
@@ -70,7 +98,7 @@ namespace {
 
         std::map<std::string, Ermine::graphics::MaterialParam> normalized;
         for (const auto& [name, param] : material.GetParameters()) {
-            std::string key = canonicalName(name);
+            std::string key = CanonicalMaterialParameterName(name);
             if (key.empty())
                 continue;
             if (normalized.find(key) == normalized.end())
@@ -671,7 +699,7 @@ void LoadSceneFromFile(Ermine::ECS& ecs, const std::filesystem::path& path) {
     // Clear MeshManager for new scene
     auto renderer = ecs.GetSystem<Ermine::graphics::Renderer>();
     if (renderer) {
-        renderer->m_MeshManager.Clear();
+        renderer->m_MeshManager.Clear(true);
     }
 
     Ermine::AssetManager::GetInstance().ClearModelCache();
@@ -959,6 +987,11 @@ void LoadSceneFromFile(Ermine::ECS& ecs, const std::filesystem::path& path) {
             renderer->m_GlobalGraphics.Deserialize(d["globalGraphics"]);
             renderer->ApplyFromGlobalGraphics();
         }
+
+        // After deserialization, force material compilation first, then full draw-data rebuild.
+        renderer->MarkMaterialsDirty();
+        renderer->CompileMaterials();
+        renderer->ForceDrawDataRebuild();
     }
 }
 
@@ -1265,6 +1298,14 @@ Ermine::EntityID LoadPrefabFromFile(Ermine::ECS& ecs, const std::filesystem::pat
     //ecs.GetSystem<Ermine::HierarchySystem>()->ForceUpdateAllTransforms();
     ecs.GetSystem<Ermine::Physics>()->UpdatePhysicList();
 
+    if (auto renderer = ecs.GetSystem<Ermine::graphics::Renderer>()) {
+        // Prefab instantiation can introduce materials that were not part of the
+        // currently compiled scene set, so refresh GPU material bindings now.
+        renderer->MarkMaterialsDirty();
+        renderer->CompileMaterials();
+        renderer->ForceDrawDataRebuild();
+    }
+
     // Return detected root; fallback to first created if none marked as root
     if (rootEntity != 0) return rootEntity;
     if (!oldGuidToNew.empty()) return oldGuidToNew.begin()->second;
@@ -1418,101 +1459,84 @@ void SaveMaterialToFile(const Ermine::graphics::Material& material,
     d.SetObject();
     auto& a = d.GetAllocator();
 
-    // Save all material parameters
     rapidjson::Value paramsObj(rapidjson::kObjectType);
+    std::set<std::string> savedParams;
 
-    // Helper lambda to save a parameter if it exists
-    auto saveParam = [&](const std::string& name) {
-        if (const auto* param = material.GetParameter(name)) {
-            rapidjson::Value paramObj(rapidjson::kObjectType);
-            
-            switch (param->type) {
-                case Ermine::graphics::MaterialParamType::FLOAT:
-                    paramObj.AddMember("type", "float", a);
-                    if (!param->floatValues.empty()) {
-                        paramObj.AddMember("value", param->floatValues[0], a);
-                    }
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::VEC2:
-                    paramObj.AddMember("type", "vec2", a);
-                    if (param->floatValues.size() >= 2) {
-                        rapidjson::Value arr(rapidjson::kArrayType);
-                        arr.PushBack(param->floatValues[0], a);
-                        arr.PushBack(param->floatValues[1], a);
-                        paramObj.AddMember("value", arr, a);
-                    }
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::VEC3:
-                    paramObj.AddMember("type", "vec3", a);
-                    if (param->floatValues.size() >= 3) {
-                        rapidjson::Value arr(rapidjson::kArrayType);
-                        arr.PushBack(param->floatValues[0], a);
-                        arr.PushBack(param->floatValues[1], a);
-                        arr.PushBack(param->floatValues[2], a);
-                        paramObj.AddMember("value", arr, a);
-                    }
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::VEC4:
-                    paramObj.AddMember("type", "vec4", a);
-                    if (param->floatValues.size() >= 4) {
-                        rapidjson::Value arr(rapidjson::kArrayType);
-                        arr.PushBack(param->floatValues[0], a);
-                        arr.PushBack(param->floatValues[1], a);
-                        arr.PushBack(param->floatValues[2], a);
-                        arr.PushBack(param->floatValues[3], a);
-                        paramObj.AddMember("value", arr, a);
-                    }
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::INT:
-                    paramObj.AddMember("type", "int", a);
-                    paramObj.AddMember("value", param->intValue, a);
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::BOOL:
-                    paramObj.AddMember("type", "bool", a);
-                    paramObj.AddMember("value", param->boolValue, a);
-                    break;
-                    
-                case Ermine::graphics::MaterialParamType::TEXTURE_2D:
-                    paramObj.AddMember("type", "texture2d", a);
-                    if (param->texture) {
-                        std::string texPath =
-                            Ermine::AssetManager::GetInstance().ResolveTexturePathForMaterialWrite(param->texture);
-                        paramObj.AddMember("value", rapidjson::Value(texPath.c_str(), a), a);
-                    }
-                    break;
-            }
-            
-            paramsObj.AddMember(rapidjson::Value(name.c_str(), a), paramObj, a);
+    auto saveParam = [&](const std::string& outputName, const Ermine::graphics::MaterialParam& param) {
+        rapidjson::Value paramObj(rapidjson::kObjectType);
+
+        switch (param.type) {
+            case Ermine::graphics::MaterialParamType::FLOAT:
+                paramObj.AddMember("type", "float", a);
+                if (!param.floatValues.empty()) {
+                    paramObj.AddMember("value", param.floatValues[0], a);
+                }
+                break;
+
+            case Ermine::graphics::MaterialParamType::VEC2:
+                paramObj.AddMember("type", "vec2", a);
+                if (param.floatValues.size() >= 2) {
+                    rapidjson::Value arr(rapidjson::kArrayType);
+                    arr.PushBack(param.floatValues[0], a);
+                    arr.PushBack(param.floatValues[1], a);
+                    paramObj.AddMember("value", arr, a);
+                }
+                break;
+
+            case Ermine::graphics::MaterialParamType::VEC3:
+                paramObj.AddMember("type", "vec3", a);
+                if (param.floatValues.size() >= 3) {
+                    rapidjson::Value arr(rapidjson::kArrayType);
+                    arr.PushBack(param.floatValues[0], a);
+                    arr.PushBack(param.floatValues[1], a);
+                    arr.PushBack(param.floatValues[2], a);
+                    paramObj.AddMember("value", arr, a);
+                }
+                break;
+
+            case Ermine::graphics::MaterialParamType::VEC4:
+                paramObj.AddMember("type", "vec4", a);
+                if (param.floatValues.size() >= 4) {
+                    rapidjson::Value arr(rapidjson::kArrayType);
+                    arr.PushBack(param.floatValues[0], a);
+                    arr.PushBack(param.floatValues[1], a);
+                    arr.PushBack(param.floatValues[2], a);
+                    arr.PushBack(param.floatValues[3], a);
+                    paramObj.AddMember("value", arr, a);
+                }
+                break;
+
+            case Ermine::graphics::MaterialParamType::INT:
+                paramObj.AddMember("type", "int", a);
+                paramObj.AddMember("value", param.intValue, a);
+                break;
+
+            case Ermine::graphics::MaterialParamType::BOOL:
+                paramObj.AddMember("type", "bool", a);
+                paramObj.AddMember("value", param.boolValue, a);
+                break;
+
+            case Ermine::graphics::MaterialParamType::TEXTURE_2D:
+                paramObj.AddMember("type", "texture2d", a);
+                if (param.texture) {
+                    std::string texPath =
+                        Ermine::AssetManager::GetInstance().ResolveTexturePathForMaterialWrite(param.texture);
+                    paramObj.AddMember("value", rapidjson::Value(texPath.c_str(), a), a);
+                }
+                break;
         }
+
+        paramsObj.AddMember(rapidjson::Value(outputName.c_str(), a), paramObj, a);
     };
 
-    // Save all common material parameters
-    saveParam("materialAlbedo");
-    saveParam("materialMetallic");
-    saveParam("materialRoughness");
-    saveParam("materialAo");
-    saveParam("materialEmissive");
-    saveParam("materialEmissiveIntensity");
-    saveParam("materialNormalStrength");
-    saveParam("materialShadingModel");
-    saveParam("materialCastsShadows");
-    saveParam("materialHasAlbedoMap");
-    saveParam("materialHasNormalMap");
-    saveParam("materialHasRoughnessMap");
-    saveParam("materialHasMetallicMap");
-    saveParam("materialHasAoMap");
-    saveParam("materialHasEmissiveMap");
-    saveParam("materialAlbedoMap");
-    saveParam("materialNormalMap");
-    saveParam("materialRoughnessMap");
-    saveParam("materialMetallicMap");
-    saveParam("materialAoMap");
-    saveParam("materialEmissiveMap");
+    for (const auto& [name, param] : material.GetParameters()) {
+        const std::string canonicalName = CanonicalMaterialParameterName(name);
+        if (canonicalName.empty() || savedParams.find(canonicalName) != savedParams.end())
+            continue;
+
+        saveParam(canonicalName, param);
+        savedParams.insert(canonicalName);
+    }
 
     d.AddMember("parameters", paramsObj, a);
 
@@ -1576,7 +1600,9 @@ Ermine::graphics::Material LoadMaterialFromFile(const std::filesystem::path& pat
         const auto& paramsObj = d["parameters"];
         
         for (auto it = paramsObj.MemberBegin(); it != paramsObj.MemberEnd(); ++it) {
-            std::string paramName = it->name.GetString();
+            std::string paramName = CanonicalMaterialParameterName(it->name.GetString());
+            if (paramName.empty())
+                continue;
             const auto& paramData = it->value;
             
             if (!paramData.IsObject() || !paramData.HasMember("type")) continue;
@@ -1620,6 +1646,17 @@ Ermine::graphics::Material LoadMaterialFromFile(const std::filesystem::path& pat
         }
     }
 
+    // Backward compatibility defaults for older material assets.
+    if (!material.HasParameter("materialFillAmount")) {
+        material.SetFloat("materialFillAmount", 1.0f);
+    }
+    if (!material.HasParameter("materialFillDirection")) {
+        material.SetVec3("materialFillDirection", Ermine::Vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (!material.HasParameter("materialFillUVAxis")) {
+        material.SetVec2("materialFillUVAxis", Ermine::Vec2(0.0f, 1.0f));
+    }
+
     // Load UV transform
     if (d.HasMember("uvTransform") && d["uvTransform"].IsObject()) {
         const auto& uvObj = d["uvTransform"];
@@ -1645,15 +1682,16 @@ Ermine::graphics::Material LoadMaterialFromFile(const std::filesystem::path& pat
             *outCustomFragmentShader = fragPath;
 
         if (!fragPath.empty()) {
+            const std::string vertexPath = ResolveCustomVertexShaderPath(fragPath);
             auto shader = Ermine::AssetManager::GetInstance().LoadShader(
-                "../Resources/Shaders/vertex.glsl",
+                vertexPath,
                 fragPath
             );
             if (shader && shader->IsValid()) {
                 material.SetShader(shader);
             }
             else {
-                EE_CORE_WARN("Failed to load custom fragment shader '{}' from material file", fragPath);
+                EE_CORE_WARN("Failed to load custom shader pair ('{}', '{}') from material file", vertexPath, fragPath);
             }
         }
     }

@@ -3,31 +3,37 @@
     {
       "components": {
         "IDComponent": {
-          "guid": "48ab75fc47e44644a348fadabc3cf38b"
+          "guid": "618b3fbaca931742b5b675ff1871c7e6"
+        },
+        "ObjectMetaData": {
+          "name": "GlobalAudio",
+          "tag": "Audio",
+          "selfActive": false
         },
         "GlobalAudioComponent": {
           "masterVolume": 1.0,
-          "musicVolume": 0.0860000029206276,
+          "musicVolume": 0.23999999463558198,
           "sfxVolume": 1.0,
-          "ambienceVolume": 0.052000001072883609,
+          "ambienceVolume": 0.1,
+          "voiceVolume": 1.0,
           "autoPlay": true,
           "music": [
             {
               "name": "test_music",
-              "path": "../Resources/Audio/231113-industrial-noise-dark-176107.mp3",
+              "path": "../Resources/Audio/NewBGM.wav",
               "volume": 1.0
             }
           ],
           "sfx": [
             {
               "name": "Shoot",
-              "path": "../Resources/Audio/Shoot_Orb.wav",
-              "volume": 1.0
+              "path": "../Resources/Audio/SteampunkWeapon_01.wav",
+              "volume": 0.5
             },
             {
               "name": "Teleport",
-              "path": "../Resources/Audio/Teleport.wav",
-              "volume": 1.0
+              "path": "../Resources/Audio/Player_Dash_v2 1.wav",
+              "volume": 0.6000000238418579
             },
             {
               "name": "Jump",
@@ -41,13 +47,13 @@
             },
             {
               "name": "UIClick",
-              "path": "../Resources/Audio/UI_Confirm.wav",
+              "path": "../Resources/Audio/UI_Confirm_Smaller.wav",
               "volume": 1.0
             },
             {
               "name": "UIHover",
               "path": "../Resources/Audio/UI_Hover 5.wav",
-              "volume": 1.0
+              "volume": 0.699999988079071
             },
             {
               "name": "SwitchOn",
@@ -58,20 +64,77 @@
               "name": "SwitchOff",
               "path": "../Resources/Audio/Switch_Off.wav",
               "volume": 1.0
+            },
+            {
+              "name": "HealthDrain1",
+              "path": "../Resources/Audio/HealthDrain_v2_Part1.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "HealthDrain2",
+              "path": "../Resources/Audio/HealthDrain_v2_Part2.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "HealthDrain3",
+              "path": "../Resources/Audio/HealthDrain_v2_Part3.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "LightDisable",
+              "path": "../Resources/Audio/LightDisable.wav",
+              "volume": 0.699999988079071
+            },
+            {
+              "name": "LightDamageLoop",
+              "path": "../Resources/Audio/LightDamage_Loop.wav",
+              "volume": 0.3499999940395355
             }
           ],
           "ambience": [
             {
               "name": "Steampunk",
-              "path": "../Resources/Audio/futuristic-factory-noise-002-311136.mp3",
+              "path": "../Resources/Audio/Ambience_Factory_v2.wav",
+              "volume": 0.75
+            }
+          ],
+          "voice": [
+            {
+              "name": "Clue1",
+              "path": "../Resources/Audio/1stClue.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Clue2",
+              "path": "../Resources/Audio/2ndClue.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Clue3",
+              "path": "../Resources/Audio/3rdClue.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Clue4",
+              "path": "../Resources/Audio/4thClue.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Locks",
+              "path": "../Resources/Audio/2Locks.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Key1",
+              "path": "../Resources/Audio/Key1.wav",
+              "volume": 1.0
+            },
+            {
+              "name": "Key2",
+              "path": "../Resources/Audio/Key2.wav",
               "volume": 1.0
             }
           ]
-        },
-        "ObjectMetaData": {
-          "name": "GlobalAudio",
-          "tag": "Audio",
-          "selfActive": false
         },
         "HierarchyComponent": {
           "depth": 0

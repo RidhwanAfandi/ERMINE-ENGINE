@@ -436,13 +436,22 @@ namespace Ermine {
         cfg.ch = c.cellHeight;
         cfg.walkableSlopeAngle = c.agentMaxSlope;
         cfg.walkableHeight = (int)std::ceil(c.agentHeight / cfg.ch);
-        cfg.walkableClimb = (int)std::floor(c.agentMaxClimb / cfg.ch);
+        //cfg.walkableClimb = (int)std::floor(c.agentMaxClimb / cfg.ch);
+        cfg.walkableClimb = std::max(1, (int)std::floor(c.agentMaxClimb / cfg.ch));
         cfg.walkableRadius = (int)std::ceil(c.agentRadius / cfg.cs);
         rcVcopy(cfg.bmin, bmin);
         rcVcopy(cfg.bmax, bmax);
         rcCalcGridSize(cfg.bmin, cfg.bmax, cfg.cs, &cfg.width, &cfg.height);
         cfg.width = std::max(cfg.width, 2);
         cfg.height = std::max(cfg.height, 2);
+        //EE_CORE_INFO(
+        //    "[NavMeshSystem] Build Config | walkableRadius={} walkableClimb={} walkableHeight={} gridWidth={} gridHeight={}",
+        //    cfg.walkableRadius,
+        //    cfg.walkableClimb,
+        //    cfg.walkableHeight,
+        //    cfg.width,
+        //    cfg.height
+        //);
         cfg.maxEdgeLen = 12;
         cfg.maxSimplificationError = 1.3f;
         cfg.minRegionArea = (int)rcSqr(8);
@@ -695,19 +704,18 @@ namespace Ermine {
             }
         };
 
-    auto AppendStaticCollider = [&](EntityID ent, std::vector<float>& outVerts, std::vector<int>& outTris)
+    auto AppendStaticCollider = [&](EntityID ent, std::vector<float>& outVerts, std::vector<int>& outTris, bool topFaceOnly)
     {
+            EE_CORE_INFO("[NavMeshSystem] Appending collider for entity {}", (uint32_t)ent);
             auto& ecs = ECS::GetInstance();
+            if (!ecs.HasComponent<Transform>(ent) || !ecs.HasComponent<PhysicComponent>(ent))
+                return;
+
             auto& t = ecs.GetComponent<Transform>(ent);
             auto& pc = ecs.GetComponent<PhysicComponent>(ent);
 
-            // For now: only Box colliders (fast + most common)
-            if (pc.shapeType != ShapeType::Box) return;
+            glm::quat entRot = glm::normalize(glm::quat(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z));
 
-            // Build collider local transform (pivot + collider rotation)
-            glm::quat entRot = glm::quat(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
-
-            // If colliderRot is degrees in your editor, convert to radians.
             glm::vec3 colEulerRad(glm::radians(pc.colliderRot.x),
                 glm::radians(pc.colliderRot.y),
                 glm::radians(pc.colliderRot.z));
@@ -725,32 +733,84 @@ namespace Ermine {
 
             const int base = (int)(outVerts.size() / 3);
 
-            // Unit cube vertices (centered)
-            const float cubeVerts[] = {
-                -0.5f,-0.5f,-0.5f,  0.5f,-0.5f,-0.5f,  0.5f, 0.5f,-0.5f, -0.5f, 0.5f,-0.5f,
-                -0.5f,-0.5f, 0.5f,  0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f
-            };
-            const int cubeTris[] = {
-                0,1,2, 0,2,3,
-                4,6,5, 4,7,6,
-                4,5,1, 4,1,0,
-                3,2,6, 3,6,7,
-                4,0,3, 4,3,7,
-                1,5,6, 1,6,2
-            };
 
-            for (int i = 0; i < 8; ++i)
+            auto AppendBoxLike = [&](const glm::mat4& model, bool topFaceOnly,
+                const glm::vec3& localMin, const glm::vec3& localMax)
+                {
+                    // 8 corners from localMin/localMax
+                    const glm::vec3 corners[8] = {
+                        {localMin.x, localMin.y, localMin.z},
+                        {localMax.x, localMin.y, localMin.z},
+                        {localMax.x, localMax.y, localMin.z},
+                        {localMin.x, localMax.y, localMin.z},
+                        {localMin.x, localMin.y, localMax.z},
+                        {localMax.x, localMin.y, localMax.z},
+                        {localMax.x, localMax.y, localMax.z},
+                        {localMin.x, localMax.y, localMax.z},
+                    };
+
+                    const int cubeTris[] = {
+                        0,1,2, 0,2,3,
+                        4,6,5, 4,7,6,
+                        4,5,1, 4,1,0,
+                        3,2,6, 3,6,7,
+                        4,0,3, 4,3,7,
+                        1,5,6, 1,6,2
+                    };
+
+                    static const int topTris[] = { 2,3,6, 3,7,6 };
+
+                    for (int i = 0; i < 8; ++i)
+                    {
+                        glm::vec4 v = model * glm::vec4(corners[i], 1.0f);
+                        outVerts.push_back(v.x);
+                        outVerts.push_back(v.y);
+                        outVerts.push_back(v.z);
+                    }
+
+                    if (topFaceOnly)
+                    {
+                        for (int i = 0; i < 6; ++i)
+                            outTris.push_back(base + topTris[i]);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < (int)(sizeof(cubeTris) / sizeof(int)); ++i)
+                            outTris.push_back(base + cubeTris[i]);
+                    }
+                };
+
+            // Box collider
+            if (pc.shapeType == ShapeType::Box)
             {
-                glm::vec4 v = model * glm::vec4(
-                    cubeVerts[i * 3 + 0], cubeVerts[i * 3 + 1], cubeVerts[i * 3 + 2], 1.0f);
-
-                outVerts.push_back(v.x);
-                outVerts.push_back(v.y);
-                outVerts.push_back(v.z);
+                // your existing "model" already includes colliderSize scaling,
+                // so the local cube stays unit-sized.
+                AppendBoxLike(model, topFaceOnly,
+                    glm::vec3(-0.5f), glm::vec3(0.5f));
+                return;
             }
 
-            for (int i = 0; i < (int)(sizeof(cubeTris) / sizeof(int)); ++i)
-                outTris.push_back(base + cubeTris[i]);
+            // Custom mesh collider
+            if (pc.shapeType == ShapeType::CustomMesh && !pc.customMeshVertices.empty())
+            {
+                // Build local bounds from the custom mesh vertices (LOCAL SPACE)
+                glm::vec3 lmn(FLT_MAX), lmx(-FLT_MAX);
+                for (const auto& lv : pc.customMeshVertices)
+                {
+                    lmn = glm::min(lmn, glm::vec3(lv.x, lv.y, lv.z));
+                    lmx = glm::max(lmx, glm::vec3(lv.x, lv.y, lv.z));
+                }
+
+                // Treat the custom mesh as a box
+                AppendBoxLike(model, topFaceOnly, lmn, lmx);
+
+                EE_CORE_INFO(
+                    "[NavMeshSystem] Geometry count -> verts {} tris {}",
+                    outVerts.size(),
+                    outTris.size()
+                );
+                return;
+            }
     };
 
 
@@ -759,45 +819,63 @@ namespace Ermine {
         auto& ecs = ECS::GetInstance();
 
         if (!ecs.HasComponent<NavMeshComponent>(e) ||
-            !ecs.HasComponent<Transform>(e) ||
-            !ecs.HasComponent<Mesh>(e))
+            !ecs.HasComponent<Transform>(e))
             return false;
 
         auto& nm = ecs.GetComponent<NavMeshComponent>(e);
+        const bool bakeCustomMeshSurroundings = nm.bakeUsingCustomMesh;
 
         SyncBakeAgentSettingsFromAgents(nm);
+        //EE_CORE_INFO("[NavMeshSystem] NM after Sync | cellHeight={} agentMaxClimb={}", nm.cellHeight, nm.agentMaxClimb);
 
         auto& navT = ecs.GetComponent<Transform>(e);
-        auto& navM = ecs.GetComponent<Mesh>(e);
-
-        // compute bake region from the cube you're baking on
-        // (AABB region around the bake cube, plus a bit above it for walls sitting on top)
-        if (navM.kind != MeshKind::Primitive || navM.primitive.type != "Cube")
-            return false;
 
         Vec3 bakeCenter = navT.position;
 
         Vec3 bakeHalf;
-        bakeHalf.x = 0.5f * navT.scale.x * navM.primitive.size.x;
-        bakeHalf.y = 0.5f * navT.scale.y * navM.primitive.size.y;
-        bakeHalf.z = 0.5f * navT.scale.z * navM.primitive.size.z;
+        bakeHalf.x = 0.5f * navT.scale.x;
+        bakeHalf.y = 0.5f * navT.scale.y;
+        bakeHalf.z = 0.5f * navT.scale.z;
 
-        const float extraSide = 0.25f; // small padding so edge-touching walls are included
-        const float extraAbove = std::max(2.0f, nm.agentHeight * 2.0f); // include "on top" obstacles
+        const float extraSideBox = 0.25f;
+        const float extraAboveBox = std::max(2.0f, nm.agentHeight * 2.0f);
+        const float extraBelowBox = 0.25f;
 
-        const float minX = bakeCenter.x - bakeHalf.x - extraSide;
-        const float maxX = bakeCenter.x + bakeHalf.x + extraSide;
-        const float minZ = bakeCenter.z - bakeHalf.z - extraSide;
-        const float maxZ = bakeCenter.z + bakeHalf.z + extraSide;
+        // CustomMesh bake needs a much larger capture volume (still center-based)
+        const float extraSideCustom = std::max(40.0f, nm.agentRadius * 3.0f);   // XZ capture radius
+        const float extraAboveCustom = std::max(20.0f, nm.agentHeight * 2.0f);
+        const float extraBelowCustom = std::max(60.0f, nm.agentHeight * 5.0f);
 
-        const float minY = bakeCenter.y - bakeHalf.y - extraSide;
-        const float maxY = bakeCenter.y + bakeHalf.y + extraAbove;
+        // Box bake region
+        const float minX_box = bakeCenter.x - bakeHalf.x - extraSideBox;
+        const float maxX_box = bakeCenter.x + bakeHalf.x + extraSideBox;
+        const float minZ_box = bakeCenter.z - bakeHalf.z - extraSideBox;
+        const float maxZ_box = bakeCenter.z + bakeHalf.z + extraSideBox;
+        const float minY_box = bakeCenter.y - bakeHalf.y - extraBelowBox;
+        const float maxY_box = bakeCenter.y + bakeHalf.y + extraAboveBox;
 
-        auto InsideBakeRegionByCenter = [&](const Transform& t) -> bool
+        // Custom bake region (use XZ radius + big Y slab)
+        const float minY_custom = bakeCenter.y - bakeHalf.y - extraBelowCustom;
+        const float maxY_custom = bakeCenter.y + bakeHalf.y + extraAboveCustom;
+        const float radiusXZ = std::max(bakeHalf.x, bakeHalf.z) + extraSideCustom;
+        const float radiusXZ2 = radiusXZ * radiusXZ;
+
+        auto InsideBakeRegion_Box = [&](const Transform& t) -> bool
             {
-                return (t.position.x >= minX && t.position.x <= maxX) &&
-                    (t.position.z >= minZ && t.position.z <= maxZ) &&
-                    (t.position.y >= minY && t.position.y <= maxY);
+                return (t.position.x >= minX_box && t.position.x <= maxX_box) &&
+                    (t.position.z >= minZ_box && t.position.z <= maxZ_box) &&
+                    (t.position.y >= minY_box && t.position.y <= maxY_box);
+            };
+
+        // Center-only, no AABB: distance in XZ + generous Y range
+        auto InsideBakeRegion_Custom = [&](const Transform& t) -> bool
+            {
+                const float dx = t.position.x - bakeCenter.x;
+                const float dz = t.position.z - bakeCenter.z;
+                const float d2 = dx * dx + dz * dz;
+
+                return (d2 <= radiusXZ2) &&
+                    (t.position.y >= minY_custom && t.position.y <= maxY_custom);
             };
 
         // collect geometry
@@ -807,7 +885,7 @@ namespace Ermine {
         tris.reserve(2048);
 
         // Bake floor's TOP face as walkable
-        AppendCube(e, true, verts, tris);
+        AppendStaticCollider(e, verts, tris, true);
 
         // Include nearby static colliders as obstacles (skip NavMeshAgents)
         for (EntityID ent = 1; ent < MAX_ENTITIES; ++ent)
@@ -819,15 +897,88 @@ namespace Ermine {
             if (ecs.HasComponent<NavMeshAgent>(ent)) continue;
 
             auto& pc = ecs.GetComponent<PhysicComponent>(ent);
+            if (ecs.HasComponent<ModelComponent>(ent))
+            {
+                auto& mc = ecs.GetComponent<ModelComponent>(ent);
+                EE_CORE_INFO("[NavMeshSystem] Checking entity {} model {}", (uint32_t)ent, mc.m_model->GetName());
+            }
 
             // Only bake static rigid colliders as obstacles
             if (pc.bodyType != PhysicsBodyType::Rigid) continue;
             if (pc.motionType != JPH::EMotionType::Static) continue;
 
-            auto& ot = ecs.GetComponent<Transform>(ent);
-            if (!InsideBakeRegionByCenter(ot)) continue; // you can improve this later to use AABB
+            if (bakeCustomMeshSurroundings)
+            {
+                if (pc.shapeType != ShapeType::CustomMesh) continue;
+            }
+            else
+            {
+                if (pc.shapeType != ShapeType::Box) continue;
+            }
 
-            AppendStaticCollider(ent, verts, tris);
+            auto& ot = ecs.GetComponent<Transform>(ent);
+            bool inside = false;
+
+            if (bakeCustomMeshSurroundings)
+            {
+                // Y slab check first
+                const bool yOk = (ot.position.y >= minY_custom && ot.position.y <= maxY_custom);
+
+                // Distance in XZ from bake center
+                const float dx = ot.position.x - bakeCenter.x;
+                const float dz = ot.position.z - bakeCenter.z;
+                const float dist2 = dx * dx + dz * dz;
+
+                // Estimate this object's horizontal "radius" from its custom mesh bounds (still NOT AABB overlap)
+                float objRadiusXZ = 0.0f;
+
+                if (pc.shapeType == ShapeType::CustomMesh && !pc.customMeshVertices.empty())
+                {
+                    float minVX = FLT_MAX, minVZ = FLT_MAX;
+                    float maxVX = -FLT_MAX, maxVZ = -FLT_MAX;
+
+                    for (auto& v : pc.customMeshVertices)
+                    {
+                        minVX = std::min(minVX, v.x);  maxVX = std::max(maxVX, v.x);
+                        minVZ = std::min(minVZ, v.z);  maxVZ = std::max(maxVZ, v.z);
+                    }
+
+                    const float extentX = (maxVX - minVX) * ot.scale.x;
+                    const float extentZ = (maxVZ - minVZ) * ot.scale.z;
+
+                    // Use half of the diagonal as a radius estimate
+                    objRadiusXZ = 0.5f * std::sqrt(extentX * extentX + extentZ * extentZ);
+                }
+
+                const float maxInflation = extraSideCustom;
+                const float inflation = std::min(objRadiusXZ, maxInflation);
+
+                const float r = radiusXZ + inflation;
+                inside = yOk && (dist2 <= (r * r));
+            }
+            else
+            {
+                inside = InsideBakeRegion_Box(ot);
+            }
+
+            EE_CORE_INFO("[NavMeshSystem] Entity {} inside region {}", (uint32_t)ent, inside);
+            if (!inside) continue;
+            EE_CORE_INFO(
+                "[NavMeshSystem] Entity {} position ({}, {}, {}) inside region {}",
+                (uint32_t)ent,
+                ot.position.x,
+                ot.position.y,
+                ot.position.z,
+                inside
+            );
+            //if (!InsideBakeRegionByCenter(ot)) continue; // you can improve this later to use AABB
+
+            bool treatAsFloor = false;
+            {
+                const float yDelta = std::abs(ot.position.y - bakeCenter.y);
+                treatAsFloor = (yDelta <= nm.agentMaxClimb + 0.5f); // tweak +0.2f
+            }
+            AppendStaticCollider(ent, verts, tris, treatAsFloor);
         }
 
         const int nverts = (int)(verts.size() / 3);

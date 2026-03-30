@@ -50,6 +50,30 @@ void Implementation::Update() {
 	{
 		mChannels.erase(it);
 	}
+
+	// Update fade-out channels
+	for (auto it = mFadeOutChannels.begin(); it != mFadeOutChannels.end(); )
+	{
+		it->elapsedTime += 0.016f; // Assume ~60fps, 16ms per frame
+		float fadeProgress = std::min(it->elapsedTime / it->fadeDuration, 1.0f);
+		
+		// Calculate new volume using linear interpolation
+		float newVolume = it->startVolume * (1.0f - fadeProgress);
+		it->channel->setVolume(newVolume);
+
+		// Check if fade-out is complete
+		if (fadeProgress >= 1.0f)
+		{
+			// Stop and remove the channel
+			it->channel->stop();
+			it = mFadeOutChannels.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
 	CAudioEngine::ErrorCheck(mpStudioSystem->update());
 }
 
@@ -271,29 +295,88 @@ float  CAudioEngine::VolumeTodB(float volume)
 }
 
 bool CAudioEngine::IsPlaying(int nChannelId) {
+	// Check active channels
 	auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
-	if (tFoundIt == sgpImplementation->mChannels.end())
-		return false;
+	if (tFoundIt != sgpImplementation->mChannels.end())
+	{
+		bool isPlaying = false;
+		tFoundIt->second->isPlaying(&isPlaying);
+		return isPlaying;
+	}
 
-	bool isPlaying = false;
-	tFoundIt->second->isPlaying(&isPlaying);
-	return isPlaying;
+	// Check fade-out channels
+	for (const auto& fadeInfo : sgpImplementation->mFadeOutChannels)
+	{
+		if (fadeInfo.channelId == nChannelId)
+		{
+			bool isPlaying = false;
+			fadeInfo.channel->isPlaying(&isPlaying);
+			return isPlaying;
+		}
+	}
+
+	return false;
 }
 
-void CAudioEngine::StopChannel(int nChannelId) {
+void CAudioEngine::StopChannel(int nChannelId, bool fadeOut, float fadeDuration) {
 	auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
 	if (tFoundIt == sgpImplementation->mChannels.end())
 		return;
 
-	CAudioEngine::ErrorCheck(tFoundIt->second->stop());
-	sgpImplementation->mChannels.erase(tFoundIt);
+	if (fadeOut && fadeDuration > 0.0f)
+	{
+		// Get current volume
+		float currentVolume = 0.0f;
+		tFoundIt->second->getVolume(&currentVolume);
+
+		// Add to fade-out list with channel ID
+		FadeOutInfo fadeInfo;
+		fadeInfo.channel = tFoundIt->second;
+		fadeInfo.channelId = nChannelId;
+		fadeInfo.startVolume = currentVolume;
+		fadeInfo.fadeDuration = fadeDuration;
+		fadeInfo.elapsedTime = 0.0f;
+		sgpImplementation->mFadeOutChannels.push_back(fadeInfo);
+
+		// Remove from active channels map (but keep playing while fading)
+		sgpImplementation->mChannels.erase(tFoundIt);
+	}
+	else
+	{
+		// Hard stop (immediate)
+		CAudioEngine::ErrorCheck(tFoundIt->second->stop());
+		sgpImplementation->mChannels.erase(tFoundIt);
+	}
 }
 
-void CAudioEngine::StopAllChannels() {
-	for (auto& channel : sgpImplementation->mChannels) {
-		CAudioEngine::ErrorCheck(channel.second->stop());
+void CAudioEngine::StopAllChannels(bool fadeOut, float fadeDuration) {
+	if (fadeOut && fadeDuration > 0.0f)
+	{
+		// Add all channels to fade-out list
+		for (auto& channelPair : sgpImplementation->mChannels)
+		{
+			float currentVolume = 0.0f;
+			channelPair.second->getVolume(&currentVolume);
+
+			FadeOutInfo fadeInfo;
+			fadeInfo.channel = channelPair.second;
+			fadeInfo.channelId = channelPair.first;  // Store the channel ID
+			fadeInfo.startVolume = currentVolume;
+			fadeInfo.fadeDuration = fadeDuration;
+			fadeInfo.elapsedTime = 0.0f;
+			sgpImplementation->mFadeOutChannels.push_back(fadeInfo);
+		}
+		// Clear the active channels map
+		sgpImplementation->mChannels.clear();
 	}
-	sgpImplementation->mChannels.clear();
+	else
+	{
+		// Hard stop all channels
+		for (auto& channel : sgpImplementation->mChannels) {
+			CAudioEngine::ErrorCheck(channel.second->stop());
+		}
+		sgpImplementation->mChannels.clear();
+	}
 }
 
 void CAudioEngine::PauseAllChannels() {
@@ -361,6 +444,47 @@ void CAudioEngine::SetListenerAttributes(const Vector3D& position,
 
 FMOD::System* CAudioEngine::GetCoreSystem() {
 	return sgpImplementation ? sgpImplementation->mpSystem : nullptr;
+}
+
+// Reverb DSP Functions
+FMOD::DSP* CAudioEngine::CreateReverbDSP() {
+	FMOD::DSP* reverbDSP = nullptr;
+	if (sgpImplementation && sgpImplementation->mpSystem) {
+		CAudioEngine::ErrorCheck(sgpImplementation->mpSystem->createDSPByType(FMOD_DSP_TYPE_SFXREVERB, &reverbDSP));
+	}
+	return reverbDSP;
+}
+
+void CAudioEngine::AddReverbToChannel(int nChannelId, FMOD::DSP* reverbDSP) {
+	auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+	if (tFoundIt == sgpImplementation->mChannels.end() || !reverbDSP)
+		return;
+
+	CAudioEngine::ErrorCheck(tFoundIt->second->addDSP(0, reverbDSP));
+}
+
+void CAudioEngine::RemoveReverbFromChannel(int nChannelId) {
+	auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+	if (tFoundIt == sgpImplementation->mChannels.end())
+		return;
+
+	// Remove DSP at index 0 (reverb)
+	FMOD::DSP* dsp = nullptr;
+	if (tFoundIt->second->getDSP(0, &dsp) == FMOD_OK && dsp) {
+		tFoundIt->second->removeDSP(dsp);
+	}
+}
+
+void CAudioEngine::SetReverbParameter(FMOD::DSP* reverbDSP, int index, float value) {
+	if (!reverbDSP)
+		return;
+	CAudioEngine::ErrorCheck(reverbDSP->setParameterFloat(index, value));
+}
+
+void CAudioEngine::RemoveReverbDSP(FMOD::DSP* reverbDSP) {
+	if (!reverbDSP)
+		return;
+	reverbDSP->release();
 }
 
 void CAudioEngine::Shutdown() {

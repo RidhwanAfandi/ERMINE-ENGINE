@@ -72,17 +72,26 @@
   <ItemGroup>
     <Compile Include="AnimationExample.cs" />
     <Compile Include="AttackState.cs" />
-    <Compile Include="EndElevator.cs" />
-    <Compile Include="MoveState.cs" />
+    <Compile Include="Credits.cs" />
+    <Compile Include="CutsceneVideo.cs" />
+    <Compile Include="GearRotateAnimationTest2.cs" />
+    <Compile Include="GearRotateAnimationTest.cs" />
+    <Compile Include="IdleState.cs" />
+    <Compile Include="Level2KeySystem\UnlockDoor.cs" />
+    <Compile Include="SpawnPointController.cs" />
+    <Compile Include="SpotLightTrigger.cs" />
     <Compile Include="ChaseState.cs" />
     <Compile Include="CutscenePlayer.cs" />
     <Compile Include="DamagePlayer.cs" />
     <Compile Include="DisableLightCone.cs" />
-    <Compile Include="EnvironmentAnimation\TemplateScript.cs" />
+    <Compile Include="EnemyFootstep.cs" />
+    <Compile Include="EndElevator.cs" />
     <Compile Include="FakePlayer.cs" />
     <Compile Include="GameManager.cs" />
     <Compile Include="GearRotateAnimation.cs" />
+    <Compile Include="HealthDrivenMaterialFill.cs" />
     <Compile Include="LifeEssenceSkillController.cs" />
+    <Compile Include="LoadingScreen.cs" />
     <Compile Include="MainMenu.cs" />
     <Compile Include="MainMenuVideo.cs" />
     <Compile Include="MoveState.cs" />
@@ -98,7 +107,11 @@
     <Compile Include="TemplateScript.cs" />
     <Compile Include="Test1.cs" />
     <Compile Include="Test2.cs" />
+    <Compile Include="Test3.cs" />
+    <Compile Include="TimedDestroy.cs" />
+    <Compile Include="UpwardsPlatform.cs" />
     <Compile Include="VerticalPlatform.cs" />
+    <Compile Include="VoidDeath.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ermine-ScriptAssembly\Ermine-ScriptAssembly.csproj">
@@ -106,6 +119,7 @@
       <Name>Ermine-ScriptAssembly</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,7 +6,9 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
-        // Ensure cursor is visible when menu starts
+        // Ensure cursor is visible and unlocked when menu starts
+        Cursor.lockState = Cursor.CursorLockState.None;
+        Cursor.visible = true;
         Debug.Log("Main Menu started");
     }
 

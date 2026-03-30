@@ -1,0 +1,1777 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6d852e30ba6ea140a3f215b5f222abee"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.024996651336550714,
+            0.02500000037252903,
+            0.024996651336550714
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "WalkerGuard",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Rigid",
+          "motionType": "Dynamic",
+          "mass": 0.0,
+          "shapeType": "Capsule",
+          "colliderpivot": [
+            0.0,
+            3.299999952316284,
+            0.0
+          ],
+          "posx": true,
+          "posy": false,
+          "posz": true,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": true,
+          "roty": true,
+          "rotz": true,
+          "collidersize": [
+            100.0,
+            170.0,
+            100.0
+          ]
+        },
+        "ModelComponent": {
+          "model": "WalkerGuardwBall.fbx",
+          "isSkinFile": false
+        },
+        "AnimationComponent": {
+          "model": "WalkerGuardwBall.fbx",
+          "graph": {
+            "playbackSpeed": 1.0,
+            "playing": true,
+            "currentTime": 0.0,
+            "states": [
+              {
+                "id": 1,
+                "name": "Idle",
+                "clipName": "Idle",
+                "isStartState": true,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": true,
+                "editorPos": [
+                  42.0,
+                  67.0
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Walk",
+                "clipName": "Walk",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": true,
+                "editorPos": [
+                  369.0,
+                  67.0
+                ]
+              },
+              {
+                "id": 6,
+                "name": "Light Deactivate",
+                "clipName": "Stunned",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  363.0,
+                  451.0
+                ]
+              },
+              {
+                "id": 7,
+                "name": "Light Activate",
+                "clipName": "Recover",
+                "isStartState": false,
+                "isAttached": true,
+                "speed": 1.0,
+                "blendWeight": 1.0,
+                "loop": false,
+                "editorPos": [
+                  699.0,
+                  453.0
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "fromNodeId": 1,
+                "toNodeId": 2,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 1,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 2,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsMoving",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 2,
+                "toNodeId": 6,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": true
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 6,
+                "toNodeId": 7,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": [
+                  {
+                    "parameterName": "IsHit",
+                    "comparison": "==",
+                    "threshold": 0.0,
+                    "boolValue": false
+                  }
+                ]
+              },
+              {
+                "fromNodeId": 7,
+                "toNodeId": 1,
+                "exitTime": 0.0,
+                "duration": 0.25,
+                "conditions": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "IsMoving",
+                "type": 0,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              },
+              {
+                "name": "IsHit",
+                "type": 0,
+                "boolValue": false,
+                "floatValue": 0.0,
+                "intValue": 0,
+                "triggerValue": false
+              }
+            ]
+          }
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "StateMachine": {
+          "nodes": [
+            {
+              "id": 0,
+              "name": "Start",
+              "scriptClassName": "",
+              "isAttached": false,
+              "isStartNode": true,
+              "posX": 100.0,
+              "posY": 100.0
+            }
+          ],
+          "links": []
+        },
+        "NavMeshAgent": {
+          "speed": 3.0,
+          "acceleration": 8.0,
+          "stoppingDistance": 1.2498325109481812,
+          "autoRotate": true,
+          "debugDrawPath": true,
+          "radius": 1.2498325109481812,
+          "height": 4.25,
+          "centerYOffset": 2.125,
+          "autoFitFromCollider": true,
+          "destination": [
+            28.177888870239259,
+            0.30163222551345827,
+            95.06134033203125
+          ]
+        },
+        "AudioComponent": {
+          "soundName": "",
+          "eventName": "",
+          "useRandomVariation": true,
+          "soundVariations": [
+            "../Resources/Audio/Footsteps_Metal_001.wav",
+            "../Resources/Audio/Footsteps_Metal_002.wav",
+            "../Resources/Audio/Footsteps_Metal_003.wav",
+            "../Resources/Audio/Footsteps_Metal_004.wav",
+            "../Resources/Audio/Footsteps_Metal_005.wav"
+          ],
+          "is3D": true,
+          "isLooping": false,
+          "isStreaming": false,
+          "volume": 1.0,
+          "followTransform": true,
+          "minDistance": 5.0,
+          "maxDistance": 150.0,
+          "playOnStart": false
+        },
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "EnemyFootstep",
+              "fields": {
+                "footstepInterval": {
+                  "t": 0,
+                  "v": 1.1
+                }
+              }
+            }
+          ]
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "86621964dca2f94d8e3b64b8faaccfe9"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pSphere2_mesh38",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "c607e2206bd12845a75a3794a1a9f98b"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "33e5a508dc72de4fbddaf55137fe7112"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__d3_mesh37",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "6f6b8b22210b3143bfa4ddc72ecc0966"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Upper_Arm.002_mesh36",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dd82a6aba34f384ebae5a63855978ac3"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Torus.002_mesh35",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d070394c8bcc084388b05818d4bf5742"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Spikes.002_mesh34",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "7af75323c1e21c4ab75756f87438dd90"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Sphere.007_mesh33",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8477e10257c29846b4e9b509f0ae0524"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__ShoulderPads.002_mesh32",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "dba5c8578245f3449b4375aaf02cc97c"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Plane.003_mesh31",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d3867c1c87d6e747a4825225bc199669"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Pelvis.002_mesh30",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0bdb4a07d302644fb88ed7a3990424bb"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__NurbsPath.005_mesh29",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "de5b7701e8c8cf45a57074921f9c6f39"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__NurbsPath.004_mesh28",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "1763031b0c2cab4ea08cf1ebbc860294"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Lantern rungs.005_mesh27",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "2b0ccb68f4d7d246a242f55a74f4fd66"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Lantern rungs.004_mesh26",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "eca2bd82d3d5094ba301290ced3a7dc6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Knee_Joints.005_mesh25",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c657afd3fb17b04d9c7693360ea8cf9d"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Knee_Joints.004_mesh24",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "f960d9df7224fa4cadddc122aeb0a639"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Feet.002_mesh23",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b03eed11f98ab242b91f01587297cd07"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.050_mesh22",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "d6cb5cc9ad361541a1a7bb70f7af1fd8"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.049_mesh21",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "bfe24030ee468c439ad5b1ce092872d0"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.048_mesh20",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8d88381d52d12e418df3e245faf80aad"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.047_mesh19",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "59112bc0d5fdd74ba12878ef731dee91"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.046_mesh18",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "92be77c1e215a94f974ffce747d35470"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.045_mesh17",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "83e8b56c541a9d46bee8b49579829687"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.044_mesh16",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b02ec626a6a80244952bd27527c69ecb"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.043_mesh15",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0ba6b9fe6bff1e4589d95d77b4a62cd2"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.042_mesh14",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "88a3ae7e7192384e82699c2070deec48"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.041_mesh13",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0fcefa03b337be44ab2e0729a43671a2"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.040_mesh12",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "c9a97a3b943cfa43ac510a2531b07849"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.039_mesh11",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "bccc5016f15a494aafbe1774a73b98fa"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.038_mesh10",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b0317a7aa6bd914c9441badfba4af60d"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.037_mesh9",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "64f206b9a1746d48a110118fc0089c41"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.036_mesh8",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "82e86bedc67cb54faad0a65b1908d626"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cylinder.034_mesh7",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2fb4f95becc56248b66da5b5aa8fab47"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "087a4e0d5cadb1478ed71372b21e4a6e"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cube.005_mesh6",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "604ebd643585bb439b8143f4b8643971"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cube.004_mesh5",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "856d9ba1fc10224380f5ee212c31cc64"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Cone.002_mesh4",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e6eb5dc5bef50b4aa3f8e67bd5389d73"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Bottom Legs.002_mesh3",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "f6bc06080a2e7f45b7b928dfbf51b579"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "519e04555bc6694ca3fbf8302d0274e6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Belt.002_mesh2",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "2b75cd7c142b2548b71409d0b0f7da20"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "b48270a88ef38d45bc8dd905c65ea7f2"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Ankle_Joints.005_mesh1",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "9e8a177ac0cf0d4aa1c6f4f753c47d72"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_WalkerGuardwBall.fbx_EnemyRig:pasted__Ankle_Joints.004_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "b80f24441d0823478e6c9acc1ea1bf06"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "6d852e30ba6ea140a3f215b5f222abee",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

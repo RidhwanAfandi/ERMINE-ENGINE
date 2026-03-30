@@ -69,6 +69,9 @@ namespace ErmineEngine
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool Internal_GetRenderEnabled();
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Internal_SetAudioVolume(string name, float volume);
+
         public static bool Load(string name, string filepath, bool loop = false)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(filepath))
@@ -158,6 +161,12 @@ namespace ErmineEngine
         public static void SetRenderEnabled(bool enabled)
         {
             Internal_SetRenderEnabled(enabled);
+        }
+
+        public static void SetAudioVolume(string name, float volume)
+        {
+            if (string.IsNullOrEmpty(name)) return;
+            Internal_SetAudioVolume(name, volume);
         }
     }
 }

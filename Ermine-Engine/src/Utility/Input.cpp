@@ -168,6 +168,11 @@ namespace Ermine
 
 	void Input::SetGameInputActive(bool active)
 	{
+		if (active && !s_GameInputActive)
+		{
+			ResetGameMouseDelta();
+		}
+
 		s_GameInputActive = active;
 	}
 
@@ -592,5 +597,12 @@ namespace Ermine
 		s_GameLastMouseY = static_cast<float>(mouseY);
 
 		return { s_GameMouseDeltaX, s_GameMouseDeltaY };
+	}
+
+	void Input::ResetGameMouseDelta()
+	{
+		s_GameMouseDeltaX = 0.0f;
+		s_GameMouseDeltaY = 0.0f;
+		s_GameMouseFirstMove = true;
 	}
 }

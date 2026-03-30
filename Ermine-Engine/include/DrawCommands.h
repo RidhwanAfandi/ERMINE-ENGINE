@@ -22,6 +22,7 @@ namespace Ermine::graphics
     // DrawInfo flag bits (must match shader constants)
     constexpr uint32_t FLAG_SKINNING = 1u << 0;        // bit 0: Skeletal animation enabled
     constexpr uint32_t FLAG_CAMERA_ATTACHED = 1u << 1; // bit 1: Object attached to camera (no motion blur)
+    constexpr uint32_t FLAG_FLICKER_EMISSIVE = 1u << 2; // bit 2: Enable emissive flicker in the g-buffer pass
 
     /**
      * @brief DrawElementsIndirectCommand structure for glDrawElementsIndirect

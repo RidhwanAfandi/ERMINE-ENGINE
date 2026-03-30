@@ -5,7 +5,7 @@ public class EndElevator : MonoBehaviour
     private bool playerIn;
 
     // Elevator movement settings
-    public float eSpeed = 2f;        // POSITIVE = up, NEGATIVE = down
+    public float eSpeed = 2f;
     public float eDuration = 3f;
 
     // Door movement settings
@@ -16,9 +16,14 @@ public class EndElevator : MonoBehaviour
     private Vector3 startPosition;
 
     // Door variables
-    private GameObject elevatorDoor;
-    private float doorOpenPos = -6f;
-    private float doorClosePos = 8f;
+    private Transform elevatorDoorLeft;
+    private Transform elevatorDoorRight;
+
+    private float leftDoorStartX;
+    private float rightDoorStartX;
+
+    private float doorOffset = 3f; // how far doors start open
+
     private bool doorClosed = false;
 
     public string sceneName = "m4-LEVEL2_AI.scene";
@@ -26,11 +31,31 @@ public class EndElevator : MonoBehaviour
     void Start()
     {
         startPosition = transform.position;
-        elevatorDoor = GameObject.Find("ElevatorDoor");
+
+        elevatorDoorLeft = transform.Find("ElevatorDoorLeft");
+        elevatorDoorRight = transform.Find("ElevatorDoorRight");
+
+        // Store original positions
+        leftDoorStartX = elevatorDoorLeft.position.x;
+        rightDoorStartX = elevatorDoorRight.position.x;
+
+        // Offset doors at start
+        elevatorDoorLeft.position = new Vector3(
+            leftDoorStartX - doorOffset,
+            elevatorDoorLeft.position.y,
+            elevatorDoorLeft.position.z
+        );
+
+        elevatorDoorRight.position = new Vector3(
+            rightDoorStartX + doorOffset,
+            elevatorDoorRight.position.y,
+            elevatorDoorRight.position.z
+        );
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.name != "Player") return;
         Debug.Log("Player entered the elevator");
         playerIn = true;
     }
@@ -46,24 +71,36 @@ public class EndElevator : MonoBehaviour
 
             if (timer <= dDuration)
             {
-                float doorMovement = Mathf.Lerp(
-                    doorOpenPos,
-                    doorClosePos,
-                    timer / dDuration
+                float t = timer / dDuration;
+
+                float leftX = Mathf.Lerp(leftDoorStartX - doorOffset, leftDoorStartX, t);
+                float rightX = Mathf.Lerp(rightDoorStartX + doorOffset, rightDoorStartX, t);
+
+                elevatorDoorLeft.position = new Vector3(
+                    leftX,
+                    elevatorDoorLeft.position.y,
+                    elevatorDoorLeft.position.z
                 );
 
-                elevatorDoor.transform.position = new Vector3(
-                    doorMovement,
-                    elevatorDoor.transform.position.y,
-                    elevatorDoor.transform.position.z
+                elevatorDoorRight.position = new Vector3(
+                    rightX,
+                    elevatorDoorRight.position.y,
+                    elevatorDoorRight.position.z
                 );
             }
             else
             {
-                elevatorDoor.transform.position = new Vector3(
-                    doorClosePos,
-                    elevatorDoor.transform.position.y,
-                    elevatorDoor.transform.position.z
+                // Snap fully closed
+                elevatorDoorLeft.position = new Vector3(
+                    leftDoorStartX,
+                    elevatorDoorLeft.position.y,
+                    elevatorDoorLeft.position.z
+                );
+
+                elevatorDoorRight.position = new Vector3(
+                    rightDoorStartX,
+                    elevatorDoorRight.position.y,
+                    elevatorDoorRight.position.z
                 );
 
                 doorClosed = true;
@@ -97,6 +134,6 @@ public class EndElevator : MonoBehaviour
 
     void LoadNextScene()
     {
-        SceneManager.LoadScene($"../Resources/Scenes/{sceneName}");
+        SceneManager.LoadScene($"../Resources/Scenes/" + sceneName);
     }
 }

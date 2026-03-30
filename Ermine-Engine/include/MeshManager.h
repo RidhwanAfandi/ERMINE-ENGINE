@@ -72,7 +72,7 @@ namespace Ermine::graphics {
         // GPU buffer management
         void Initialize(size_t estimatedDrawCount = 0);  // Initialize with optional scene-based sizing
         void UploadAndBuild();  // Upload staged data and build indirect commands (call once per scene)
-        void Clear();           // Clear all data for new scene
+        void Clear(bool preservePrimitiveMeshes = false); // Clear scene data, optionally keeping built-in primitive mesh registrations
 
         // Getters for rendering (SSBOs)
         GLuint GetIndirectBuffer() const { return m_IndirectBuffer.bufferID; }

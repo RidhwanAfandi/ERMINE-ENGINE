@@ -4,6 +4,12 @@
 #include <Windows.h>
 #endif
 
+extern "C"
+{
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001; // Enable NVIDIA Optimus on laptops, requests high-performance GPU
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; // Enable AMD Switchable Graphics on laptops, requests high-performance GPU
+}
+
 #if (defined(EE_EDITOR) || defined(EE_GAME)) && defined(EE_RELEASE)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #else

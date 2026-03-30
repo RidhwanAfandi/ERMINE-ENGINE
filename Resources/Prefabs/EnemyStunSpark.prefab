@@ -1,0 +1,124 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "33e1c2d4b5a6e7f8c9d0a1b2e3f4c5d6"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "EnemyStunSpark",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "GPUParticleEmitter": {
+          "active": true,
+          "maxParticles": 100,
+          "emissionShape": 1,
+          "localPositionOffset": [
+            0.0,
+            1.5,
+            0.0
+          ],
+          "overallScale": 1.0,
+          "spawnBoxExtents": [
+            0.8,
+            2.5,
+            0.8
+          ],
+          "spawnRadius": 1.0,
+          "spawnRadiusInner": 0.0,
+          "spawnRate": 25.0,
+          "burstCountMin": 3,
+          "burstCountMax": 8,
+          "burstInterval": 0.5,
+          "burstOnStart": true,
+          "directionMode": 0,
+          "direction": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "coneAngle": 180.0,
+          "coneInnerAngle": 0.0,
+          "speedMin": 0.5,
+          "speedMax": 1.5,
+          "gravity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "drag": 0.0,
+          "turbulenceStrength": 0.5,
+          "turbulenceScale": 1.0,
+          "boundsMode": 0,
+          "boundsShape": 0,
+          "boundsBoxExtents": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "boundsRadius": 2.0,
+          "boundsRadiusInner": 0.0,
+          "renderMode": 2,
+          "smokeOpacity": 0.0,
+          "smokeSoftness": 0.0,
+          "smokeNoiseScale": 0.0,
+          "smokeDistortScale": 0.0,
+          "smokeDistortStrength": 0.0,
+          "smokePuffScale": 0.0,
+          "smokePuffStrength": 0.0,
+          "smokeStretch": 0.0,
+          "smokeUpBias": 0.0,
+          "smokeDepthFade": 0.0,
+          "electricIntensity": 4.0,
+          "electricFrequency": 12.0,
+          "electricBoltThickness": 0.15,
+          "electricBoltVariation": 1.5,
+          "electricGlow": 2.5,
+          "electricBoltCount": 1,
+          "colorStart": [
+            0.3,
+            0.7,
+            1.0
+          ],
+          "colorEnd": [
+            0.0,
+            0.2,
+            0.5
+          ],
+          "alphaStart": 1.0,
+          "alphaEnd": 0.0,
+          "sizeStartMin": 0.8,
+          "sizeStartMax": 1.5,
+          "sizeEndMin": 0.3,
+          "sizeEndMax": 0.6,
+          "lifetimeMin": 0.4,
+          "lifetimeMax": 0.8,
+          "sparkleShape": 1
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@ namespace ErmineEngine
 {
     public static class GameplayHUD
     {
+        public static event Action<GameObject, float, float> HealthChanged;
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float Internal_GetHealth(ulong entity);
 
@@ -25,7 +27,13 @@ namespace ErmineEngine
             => Internal_GetHealth((ulong)obj.GetInstanceID());
 
         public static void SetHealth(GameObject obj, float value)
-            => Internal_SetHealth((ulong)obj.GetInstanceID(), value);
+        {
+            if (obj == null) return;
+            Internal_SetHealth((ulong)obj.GetInstanceID(), value);
+            float current = GetHealth(obj);
+            float max = GetMaxHealth(obj);
+            HealthChanged?.Invoke(obj, current, max);
+        }
 
         public static float GetMaxHealth(GameObject obj)
             => Internal_GetMaxHealth((ulong)obj.GetInstanceID());
@@ -37,6 +45,12 @@ namespace ErmineEngine
         {
             ulong id = Internal_GetHealthBar();
             return GameObject.FromEntityID(id);
+        }
+
+        public static void NotifyHealthChanged(GameObject obj)
+        {
+            if (obj == null) return;
+            HealthChanged?.Invoke(obj, GetHealth(obj), GetMaxHealth(obj));
         }
     }
 }

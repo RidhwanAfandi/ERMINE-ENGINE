@@ -274,6 +274,7 @@ namespace Ermine
 
         void FreeVideo(const std::string& name);
         void CleanupAllVideos();
+        void SetAudioVolume(const std::string& name, float volume);
 
         const std::unordered_map<std::string, std::shared_ptr<VideoData>>& GetVideos() const { return m_videos; }
         const std::string& GetCurrentVideo() const { return m_currentVideo; }

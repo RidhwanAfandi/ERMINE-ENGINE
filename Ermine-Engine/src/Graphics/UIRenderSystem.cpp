@@ -18,7 +18,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.h"
 #include "Logger.h"
 #include "Texture.h"
+#include "SettingsManager.h"
 #include <cmath>
+#include <algorithm>
+#include <vector>
 
 #if defined(EE_EDITOR)
 #include "EditorGUI.h"
@@ -238,24 +241,49 @@ namespace Ermine
             firstRender = false;
         }
 
-        // Render UIImageComponent entities first (fullscreen images, cutscenes, backgrounds)
+        // Render UIImageComponent entities sorted by renderOrder
         auto& ecs = ECS::GetInstance();
         constexpr EntityID MAX_ENTITIES = 10000;
 
+        // Collect active image entities and sort by renderOrder
+        std::vector<EntityID> imageEntities;
         for (EntityID entity = 1; entity < MAX_ENTITIES; ++entity)
         {
-            // Check if entity is valid and has UIImageComponent
             if (!ecs.IsEntityValid(entity))
                 continue;
-
             if (!ecs.HasComponent<UIImageComponent>(entity))
                 continue;
-
-            // ✅ FIX: Check if entity is active in hierarchy (including parents)
             if (!IsEntityActiveInHierarchy(entity))
                 continue;
+            imageEntities.push_back(entity);
+        }
+        std::sort(imageEntities.begin(), imageEntities.end(), [&ecs](EntityID a, EntityID b)
+        {
+            return ecs.GetComponent<UIImageComponent>(a).renderOrder < ecs.GetComponent<UIImageComponent>(b).renderOrder;
+        });
 
+        for (EntityID entity : imageEntities)
+        {
             const auto& imageComp = ecs.GetComponent<UIImageComponent>(entity);
+
+            // Check if this is the gamma preview image
+            bool isGammaPreview = false;
+            if (const auto& meta = ecs.TryGetComponent<ObjectMetaData>(entity))
+            {
+                if (meta->name == "Gamma Preview Image")
+                    isGammaPreview = true;
+            }
+
+            // Set gamma uniform: apply gamma correction only to the preview image
+            if (isGammaPreview)
+            {
+                float gamma = 2.8f - (Ermine::SettingsManager::GetInstance().gammaSliderValue * 1.2f);
+                m_uiShader->SetUniform1f("u_Gamma", gamma);
+            }
+            else
+            {
+                m_uiShader->SetUniform1f("u_Gamma", 1.0f);
+            }
 
             // Load texture if image path is specified
             std::shared_ptr<graphics::Texture> texture;
@@ -282,6 +310,7 @@ namespace Ermine
                 if (imageComp.fullscreen)
                 {
                     RenderTexturedSquare(0.5f, 0.5f, imageComp.height, texture, imageComp.tintColor, imageComp.alpha);
+					//RenderTexturedRect(0.5f, 0.5f, imageComp.width, imageComp.height, texture, imageComp.tintColor, imageComp.alpha);
                 }
                 else
                 {
@@ -293,6 +322,15 @@ namespace Ermine
                         imageComp.tintColor,
                         imageComp.alpha
                     );
+     //               RenderTexturedRect(
+     //                   imageComp.position.x,
+     //                   imageComp.position.y,
+     //                   imageComp.width,
+     //                   imageComp.height,
+     //                   texture,
+     //                   imageComp.tintColor,
+     //                   imageComp.alpha
+					//);
                 }
             }
 
@@ -319,6 +357,9 @@ namespace Ermine
                 );
             }
         }
+
+        // Reset gamma uniform so other UI elements are not affected
+        m_uiShader->SetUniform1f("u_Gamma", 1.0f);
 
         // Render UI for all entities with UIComponent (legacy support)
         for (EntityID entity : m_Entities)
@@ -356,77 +397,101 @@ namespace Ermine
                 continue;
 
             // Render UIHealthbarComponent
-            if (ecs.HasComponent<UIHealthbarComponent>(entity))
+            if (const auto& healthbar =  ecs.TryGetComponent<UIHealthbarComponent>(entity))
             {
-                const auto& healthbar = ecs.GetComponent<UIHealthbarComponent>(entity);
-                if (healthbar.showHealthbar)
-                    RenderHealthBarNew(healthbar);
+                if (healthbar->showHealthbar)
+                    RenderHealthBarNew(*healthbar);
             }
 
             // Render UICrosshairComponent
-            if (ecs.HasComponent<UICrosshairComponent>(entity))
+            if (const auto& crosshair = ecs.TryGetComponent<UICrosshairComponent>(entity))
             {
-                const auto& crosshair = ecs.GetComponent<UICrosshairComponent>(entity);
-                if (crosshair.showCrosshair)
-                    RenderCrosshairNew(crosshair);
+                if (crosshair->showCrosshair)
+                    RenderCrosshairNew(*crosshair);
             }
 
             // Render UISkillsComponent
-            if (ecs.HasComponent<UISkillsComponent>(entity))
+            if (const auto& skills = ecs.TryGetComponent<UISkillsComponent>(entity))
             {
-                const auto& skills = ecs.GetComponent<UISkillsComponent>(entity);
-                if (skills.showSkills)
-                    RenderSkillSlotsNew(skills, entity);
+                if (skills->showSkills)
+                    RenderSkillSlotsNew(*skills, entity);
             }
 
             // Render UIManaBarComponent
-            if (ecs.HasComponent<UIManaBarComponent>(entity))
+            if (const auto& manaBar = ecs.TryGetComponent<UIManaBarComponent>(entity))
             {
-                const auto& manaBar = ecs.GetComponent<UIManaBarComponent>(entity);
-                if (manaBar.showManaBar)
-                    RenderManaBarNew(manaBar);
+                if (manaBar->showManaBar)
+                    RenderManaBarNew(*manaBar);
             }
 
             // Render UIBookCounterComponent
-            if (ecs.HasComponent<UIBookCounterComponent>(entity))
+            if (const auto& bookCounter = ecs.TryGetComponent<UIBookCounterComponent>(entity))
             {
-                const auto& bookCounter = ecs.GetComponent<UIBookCounterComponent>(entity);
-                if (bookCounter.showBookCounter)
-                    RenderBookCounterNew(bookCounter);
+                if (bookCounter->showBookCounter)
+                    RenderBookCounterNew(*bookCounter);
             }
         }
 
-        // Render UIButtonComponent entities
+        // Render UIButtonComponent entities sorted by renderOrder
+        std::vector<EntityID> buttonEntities;
         for (EntityID entity = 1; entity < MAX_ENTITIES; ++entity)
         {
             if (!ecs.IsEntityValid(entity))
                 continue;
-
             if (!ecs.HasComponent<UIButtonComponent>(entity))
                 continue;
-
-            // ✅ FIX: Check hierarchy before rendering buttons
             if (!IsEntityActiveInHierarchy(entity))
                 continue;
+            buttonEntities.push_back(entity);
+        }
+        ranges::sort(buttonEntities, [&ecs](EntityID a, EntityID b)
+        {
+	        return ecs.GetComponent<UIButtonComponent>(a).renderOrder < ecs.GetComponent<UIButtonComponent>(b).renderOrder;
+        });
 
+        for (EntityID entity : buttonEntities)
+        {
             const auto& button = ecs.GetComponent<UIButtonComponent>(entity);
             RenderButton(button);
         }
 
-        // Render UISliderComponent entities
+        // Render UISliderComponent entities sorted by renderOrder
+        std::vector<EntityID> sliderEntities;
+        for (EntityID entity = 1; entity < MAX_ENTITIES; ++entity)
+        {
+            if (!ecs.IsEntityValid(entity))
+                continue;
+            if (!ecs.HasComponent<UISliderComponent>(entity))
+                continue;
+            if (!IsEntityActiveInHierarchy(entity))
+                continue;
+            sliderEntities.push_back(entity);
+        }
+        ranges::sort(sliderEntities, [&ecs](EntityID a, EntityID b)
+        {
+	        return ecs.GetComponent<UISliderComponent>(a).renderOrder < ecs.GetComponent<UISliderComponent>(b).renderOrder;
+        });
+
+        for (EntityID entity : sliderEntities)
+        {
+            const auto& slider = ecs.GetComponent<UISliderComponent>(entity);
+            RenderSlider(slider);
+        }
+
+        // Render UITextComponent entities
         for (EntityID entity = 1; entity < MAX_ENTITIES; ++entity)
         {
             if (!ecs.IsEntityValid(entity))
                 continue;
 
-            if (!ecs.HasComponent<UISliderComponent>(entity))
+            if (!ecs.HasComponent<UITextComponent>(entity))
                 continue;
 
             if (!IsEntityActiveInHierarchy(entity))
                 continue;
 
-            const auto& slider = ecs.GetComponent<UISliderComponent>(entity);
-            RenderSlider(slider);
+            const auto& textComp = ecs.GetComponent<UITextComponent>(entity);
+            RenderTextComponent(textComp);
         }
 
         // Re-enable depth test
@@ -443,23 +508,20 @@ namespace Ermine
             return false;
 
         // Check self active state
-        if (ecs.HasComponent<ObjectMetaData>(entity))
+        if (const auto& meta = ecs.TryGetComponent<ObjectMetaData>(entity))
         {
-            auto& meta = ecs.GetComponent<ObjectMetaData>(entity);
-            if (!meta.selfActive)
+            if (!meta->selfActive)
                 return false;
         }
 
         // Check parent chain via HierarchyComponent
-        if (ecs.HasComponent<HierarchyComponent>(entity))
+        if (const auto& hierarchy = ecs.TryGetComponent<HierarchyComponent>(entity))
         {
-            auto& hierarchy = ecs.GetComponent<HierarchyComponent>(entity);
-
             // If has a valid parent, check if parent is active
-            if (hierarchy.parent != HierarchyComponent::INVALID_PARENT)
+            if (hierarchy->parent != HierarchyComponent::INVALID_PARENT)
             {
                 // Recursively check parent's active state
-                return IsEntityActiveInHierarchy(hierarchy.parent);
+                return IsEntityActiveInHierarchy(hierarchy->parent);
             }
         }
 
@@ -1685,6 +1747,78 @@ namespace Ermine
                 m_VBO
             );
         }
+
+        // Render value display if enabled
+        if (m_textRenderer && slider.showValue)
+        {
+            std::string valueText;
+            if (slider.valueAsPercentage)
+            {
+                int percent = static_cast<int>(normalizedValue * 100.0f + 0.5f);
+                valueText = std::to_string(percent) + "%";
+            }
+            else
+            {
+                // Show raw value with 1 decimal place
+                char buf[32];
+                snprintf(buf, sizeof(buf), "%.1f", slider.value);
+                valueText = buf;
+            }
+
+            float valueX = slider.position.x + slider.valueOffset.x;
+            float valueY = slider.position.y + slider.valueOffset.y;
+
+            // Center the value text vertically relative to the offset position
+            float valTextWidth = m_textRenderer->GetTextWidth(valueText, slider.valueScale);
+            valueX -= valTextWidth * 0.5f;
+
+            m_textRenderer->RenderText(
+                m_uiShader,
+                valueText,
+                valueX,
+                valueY,
+                slider.valueScale,
+                slider.valueColor,
+                1.0f,
+                m_VAO,
+                m_VBO
+            );
+        }
+    }
+
+    void UIRenderSystem::RenderTextComponent(const UITextComponent& textComp)
+    {
+        if (!m_textRenderer || textComp.text.empty())
+            return;
+
+        float textScale = textComp.fontSize;
+
+        // Calculate starting X based on alignment
+        float textX = textComp.position.x;
+        if (textComp.alignment == 1) // Center
+        {
+            float textWidth = m_textRenderer->GetTextWidth(textComp.text, textScale);
+            textX -= textWidth * 0.5f;
+        }
+        else if (textComp.alignment == 2) // Right
+        {
+            float textWidth = m_textRenderer->GetTextWidth(textComp.text, textScale);
+            textX -= textWidth;
+        }
+
+        float textY = textComp.position.y;
+
+        m_textRenderer->RenderText(
+            m_uiShader,
+            textComp.text,
+            textX,
+            textY,
+            textScale,
+            textComp.color,
+            textComp.alpha,
+            m_VAO,
+            m_VBO
+        );
     }
 
 } // namespace Ermine

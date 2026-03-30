@@ -41,9 +41,10 @@ namespace Ermine
 	{
 		const char* typeName = typeid(T).name();
 		
-		assert(m_Systems.find(typeName) != m_Systems.end() && "System used before registered.");
+		auto it = m_Systems.find(typeName);
+		assert(it != m_Systems.end() && "System used before registered.");
 
-		return std::static_pointer_cast<T>(m_Systems[typeName]);
+		return std::static_pointer_cast<T>(it->second);
 	}
 
 	/**

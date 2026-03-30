@@ -25,6 +25,12 @@ namespace Ermine
 
     void StateManager::Update(float dt)
     {
+#if defined(EE_EDITOR)
+        // Only run FSM logic in Play mode
+        if (editor::EditorGUI::s_state != editor::EditorGUI::SimState::playing)
+            return;
+#endif
+
         for (auto entity : m_Entities)
         {
             if (!ECS::GetInstance().HasComponent<StateMachine>(entity))
@@ -57,7 +63,7 @@ namespace Ermine
 
             if (!currentValid(fsm))
             {
-                EE_CORE_INFO("[FSM] Current invalid after load, re-init entity {}", entity);
+                //EE_CORE_INFO("[FSM] Current invalid after load, re-init entity {}", entity);
 
                 fsm.Init(entity);
 

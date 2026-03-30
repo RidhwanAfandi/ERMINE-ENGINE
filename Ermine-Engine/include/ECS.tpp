@@ -106,6 +106,18 @@ namespace Ermine
 	}
 
 	/**
+	 * @brief Try to get a pointer to a component of type T for an entity
+	 * @tparam T The component type to get
+	 * @param entity The entity to get the component from
+	 * @return Pointer to the component if it exists, nullptr otherwise
+	 */
+	template <typename T>
+	T* ECS::TryGetComponent(EntityID entity) const
+	{
+		return m_ComponentManager->TryGetComponent<T>(entity);
+	}
+
+	/**
 	 * @brief Get a component type ID
 	 * @tparam T The component type to get the ID of
 	 * @return The component type ID

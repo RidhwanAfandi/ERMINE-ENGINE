@@ -4,7 +4,7 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoord;
-layout(location = 3) in vec3 aTangent;
+layout(location = 3) in vec4 aTangent;
 layout(location = 4) in ivec4 aBoneIDs;      // Only present in SkinnedVAO
 layout(location = 5) in vec4 aBoneWeights;    // Only present in SkinnedVAO
 
@@ -69,7 +69,8 @@ void main()
 
     vec4 skinnedPos = vec4(aPos, 1.0);
     vec3 skinnedNormal  = aNormal;
-    vec3 skinnedTangent = aTangent;
+    vec3 skinnedTangent = aTangent.xyz;
+    float tangentSign = aTangent.w;
 
     // Apply skeletal animation if enabled
     if (useSkinning) {
@@ -87,7 +88,7 @@ void main()
             mat4 boneTransform = boneTransforms[boneOffset + aBoneIDs[0]];
             skinnedPosition += boneTransform * vec4(aPos, 1.0) * aBoneWeights[0];
             skinnedNormalVec += mat3(boneTransform) * aNormal * aBoneWeights[0];
-            skinnedTangentVec += mat3(boneTransform) * aTangent * aBoneWeights[0];
+            skinnedTangentVec += mat3(boneTransform) * aTangent.xyz * aBoneWeights[0];
         }
 
         // Bone 1
@@ -95,7 +96,7 @@ void main()
             mat4 boneTransform = boneTransforms[boneOffset + aBoneIDs[1]];
             skinnedPosition += boneTransform * vec4(aPos, 1.0) * aBoneWeights[1];
             skinnedNormalVec += mat3(boneTransform) * aNormal * aBoneWeights[1];
-            skinnedTangentVec += mat3(boneTransform) * aTangent * aBoneWeights[1];
+            skinnedTangentVec += mat3(boneTransform) * aTangent.xyz * aBoneWeights[1];
         }
 
         // Bone 2
@@ -103,7 +104,7 @@ void main()
             mat4 boneTransform = boneTransforms[boneOffset + aBoneIDs[2]];
             skinnedPosition += boneTransform * vec4(aPos, 1.0) * aBoneWeights[2];
             skinnedNormalVec += mat3(boneTransform) * aNormal * aBoneWeights[2];
-            skinnedTangentVec += mat3(boneTransform) * aTangent * aBoneWeights[2];
+            skinnedTangentVec += mat3(boneTransform) * aTangent.xyz * aBoneWeights[2];
         }
 
         // Bone 3
@@ -111,7 +112,7 @@ void main()
             mat4 boneTransform = boneTransforms[boneOffset + aBoneIDs[3]];
             skinnedPosition += boneTransform * vec4(aPos, 1.0) * aBoneWeights[3];
             skinnedNormalVec += mat3(boneTransform) * aNormal * aBoneWeights[3];
-            skinnedTangentVec += mat3(boneTransform) * aTangent * aBoneWeights[3];
+            skinnedTangentVec += mat3(boneTransform) * aTangent.xyz * aBoneWeights[3];
         }
 
         skinnedPos = skinnedPosition;
@@ -138,19 +139,16 @@ void main()
     // Calculate tangent and bitangent for normal mapping
     Tangent = normalize(normalMatrix * skinnedTangent);
 
-    // Calculate bitangent using cross product
-    Bitangent = cross(Normal, Tangent);
-
     // Gram-Schmidt process to re-orthogonalize TBN vectors
-    // Only tangent needs correction; bitangent is recalculated from corrected tangent
     Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
-    Bitangent = cross(Normal, Tangent);
+    Bitangent = cross(Normal, Tangent) * tangentSign;
 
     // Pass material index to fragment shader
     vMaterialIndex = drawInfo.materialIndex;
 
-    // Extract model center from model matrix (translation component) for volumetric shaders
-    vModelCenter = vec3(model[3][0], model[3][1], model[3][2]);
+    // Use the current draw's mesh bounds so custom volumetrics center on the submesh, not the model root.
+    vec3 localMeshCenter = 0.5 * (drawInfo.aabbMin + drawInfo.aabbMax);
+    vModelCenter = vec3(model * vec4(localMeshCenter, 1.0));
 
     // Extract camera position from view matrix for volumetric shaders
     mat3 viewRot = mat3(view);

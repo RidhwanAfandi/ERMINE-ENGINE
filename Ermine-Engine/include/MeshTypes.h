@@ -23,7 +23,7 @@ namespace Ermine::graphics {
         glm::vec3 position;
         glm::vec3 normal;  
         glm::vec2 texCoord;
-        glm::vec3 tangent; 
+        glm::vec4 tangent;
     };
 
     // SkinnedVertex structure
@@ -31,7 +31,7 @@ namespace Ermine::graphics {
         glm::vec3 position;     
         glm::vec3 normal;      
         glm::vec2 texCoord;    
-        glm::vec3 tangent;     
+        glm::vec4 tangent;
         glm::ivec4 boneIDs;    
         glm::vec4 boneWeights; 
     };

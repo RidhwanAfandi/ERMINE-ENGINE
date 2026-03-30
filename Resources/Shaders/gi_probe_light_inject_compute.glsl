@@ -1,6 +1,6 @@
 #version 460 core
 
-// Inject direct lighting from LightsUBO into voxel emissive volume.
+// Inject direct lighting from the light SSBO into voxel emissive volume.
 layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
 layout(rgba8, binding = 0) uniform image3D u_VoxelAlbedo;
@@ -11,7 +11,6 @@ uniform vec3 u_VoxelBoundsMin;
 uniform vec3 u_VoxelBoundsMax;
 uniform int u_VoxelResolution;
 
-const int MAX_LIGHTS = 32;
 const int NUM_CASCADES = 4;
 const int POINT_LIGHT = 0;
 const int DIRECTIONAL_LIGHT = 1;
@@ -27,9 +26,9 @@ struct Light {
     vec4 splitDepths[(NUM_CASCADES + 3) / 4];
 };
 
-layout (std140, binding = 1) uniform LightsUBO {
+layout (std430, binding = 4) readonly buffer LightsSSBO { // Matches LIGHT_SSBO_BINDING in SSBO_Bindings.h
     vec4 lightCount;
-    Light lights[MAX_LIGHTS];
+    Light lights[];
 };
 
 float calculateAttenuation(int lightIndex, vec3 fragPosWorld, out vec3 lightDir)

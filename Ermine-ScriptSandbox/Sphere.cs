@@ -1,26 +1,54 @@
 ﻿using ErmineEngine;
+using System;
 
 public class Sphere : MonoBehaviour
 {
+    private static readonly Vector3 ParkedPosition = new Vector3(0.0f, -1000.0f, 0.0f);
+
     public Vector3 direction;
     public float speed = 20.0f;
 
     private float timeAlive = 1.0f;
+    private Material materialComponent;
+    private bool flickerEnabled;
 
     private void Start()
     {
+        ResolveMaterial();
+    }
+
+    public void Launch(Vector3 spawnPosition, Quaternion spawnRotation, Vector3 shootDirection)
+    {
+        ResolveMaterial();
+        gameObject.SetActive(true);
+        transform.position = spawnPosition;
+        transform.rotation = spawnRotation;
+        direction = shootDirection;
+        timeAlive = 1.0f;
+        SetFlicker(false);
+        Physics.SetPosition((ulong)gameObject.GetInstanceID(), transform.position);
+    }
+
+    public void Deactivate()
+    {
+        timeAlive = 0.0f;
+        direction = Vector3.zero;
+        SetFlicker(false);
+        transform.position = ParkedPosition;
+        Physics.SetPosition((ulong)gameObject.GetInstanceID(), transform.position);
+        gameObject.SetActive(false);
     }
 
     private void Update()
     {
         timeAlive -= Time.deltaTime;
         transform.position -= direction * speed * Time.deltaTime;
+        SetFlicker(timeAlive <= 0.5f);
 
         Physics.SetPosition((ulong)gameObject.GetInstanceID(), transform.position);
         if (timeAlive < 0.0f)
         {
-            Physics.RemovePhysic((ulong)gameObject.GetInstanceID());
-            GameObject.Destroy(gameObject);
+            Deactivate();
         }
 
     }
@@ -29,7 +57,10 @@ public class Sphere : MonoBehaviour
     {
         if (Physics.CheckMotionType((ulong)col.gameObject.GetInstanceID()) == 0
             && !col.gameObject.name.Contains("Bars")
-            && !col.gameObject.name.Contains("gate")) //static obj
+            && !col.gameObject.name.Contains("gate")
+            && !col.gameObject.name.Contains("BARS")
+            && !col.gameObject.name.Contains("Fence")
+            ) //static obj
         {
             Debug.Log("Sphere: Hit static object " + col.gameObject.name + " (" + col.gameObject.GetInstanceID() + ")");
             Debug.Log(Physics.CheckMotionType((ulong)col.gameObject.GetInstanceID()));
@@ -43,14 +74,9 @@ public class Sphere : MonoBehaviour
                 explosionPos = hit.point;
             }
 
-            // Spawn explosion effect on contact
-            GameObject explosion = Prefab.Instantiate("../Resources/Prefabs/ParticleExplosion.prefab");
-            if (explosion != null)
-            {
-                explosion.transform.position = explosionPos;
-            }
+            SpawnExplosionLayers(explosionPos);
 
-            timeAlive = 0f;
+            Deactivate();
         }
         /*
         Debug.Log("Yes me lord? : " + gameObject.name);
@@ -63,5 +89,40 @@ public class Sphere : MonoBehaviour
             Physics.SetPosition((ulong)col.gameObject.GetInstanceID(), col.gameObject.transform.position);
         }
         */
+    }
+
+    private void SpawnExplosionLayers(Vector3 position)
+    {
+        GameObject coreExplosion = Prefab.Instantiate("../Resources/Prefabs/ParticleExplosion.prefab");
+        if (coreExplosion != null)
+        {
+            coreExplosion.transform.position = position;
+        }
+
+        GameObject smokeExplosion = Prefab.Instantiate("../Resources/Prefabs/ParticleExplosionSmoke.prefab");
+        if (smokeExplosion != null)
+        {
+            smokeExplosion.transform.position = position;
+        }
+    }
+
+    private void ResolveMaterial()
+    {
+        if (materialComponent == null && gameObject != null)
+        {
+            materialComponent = gameObject.GetComponent<Material>();
+        }
+    }
+
+    private void SetFlicker(bool enabled)
+    {
+        ResolveMaterial();
+        if (materialComponent == null || flickerEnabled == enabled)
+        {
+            return;
+        }
+
+        materialComponent.flickerEmissive = enabled;
+        flickerEnabled = enabled;
     }
 }

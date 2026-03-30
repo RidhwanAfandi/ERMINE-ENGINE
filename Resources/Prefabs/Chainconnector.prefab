@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "760be8ea4858d7409187bb8c690fec0a"
+        },
+        "Transform": {
+          "position": [
+            -2.7896597385406496,
+            12.678062438964844,
+            -8.719348907470704
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.08615761250257492,
+            0.08615761250257492,
+            0.08615761250257492
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Chainconnector",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_chain_connecter.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "e82024a3015b6f469815c4542b54ab68"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_chain_connecter.fbx_Chain_connector_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "c06a081ca66933418c8116e2df5d3174"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "760be8ea4858d7409187bb8c690fec0a",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

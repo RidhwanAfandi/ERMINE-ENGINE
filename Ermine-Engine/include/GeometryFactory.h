@@ -37,7 +37,7 @@ namespace Ermine::graphics
          * @param indices The index data forming triangles
          * @return Vector of tangents, one per vertex
          */
-        static std::vector<glm::vec3> CalculateTangents(
+        static std::vector<glm::vec4> CalculateTangents(
             const std::vector<Vertex>& vertices,
             const std::vector<unsigned int>& indices);
 

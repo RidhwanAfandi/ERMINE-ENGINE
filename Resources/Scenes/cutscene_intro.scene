@@ -79,9 +79,26 @@
         "ScriptsComponent": {
           "scripts": [
             {
-              "class": "CutscenePlayer",
+              "class": "CutsceneVideo",
               "enabled": true,
-              "fields": {}
+              "fields": {
+                "nextSceneName": {
+                  "t": 3,
+                  "v": "../Resources/Scenes/loading_level1.scene"
+                },
+                "VideoFileName": {
+                  "t": 3,
+                  "v": "IntroCinematic.mpeg"
+                },
+                "videoDurationSeconds": {
+                  "t": 0,
+                  "v": 16.416667938232423
+                },
+                "assumedFPS": {
+                  "t": 1,
+                  "v": 60
+                }
+              }
             }
           ]
         }
@@ -91,7 +108,7 @@
       "id": 3,
       "components": {
         "IDComponent": {
-          "guid": "912274477014cc438e7d811904b2c928"
+          "guid": "9d5315cf11c38242bc1fee8f94d2b2c2"
         },
         "Transform": {
           "position": [
@@ -112,23 +129,24 @@
           ]
         },
         "ObjectMetaData": {
-          "name": "Slide1",
-          "tag": "Cutscene",
+          "name": "BlackScreenPrefab",
+          "tag": "Untagged",
           "selfActive": true
         },
         "HierarchyComponent": {
-          "depth": 0
+          "parentGuid": "3db3a3b89e7dc348b32afa32408882db",
+          "depth": 1
         },
         "UIImageComponent": {
-          "imagePath": "../Resources/Textures/UI/cutscene1.png",
-          "fullscreen": true,
+          "imagePath": "Resources/Textures/black-screen_39.png",
+          "fullscreen": false,
           "position": [
             0.5,
             0.5,
             0.0
           ],
           "width": 1.0,
-          "height": 1.0,
+          "height": 4.519999980926514,
           "tintColor": [
             1.0,
             1.0,
@@ -136,142 +154,31 @@
           ],
           "alpha": 1.0,
           "maintainAspectRatio": true,
-          "caption": "Creation & Betrayal: Scientist invents glowing energy machine; shady boss takes over.",
+          "caption": "",
           "showCaption": false,
           "captionColor": [
             1.0,
             1.0,
             1.0
           ],
-          "captionFontSize": 21.0,
+          "captionFontSize": 24.0,
           "captionPosition": [
-            0.1599999964237213,
-            0.05999999865889549,
-            0.0
-          ]
-        },
-        "GlobalTransform": {}
-      }
-    },
-    {
-      "id": 4,
-      "components": {
-        "IDComponent": {
-          "guid": "b334179a3030de4e98a340f183e4c79b"
-        },
-        "Transform": {
-          "position": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            1.0,
-            1.0,
-            1.0
-          ]
-        },
-        "ObjectMetaData": {
-          "name": "Slide2",
-          "tag": "Cutscene",
-          "selfActive": true
-        },
-        "HierarchyComponent": {
-          "depth": 0
-        },
-        "UIImageComponent": {
-          "imagePath": "../Resources/Textures/UI/cutscene2.png",
-          "fullscreen": true,
-          "position": [
             0.5,
-            0.5,
-            0.0
-          ],
-          "width": 1.0,
-          "height": 1.0,
-          "tintColor": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "alpha": 1.0,
-          "maintainAspectRatio": true,
-          "caption": "Horror Factory: Scientist, now a prisoner, sees his invention used to torture people in a vast, dark factory.",
-          "showCaption": false,
-          "captionColor": [
-            255.0,
-            255.0,
-            255.0
-          ],
-          "captionFontSize": 21.0,
-          "captionPosition": [
-            0.0949999988079071,
-            0.05999999865889549,
+            0.10000000149011612,
             0.0
           ]
-        },
-        "GlobalTransform": {}
-      }
-    },
-    {
-      "id": 5,
-      "components": {
-        "IDComponent": {
-          "guid": "155ee7c2181d604d93ed5bf05e146997"
-        },
-        "Transform": {
-          "position": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            1.0,
-            1.0,
-            1.0
-          ]
-        },
-        "GlobalAudioComponent": {
-          "masterVolume": 1.0,
-          "musicVolume": 0.699999988079071,
-          "sfxVolume": 0.800000011920929,
-          "ambienceVolume": 1.0,
-          "autoPlay": true,
-          "music": [
-            {
-              "name": "CutSceneBGM",
-              "path": "../Resources/Audio/suspense-horror-music-loop-382813.mp3",
-              "volume": 1.0
-            }
-          ],
-          "sfx": [],
-          "ambience": []
-        },
-        "ObjectMetaData": {
-          "name": "GlobalAudio",
-          "tag": "Audio",
-          "selfActive": false
-        },
-        "HierarchyComponent": {
-          "depth": 0
         },
         "GlobalTransform": {}
       }
     }
   ],
   "globalGraphics": {
+    "ambientColor": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "ambientIntensity": 0.07999999821186066,
     "ssaoEnabled": false,
     "ssaoSamples": 16,
     "ssaoRadius": 10.0,
@@ -297,13 +204,33 @@
     "gammaCorrectionEnabled": true,
     "bloomEnabled": true,
     "skyboxIsHDR": false,
+    "showSkybox": true,
     "exposure": 1.0,
     "contrast": 1.0,
     "saturation": 1.0,
     "gamma": 2.200000047683716,
     "vignetteIntensity": 0.30000001192092898,
     "vignetteRadius": 0.800000011920929,
+    "vignetteCoverage": 0.0,
+    "vignetteFalloff": 0.20000000298023225,
+    "vignetteMapStrength": 1.0,
+    "vignetteMapRGBModifier": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "vignetteMapPath": "",
     "bloomStrength": 0.03999999910593033,
+    "filmGrainEnabled": false,
+    "grainIntensity": 0.014999999664723874,
+    "grainScale": 1.5,
+    "chromaticAberrationEnabled": false,
+    "chromaticAmount": 0.003000000026077032,
+    "radialBlurEnabled": false,
+    "radialBlurStrength": 0.0,
+    "radialBlurSamples": 12,
+    "radialBlurCenterX": 0.5,
+    "radialBlurCenterY": 0.5,
     "fxaaSpanMax": 8.0,
     "fxaaReduceMin": 0.0078125,
     "fxaaReduceMul": 0.125,

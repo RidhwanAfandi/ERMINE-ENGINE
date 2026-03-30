@@ -57,7 +57,8 @@ namespace Ermine::editor
         void DrawPerformanceMetrics();
         void DrawLightingControls();
         void DrawShaderControls();
-        
+        void DrawGBufferViewer();
+
         // Helper methods
         void DrawTooltip(const char* description);
         bool DrawFloatSlider(const char* label, float* value, float min, float max, const char* tooltip = nullptr);

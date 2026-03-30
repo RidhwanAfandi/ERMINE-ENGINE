@@ -42,6 +42,19 @@ namespace ErmineEngine
 
         #endregion 
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern Vector3 Internal_GetWorldPosition();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern Quaternion Internal_GetWorldRotation();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern Vector3 Internal_GetWorldScale();
+
+        public Vector3 worldPosition => Internal_GetWorldPosition();
+        public Quaternion worldRotation => Internal_GetWorldRotation();
+        public Vector3 worldScale => Internal_GetWorldScale();
+
         // World position in Vector3
         public Vector3 position
         {

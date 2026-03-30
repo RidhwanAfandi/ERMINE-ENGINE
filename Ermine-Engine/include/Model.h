@@ -47,7 +47,7 @@ namespace Ermine::graphics
         float position[3];                  // Position of the vertex
         float normal[3];                    // Normal vector
         float texCoords[2];                 // Texture coordinates
-        float tangent[3];                   // Tangent vector for normal mapping
+        float tangent[4];                   // Tangent xyz and handedness sign in w
         int IDs[MAX_BONE_INFLUENCE];        // Bone IDs affecting this vertex
         float Weights[MAX_BONE_INFLUENCE];  // Bone weights corresponding to IDs
 
@@ -62,6 +62,7 @@ namespace Ermine::graphics
                 normal[i] = 0.0f;
                 tangent[i] = 0.0f;
             }
+            tangent[3] = 1.0f;
 
             for (int i = 0; i < 2; ++i)
                 texCoords[i] = 0.0f;
@@ -91,6 +92,7 @@ namespace Ermine::graphics
             }
         }
     };
+    static_assert(sizeof(VertexData) == 80, "VertexData must remain 80 bytes to match cached mesh data");
 
     /**
      * @brief Mesh data wrapper containing GPU buffers and local transform.
@@ -204,6 +206,8 @@ namespace Ermine::graphics
         std::vector<glm::vec3> GetMeshVertices() const;
 
         std::vector<glm::vec3> GetSkinnedVertices() const;
+
+        void GetCollisionMesh(std::vector<glm::vec3>& outVerts, std::vector<uint32_t>& outIndices, bool applyLocalTransform = true) const;
 
     private:
         std::string m_directory;                            // Directory of the model

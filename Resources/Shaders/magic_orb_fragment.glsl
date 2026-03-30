@@ -21,8 +21,8 @@ struct MaterialData {
     float emissiveIntensity;
     int shadingModel;
     uint textureFlags;
-    float _pad0;
-    float _pad1;
+    int castsShadows; // Kept for CPU/GPU layout parity
+    float fillAmount;
     vec2 uvScale;
     vec2 uvOffset;
     int albedoMapIndex;
@@ -31,8 +31,8 @@ struct MaterialData {
     int metallicMapIndex;
     int aoMapIndex;
     int emissiveMapIndex;
-    int _pad2;
-    int _pad3;
+    float fillDirOctX;
+    float fillDirOctY;
 };
 
 layout(std430, binding = 3) restrict readonly buffer MaterialBlock {

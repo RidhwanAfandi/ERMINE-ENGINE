@@ -2,11 +2,12 @@
 /*!
 \file       HierarchyPanel.h
 \author     Edwin Lee Zirui, edwinzirui.lee, 2301299, edwinzirui.lee\@digipen.edu
-\date       Sep 05, 2025
+\co-author  Lum Ko Sand, kosand.lum, 2301263, kosand.lum\@digipen.edu
+\date       Mar 23, 2026
 \brief      Declares the HierarchyPanel class which provides an ImGui-based interface
             for visualizing and manipulating the scene's entity hierarchy tree.
 
-Copyright (C) 2025 DigiPen Institute of Technology.
+Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
@@ -23,15 +24,17 @@ namespace Ermine {
     */
     class HierarchyPanel {
     private:
-        Scene* m_ActiveScene = nullptr;      ///< Pointer to the currently active scene
+        Scene* m_ActiveScene = nullptr;       ///< Pointer to the currently active scene
         bool m_IsVisible = true;              ///< Panel visibility state
         bool m_ShowInactive = false;          ///< Show inactive entities in hierarchy (grayed out)
         EntityID m_PendingFocusEntity = 0;    ///< Entity waiting for inspector focus after interaction
         float m_indentPadding = 8.0f;
         EntityID m_LastClickedEntity = 0;     ///< Last clicked entity for Shift+Click range selection
+        EntityID m_LastScrolledEntity = 0;    ///< Last entity that was scrolled into view for auto-scrolling logic
 
-        char m_SearchBuffer[128] = {};  ///< Buffer for entity search input
-        bool m_IsSearching = false;		///< Flag indicating if search mode is active
+        char m_SearchBuffer[128] = {};        ///< Buffer for entity search input
+        bool m_IsSearching = false;		      ///< Flag indicating if search mode is active
+        bool m_CloseAllNodes = false;         ///< Flag to close all tree nodes
 
         // UI helper functions
         void DuplicateEntity(EntityID sourceEntity);
@@ -81,10 +84,24 @@ namespace Ermine {
         bool NameMatchesSearch(const std::string& name, const char* search) const;
 
         /*!
+        \brief Recursively checks if an entity or any of its descendants match the search query
+        \param entity The entity to check
+        \return True if the entity or any descendant matches the search query, false otherwise
+        */
+        bool EntityMatchesSearchRecursive(EntityID entity);
+
+        /*!
+        \brief Recursively draws an entity node and its children, filtering by search query
+        \param entity The entity ID to draw
+        \param depth Current depth level for indentation (0 = root level)
+        */
+        void DrawEntityNode_Search(EntityID entity, int depth);
+
+        /*!
         \brief Builds a flat list of visible entities in display order for range selection
         \param outList Output vector to store the ordered entity list
         */
-        void BuildVisibleEntityList(std::vector<EntityID>& outList) const;
+        void BuildVisibleEntityList(std::vector<EntityID>& outList);
 
         /*!
         \brief Helper to recursively add entities to visible list in hierarchy order

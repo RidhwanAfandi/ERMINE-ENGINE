@@ -85,10 +85,8 @@ namespace Ermine::graphics
          * @brief Render the skybox
          * @param view The view matrix (translation will be removed)
          * @param projection The projection matrix
-         * @param exposure Exposure value for tone mapping
-         * @param gamma Gamma correction value
          */
-        void Render(const Mtx44& view, const Mtx44& projection, float exposure = 1.0f, float gamma = 2.2f);
+        void Render(const Mtx44& view, const Mtx44& projection);
 
         /**
          * @brief Check if the skybox is ready to render

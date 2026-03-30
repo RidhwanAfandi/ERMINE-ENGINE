@@ -1,0 +1,72 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "8e85b37f488f1947884d2181bf9e66b1"
+        },
+        "Transform": {
+          "position": [
+            -2.2360684871673586,
+            1.0499999523162842,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "SpawnPoint_1",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "PhysicComponent": {
+          "bodyType": "Trigger",
+          "motionType": "Kinematic",
+          "mass": 0.0,
+          "shapeType": "Box",
+          "colliderpivot": [
+            0.0,
+            3.6500000953674318,
+            0.0
+          ],
+          "posx": false,
+          "posy": false,
+          "posz": false,
+          "colliderrot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotx": false,
+          "roty": false,
+          "rotz": false,
+          "collidersize": [
+            8.050000190734864,
+            8.5,
+            1.0
+          ]
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {},
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "SpawnPointController"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

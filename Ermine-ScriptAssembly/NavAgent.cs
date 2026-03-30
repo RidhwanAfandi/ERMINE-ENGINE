@@ -24,5 +24,8 @@ namespace ErmineEngine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void StartJump(ulong agentEntityID, ulong linkEntityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetAutoRotate(ulong entityID, bool enabled);
     }
 }

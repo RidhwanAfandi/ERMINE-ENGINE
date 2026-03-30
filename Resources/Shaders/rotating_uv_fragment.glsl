@@ -20,7 +20,7 @@ flat in uint vMaterialIndex;
 
 out vec4 FragColor;
 
-// Material structure (112 bytes, matches C++ MaterialSSBO)
+// Material structure (112 bytes, matches C++ MaterialSSBO exactly)
 struct MaterialData {
     vec4 albedo;                // 16 bytes (0-15)
     float metallic;             // 4 bytes (16-19)
@@ -33,8 +33,8 @@ struct MaterialData {
 
     int shadingModel;           // 4 bytes (48-51)
     uint textureFlags;          // 4 bytes (52-55)
-    float _pad0;                // 4 bytes (56-59)
-    float _pad1;                // 4 bytes (60-63)
+    int castsShadows;           // 4 bytes (56-59) - Kept for CPU/GPU layout parity
+    float fillAmount;           // 4 bytes (60-63)
 
     vec2 uvScale;               // 8 bytes (64-71)
     vec2 uvOffset;              // 8 bytes (72-79)
@@ -47,8 +47,8 @@ struct MaterialData {
 
     int aoMapIndex;             // 4 bytes (96-99)
     int emissiveMapIndex;       // 4 bytes (100-103)
-    int _pad2;                  // 4 bytes (104-107)
-    int _pad3;                  // 4 bytes (108-111)
+    float fillDirOctX;          // 4 bytes (104-107)
+    float fillDirOctY;          // 4 bytes (108-111)
 };
 
 // Material SSBO

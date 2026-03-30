@@ -81,5 +81,23 @@ namespace Ermine
 		void GizmoOverlay(const ImVec2& imgMin, const ImVec2& imgSize, const ImVec2& vmSize, const ImVec2& vmPos, const Ermine::EntityID&
 		                  selectedEntity,
 		                  ImGuizmo::OPERATION& gOperation, ImGuizmo::MODE& gMode);
+
+		/**
+		 * @brief Render and handle a 2D drag gizmo for selected UI entities
+		 * @param imgMin Top-left corner of the viewport image in screen coordinates
+		 * @param imgSize Size of the viewport image
+		 * @param selectedEntity Currently selected entity
+		 * @return true if the UI gizmo is being used (to suppress 3D gizmo/picking)
+		 */
+		bool UIGizmoOverlay(const ImVec2& imgMin, const ImVec2& imgSize, const Ermine::EntityID& selectedEntity);
+
+	private:
+		// UI Gizmo handle types for move and resize
+		enum class UIGizmoHandle { None, Move, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left };
+
+		UIGizmoHandle m_uiGizmoActiveHandle = UIGizmoHandle::None;
+		ImVec2 m_uiGizmoDragStart = {};
+		Ermine::Vec3 m_uiGizmoStartPos = {};
+		Ermine::Vec2 m_uiGizmoStartSize = {};
 	};
 }

@@ -49,17 +49,19 @@ namespace Ermine {
         float position[3];
         float normal[3];
         float texCoord[2];
-        float tangent[3];
+        float tangent[4];
     };
+    static_assert(sizeof(Vertex) == 48, "ResourcePipe::Vertex must remain 48 bytes for .mesh cache layout");
 
     struct SkinnedVertex {
         float position[3];
         float normal[3];
         float texCoord[2];
-        float tangent[3];
+        float tangent[4];
         int boneIndices[4];
         float boneWeights[4];
     };
+    static_assert(sizeof(SkinnedVertex) == 80, "ResourcePipe::SkinnedVertex must remain 80 bytes for .skin cache layout");
 
     struct BoneInfo {
         std::string name;

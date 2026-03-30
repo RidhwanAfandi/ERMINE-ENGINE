@@ -25,27 +25,27 @@
         },
         "GPUParticleEmitter": {
           "active": true,
-          "maxParticles": 1024,
+          "maxParticles": 3000,
           "emissionShape": 1,
           "localPositionOffset": [
             0.0,
             0.0,
             0.0
           ],
-          "overallScale": 1.0,
+          "overallScale": 0.5,
           "spawnBoxExtents": [
             0.1,
             0.1,
             0.1
           ],
-          "spawnRadius": 0.5,
+          "spawnRadius": 0.12,
           "spawnRadiusInner": 0.0,
           "spawnRate": 0.0,
-          "burstCountMin": 50,
-          "burstCountMax": 100,
+          "burstCountMin": 260,
+          "burstCountMax": 360,
           "burstInterval": 0.0,
           "burstOnStart": true,
-          "directionMode": 0,
+          "directionMode": 2,
           "direction": [
             0.0,
             1.0,
@@ -53,37 +53,37 @@
           ],
           "coneAngle": 180.0,
           "coneInnerAngle": 0.0,
-          "speedMin": 5.0,
-          "speedMax": 10.0,
+          "speedMin": 25.0,
+          "speedMax": 45.0,
           "gravity": [
             0.0,
-            -9.8,
+            -8.0,
             0.0
           ],
-          "drag": 0.5,
-          "turbulenceStrength": 0.0,
-          "turbulenceScale": 1.0,
+          "drag": 2.8,
+          "turbulenceStrength": 2.4,
+          "turbulenceScale": 2.2,
           "boundsMode": 0,
           "renderMode": 0,
           "colorStart": [
-            0.0,
-            0.56,
+            0.78,
+            0.92,
             1.0
           ],
           "colorEnd": [
-            0.0,
-            0.2,
-            0.5
+            0.08,
+            0.25,
+            0.9
           ],
           "alphaStart": 1.0,
           "alphaEnd": 0.0,
-          "sizeStartMin": 0.2,
-          "sizeStartMax": 0.4,
-          "sizeEndMin": 0.05,
-          "sizeEndMax": 0.1,
-          "lifetimeMin": 0.5,
-          "lifetimeMax": 1.0,
-          "sparkleShape": 0
+          "sizeStartMin": 0.32,
+          "sizeStartMax": 0.62,
+          "sizeEndMin": 0.04,
+          "sizeEndMax": 0.12,
+          "lifetimeMin": 0.28,
+          "lifetimeMax": 0.55,
+          "sparkleShape": 2
         },
         "ObjectMetaData": {
           "name": "OrbExplosion",

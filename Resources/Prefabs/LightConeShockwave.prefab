@@ -1,0 +1,73 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a3f7b2c14e08964d90ab1e827dd40f1c"
+        },
+        "Transform": {
+          "position": [0.0, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0, 1.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "GPUParticleEmitter": {
+          "active": true,
+          "maxParticles": 1,
+          "emissionShape": 0,
+          "localPositionOffset": [0.0, 0.0, 0.0],
+          "overallScale": 2.0,
+          "spawnBoxExtents": [0.0, 0.0, 0.0],
+          "spawnRadius": 0.0,
+          "spawnRadiusInner": 0.0,
+          "spawnRate": 0.0,
+          "burstCountMin": 1,
+          "burstCountMax": 1,
+          "burstInterval": 0.0,
+          "burstOnStart": true,
+          "directionMode": 0,
+          "direction": [0.0, 1.0, 0.0],
+          "coneAngle": 0.0,
+          "coneInnerAngle": 0.0,
+          "speedMin": 0.0,
+          "speedMax": 0.0,
+          "gravity": [0.0, 0.0, 0.0],
+          "drag": 0.0,
+          "turbulenceStrength": 0.0,
+          "turbulenceScale": 1.0,
+          "boundsMode": 0,
+          "renderMode": 3,
+          "colorStart": [0.85, 0.95, 1.0],
+          "colorEnd": [0.25, 0.55, 1.0],
+          "alphaStart": 1.0,
+          "alphaEnd": 0.0,
+          "sizeStartMin": 0.1,
+          "sizeStartMax": 0.1,
+          "sizeEndMin": 10.0,
+          "sizeEndMax": 10.0,
+          "lifetimeMin": 0.55,
+          "lifetimeMax": 0.55,
+          "sparkleShape": 0
+        },
+        "ObjectMetaData": {
+          "name": "LightConeShockwave",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "TimedDestroy",
+              "enabled": true,
+              "fields": {
+                "duration": {
+                  "t": 0,
+                  "v": 1.0
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

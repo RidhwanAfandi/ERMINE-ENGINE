@@ -21,6 +21,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "UITextRenderer.h"
 #include <memory>
 #include <unordered_map>
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -144,6 +145,18 @@ namespace Ermine
             Reference to UISliderComponent with slider settings.
         *************************************************************************/
         void RenderSlider(const UISliderComponent& slider);
+
+        void RenderTextComponent(const UITextComponent& textComp);
+
+        void RenderImage(const UIImageComponent& imageComp);
+
+        // Sorted render queue types
+        enum class UIComponentType { Image, Button, Slider, Text };
+        struct UIRenderEntry {
+            EntityID entity;
+            UIComponentType type;
+            int renderOrder;
+        };
 
         bool IsEntityActiveInHierarchy(EntityID entity);
 

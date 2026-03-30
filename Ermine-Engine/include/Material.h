@@ -18,6 +18,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Texture.h"
 #include "Cubemap.h"
 #include "MathVector.h"
+#include <algorithm>
+#include <cmath>
 
 namespace Ermine::graphics
 {
@@ -96,7 +98,7 @@ namespace Ermine::graphics
         int shadingModel{ 0 };                   // 4 bytes (48-51)
         uint32_t textureFlags{ 0 };              // 4 bytes (52-55) - Packed bitfield for all texture flags
         int castsShadows{ 1 };                   // 4 bytes (56-59) - Whether this material casts shadows (1=true, 0=false)
-        float _pad0{};                           // 4 bytes (60-63) - padding for alignment
+        float fillAmount{ 1.0f };                // 4 bytes (60-63) - Mesh fill amount [0,1]
 
         // UV Scale and Offset
         Vec2 uvScale{ 1.0f, 1.0f };             // 8 bytes (64-71)
@@ -110,10 +112,11 @@ namespace Ermine::graphics
 
         int aoMapIndex{ -1 };                   // 4 bytes (96-99)
         int emissiveMapIndex{ -1 };             // 4 bytes (100-103)
-        int _pad1{};                            // 4 bytes (104-107) - padding
-        int _pad2{};                            // 4 bytes (108-111) - padding for vec4 alignment
+        float fillDirOctX{ 0.0f };              // 4 bytes (104-107) - Normalized UV fill axis X
+        float fillDirOctY{ 1.0f };              // 4 bytes (108-111) - Normalized UV fill axis Y
         // Total: 112 bytes (down from 128 bytes) - 12.5% reduction
     };
+    static_assert(sizeof(MaterialSSBO) == 112, "MaterialSSBO must remain 112 bytes");
 
     // Forward declaration
     class Material;
@@ -140,7 +143,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
         // Returns a parameter map for a metallic PBR material.
@@ -161,7 +167,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
 
@@ -183,7 +192,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
 		// Emissive material
@@ -204,7 +216,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
 
@@ -226,7 +241,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
 
@@ -248,7 +266,10 @@ namespace Ermine::graphics
                 {"materialHasMetallicMap", false},
                 {"materialHasAoMap", false},
                 {"materialHasEmissiveMap", false},
-                {"materialCastsShadows", true}
+                {"materialCastsShadows", true},
+                {"materialFillAmount", 1.0f},
+                {"materialFillDirection", Vec3(0.0f, 1.0f, 0.0f)},
+                {"materialFillUVAxis", Vec2(0.0f, 1.0f)}
             };
         }
 
@@ -261,6 +282,11 @@ namespace Ermine::graphics
     class Material
     {
     private:
+        static float Clamp01(const float value)
+        {
+            return std::max(0.0f, std::min(1.0f, value));
+        }
+
         std::map<std::string, MaterialParam> m_parameters;
         std::shared_ptr<Shader> m_shader;
 
@@ -336,6 +362,45 @@ namespace Ermine::graphics
 
             if (auto param = GetParameter("materialCastsShadows"))
                 m_materialData.castsShadows = param->boolValue ? 1 : 0;
+
+            // Mesh fill controls
+            float fillAmount = 1.0f;
+            if (auto param = GetParameter("materialFillAmount"))
+            {
+                if (!param->floatValues.empty()) {
+                    fillAmount = param->floatValues[0];
+                }
+            }
+            m_materialData.fillAmount = Clamp01(fillAmount);
+
+            Vec2 fillAxisUV(0.0f, 1.0f);
+            if (auto param = GetParameter("materialFillUVAxis"))
+            {
+                if (param->floatValues.size() >= 2)
+                {
+                    fillAxisUV = Vec2(param->floatValues[0], param->floatValues[1]);
+                }
+            }
+            else if (auto param = GetParameter("materialFillDirection"))
+            {
+                if (param->floatValues.size() >= 2)
+                {
+                    fillAxisUV = Vec2(param->floatValues[0], param->floatValues[1]);
+                }
+            }
+
+            const float fillAxisLenSq = fillAxisUV.x * fillAxisUV.x + fillAxisUV.y * fillAxisUV.y;
+            if (fillAxisLenSq < 1e-12f) {
+                fillAxisUV = Vec2(0.0f, 1.0f);
+            }
+            else {
+                const float invLen = 1.0f / std::sqrt(fillAxisLenSq);
+                fillAxisUV.x *= invLen;
+                fillAxisUV.y *= invLen;
+            }
+
+            m_materialData.fillDirOctX = fillAxisUV.x;
+            m_materialData.fillDirOctY = fillAxisUV.y;
 
             // Update texture flags (packed into bitfield for efficiency)
             m_materialData.textureFlags = 0;

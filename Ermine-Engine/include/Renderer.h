@@ -267,6 +267,7 @@ namespace Ermine::graphics
         bool m_ShowSkybox = true;
         bool m_FilmGrainEnabled = false;
         bool m_ChromaticAberrationEnabled = false;
+        bool m_RadialBlurEnabled = false;
 
         // Post-processing uniforms - parameters
         float m_Exposure = 1.0f;
@@ -275,10 +276,18 @@ namespace Ermine::graphics
         float m_Gamma = 2.2f;
         float m_VignetteIntensity = 0.3f;
         float m_VignetteRadius = 0.8f;
+        float m_VignetteCoverage = 0.0f;
+        float m_VignetteFalloff = 0.2f;
+        float m_VignetteMapStrength = 1.0f;
+        std::string m_VignetteMapPath{};
+        glm::vec3 m_VignetteMapRGBModifier = glm::vec3(0.0f, 0.0f, 0.0f);
         float m_BloomStrength = 0.04f;
         float m_GrainIntensity = 0.015f;
         float m_GrainScale = 1.5f;
         float m_ChromaticAmount = 0.003f;
+        float m_RadialBlurStrength = 0.0f;
+        int m_RadialBlurSamples = 12;
+        glm::vec2 m_RadialBlurCenter = glm::vec2(0.5f, 0.5f);
 
         // FXAA parameters
         float m_FXAASpanMax = 8.0f;
@@ -314,6 +323,23 @@ namespace Ermine::graphics
         // Sync helpers
         void SyncToGlobalGraphics();    // copy class -> m_GlobalGraphics
         void ApplyFromGlobalGraphics(); // copy m_GlobalGraphics -> class
+
+        void SetVignetteMapTexture(const std::shared_ptr<Texture>& texture, const std::string& path)
+        {
+            m_VignetteMapTexture = texture;
+            m_VignetteMapPath = path;
+        }
+
+        void ClearVignetteMapTexture()
+        {
+            m_VignetteMapTexture.reset();
+            m_VignetteMapPath.clear();
+        }
+
+        bool HasVignetteMapTexture() const
+        {
+            return m_VignetteMapTexture && m_VignetteMapTexture->IsValid();
+        }
 
         /**
          * @brief To run the pass and read GL_STENCIL_INDEX at a pixel
@@ -466,13 +492,14 @@ namespace Ermine::graphics
             uint64_t HandlePackedTexture1 = 0;
             uint64_t HandlePackedTexture2 = 0;
             uint64_t HandlePackedTexture3 = 0;
+            uint64_t HandlePackedTexture4 = 0;  // Velocity buffer
             uint64_t HandleDepthTexture = 0;
-
 
             unsigned int PackedTexture0 = 0;
             unsigned int PackedTexture1 = 0;
             unsigned int PackedTexture2 = 0;
             unsigned int PackedTexture3 = 0;
+            unsigned int PackedTexture4 = 0;    // Velocity buffer
 
 
 
@@ -606,6 +633,8 @@ namespace Ermine::graphics
 
         std::shared_ptr<OffscreenBuffer> GetOffscreenBuffer() const { return m_OffscreenBuffer; }
         std::shared_ptr<GBuffer> GetGBuffer() const { return m_GBuffer; }
+        std::shared_ptr<PostProcessBuffer> GetPostProcessBuffer() const { return m_PostProcessBuffer; }
+        std::shared_ptr<PostProcessBuffer> GetMotionBlurBuffer() const { return m_MotionBlurBuffer; }
 
         /**
         * @brief Cleanup g-buffer resources
@@ -653,10 +682,13 @@ namespace Ermine::graphics
          */
         bool GetShadingMode() const { return m_IsBlinnPhong; }
         /**
-         * @brief Updates the lights' shader UBO with the current light and transform data from all living entities.
-         * @param view The view matrix to transform the positions and directions of the lights into view space.
+         * @brief Updates the lights' shader SSBO with the current light and transform data from all living entities.
+         * @param view Current output-frame view matrix.
+         * @param projection Current output-frame projection matrix.
          */
-        void UpdateLightsUBO(const Mtx44& view);
+        void UpdateLightsSSBO(const Mtx44& view, const Mtx44& projection);
+        size_t GetUploadedLightCount() const { return m_LastUploadedLightCount; }
+        size_t GetLightSSBOCapacity() const { return m_LightsSSBOCapacity; }
         
 		/**
 		 * @brief Updates the light probes UBO with current probe data from all probe entities.
@@ -918,11 +950,17 @@ namespace Ermine::graphics
         bool CreateShadowMapArray();
         /**
          * @brief Calculates light-space matrices for all shadow-casting lights.
-         * Computes cascade splits and shadow matrices for directional and spot lights based on the camera's view and projection.
+         * Computes cascade splits and shadow matrices for directional and spot lights based on the current frame view and projection.
          * Updates each light's shadow matrix and split depth for use in shadow mapping.
-         * @param editorCamera Reference to the editor camera providing view and projection matrices.
+         * @param view Current output-frame view matrix.
+         * @param projection Current output-frame projection matrix.
          */
-        void CalculateLightMatrix(const editor::EditorCamera& editorCamera);
+        void CalculateLightMatrix(const Mtx44& view, const Mtx44& projection);
+        /**
+         * @brief Syncs shadow view state against the current output frame before rendering.
+         * Rebuilds shadow layer allocation, updates light-space matrices, and re-uploads the light SSBO.
+         */
+        void SyncShadowViewsForOutputFrame(const Mtx44& view, const Mtx44& projection);
         /**
          * @brief Renders the shadow map for all shadow-casting lights and cascades.
          * Reuses pre-skinned positions from geometry pass to avoid redundant bone calculations.
@@ -1001,6 +1039,7 @@ namespace Ermine::graphics
          * @param projection The projection matrix
          */
         void RenderMotionBlurMask(const Mtx44& view, const Mtx44& projection);
+        void RenderMotionBlurPass();
 
         /**
          * @brief Sort opaque custom shader objects by shader pointer (for batching)
@@ -1051,6 +1090,9 @@ namespace Ermine::graphics
 		
 
     private:
+        void EnsureLightsSSBO(size_t requiredLightCount);
+        void BindLightsSSBO() const;
+
         // Texture Array Management (Bindless Texture System)
         struct TextureArrayEntry
         {
@@ -1082,10 +1124,10 @@ namespace Ermine::graphics
 		std::shared_ptr<MaterialSystem> m_MaterialSystem = nullptr;
         std::shared_ptr<OffscreenBuffer> m_OffscreenBuffer;
 
-        // Lighting UBO
-        GLuint m_LightsUBO = 0;
-        static constexpr GLuint LightsBindingPoint = 1;
-        std::unordered_set<GLuint> m_LightBlockBoundPrograms;
+        // Lighting SSBO
+        GLuint m_LightsSSBO = 0;
+        size_t m_LightsSSBOCapacity = 0;
+        size_t m_LastUploadedLightCount = 0;
         bool m_IsBlinnPhong = false; // Default to PBR shading
 
 		// Light Probe UBO
@@ -1264,6 +1306,7 @@ namespace Ermine::graphics
             bool useSkinning;              // Skinning flag (affects VAO selection)
             bool hasSkinningData;          // Mesh has valid bone influences
             bool isCameraAttached;         // Camera-attached flag (no motion blur)
+            bool flickerEmissive;          // Enable emissive flicker in the g-buffer pass
             uint32_t boneOffset;           // Bone transform offset (skinned only)
         };
         std::vector<CachedDrawItem> m_CachedDrawItems; // Cached draw items for fast updates
@@ -1288,10 +1331,11 @@ namespace Ermine::graphics
         std::shared_ptr<PostProcessBuffer> m_BloomExtractBuffer;
         std::shared_ptr<PostProcessBuffer> m_BloomBlurBuffer1;
         std::shared_ptr<PostProcessBuffer> m_BloomBlurBuffer2;
-		std::shared_ptr<PostProcessBuffer> m_AntiAliasingBuffer;
+        std::shared_ptr<PostProcessBuffer> m_AntiAliasingBuffer;
         std::shared_ptr<PostProcessBuffer> m_MotionBlurBuffer;
         std::shared_ptr<PostProcessBuffer> m_MotionBlurMaskBuffer;
         GLuint m_NoiseTexture = 0; // Film grain noise texture
+        std::shared_ptr<Texture> m_VignetteMapTexture = nullptr; // Optional vignette map texture
         std::shared_ptr<Shader> m_BloomShader = 0; // Shader for bloom effect
         std::shared_ptr<Shader> m_PostProcessShader = 0; // Shader for post-processing effects
 		std::shared_ptr<Shader> m_AAShader = 0; // Shader for anti-aliasing
@@ -1329,6 +1373,7 @@ namespace Ermine::graphics
         GLuint m_ShadowViewSSBO = 0; // SSBO containing per-layer shadow view matrices
         size_t m_ShadowViewSSBOCapacity = 0;
         std::vector<ShadowViewGPU> m_ShadowViews;
+        std::vector<EntityID> m_VisibleLights;
         std::vector<EntityID> m_ShadowCastingLights;
 
         // Forward rendering shader for transparent objects
@@ -1354,6 +1399,9 @@ namespace Ermine::graphics
 
         std::shared_ptr<PickingBuffer> m_PickingBuffer;
         std::shared_ptr<Shader> m_PickingShader = nullptr; // Legacy picking shader (unused)
+
+        void BuildVisibleLightSet(const Mtx44& view, const Mtx44& projection);
+        void UploadLightsSSBOFromPreparedState();
         std::shared_ptr<Shader> m_PickingIndirectShader = nullptr; // Indirect rendering picking (standard meshes)
         std::shared_ptr<Shader> m_PickingIndirectSkinnedShader = nullptr; // Indirect rendering picking (skinned meshes)
 

@@ -1,0 +1,110 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "a9e5c3414d69574490fb5d918cc3f6a5"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "GPUParticleEmitter": {
+          "active": true,
+          "maxParticles": 1800,
+          "emissionShape": 1,
+          "localPositionOffset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overallScale": 1.0,
+          "spawnBoxExtents": [
+            0.1,
+            0.1,
+            0.1
+          ],
+          "spawnRadius": 0.42,
+          "spawnRadiusInner": 0.16,
+          "spawnRate": 0.0,
+          "burstCountMin": 180,
+          "burstCountMax": 260,
+          "burstInterval": 0.0,
+          "burstOnStart": true,
+          "directionMode": 2,
+          "direction": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "coneAngle": 180.0,
+          "coneInnerAngle": 0.0,
+          "speedMin": 7.0,
+          "speedMax": 14.0,
+          "gravity": [
+            0.0,
+            1.5,
+            0.0
+          ],
+          "drag": 1.7,
+          "turbulenceStrength": 4.0,
+          "turbulenceScale": 1.4,
+          "boundsMode": 0,
+          "renderMode": 1,
+          "colorStart": [
+            0.1,
+            0.2,
+            0.6
+          ],
+          "colorEnd": [
+            0.05,
+            0.05,
+            0.05
+          ],
+          "alphaStart": 0.52,
+          "alphaEnd": 0.0,
+          "sizeStartMin": 0.55,
+          "sizeStartMax": 1.0,
+          "sizeEndMin": 1.15,
+          "sizeEndMax": 1.85,
+          "lifetimeMin": 0.7,
+          "lifetimeMax": 1.3,
+          "sparkleShape": 0
+        },
+        "ObjectMetaData": {
+          "name": "OrbExplosionSmoke",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ScriptsComponent": {
+          "scripts": [
+            {
+              "class": "TimedDestroy",
+              "enabled": true,
+              "fields": {
+                "duration": {
+                  "t": 0,
+                  "v": 1.8
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

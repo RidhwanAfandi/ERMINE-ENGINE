@@ -1,0 +1,80 @@
+{
+  "entities": [
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "3c32cb5e2eb3514ba3ec020a09b6f561"
+        },
+        "Transform": {
+          "position": [
+            0.2126302719116211,
+            0.4345720112323761,
+            3.7569034099578859
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.030000001192092897,
+            0.029999999329447748,
+            0.03000001050531864
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Desk",
+          "tag": "Untagged",
+          "selfActive": true
+        },
+        "ModelComponent": {
+          "model": "ART1_desk_low.fbx",
+          "isSkinFile": false
+        },
+        "HierarchyComponent": {
+          "depth": 0
+        },
+        "GlobalTransform": {}
+      }
+    },
+    {
+      "components": {
+        "IDComponent": {
+          "guid": "0106aba1ea805e46b9bd4dd95a989a8f"
+        },
+        "Transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "ObjectMetaData": {
+          "name": "Mesh_ART1_desk_low.fbx_desk_mesh0",
+          "tag": "Mesh",
+          "selfActive": true
+        },
+        "Material": {
+          "guid": "4686add7734bf542a3c94a8c5808db98"
+        },
+        "HierarchyComponent": {
+          "parentGuid": "3c32cb5e2eb3514ba3ec020a09b6f561",
+          "depth": 1
+        },
+        "GlobalTransform": {}
+      }
+    }
+  ]
+}

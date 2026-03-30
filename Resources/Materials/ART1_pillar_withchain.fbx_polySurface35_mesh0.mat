@@ -15,7 +15,7 @@
         },
         "materialRoughness": {
             "type": "float",
-            "value": 0.30000001192092898
+            "value": 0.7
         },
         "materialAo": {
             "type": "float",
@@ -44,6 +44,25 @@
         "materialCastsShadows": {
             "type": "bool",
             "value": true
+        },
+        "materialFillAmount": {
+            "type": "float",
+            "value": 1.0
+        },
+        "materialFillDirection": {
+            "type": "vec3",
+            "value": [
+                0.0,
+                1.0,
+                0.0
+            ]
+        },
+        "materialFillUVAxis": {
+            "type": "vec2",
+            "value": [
+                0.0,
+                1.0
+            ]
         },
         "materialHasAlbedoMap": {
             "type": "bool",

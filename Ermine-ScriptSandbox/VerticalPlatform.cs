@@ -10,14 +10,24 @@ public class VerticalPlatform : MonoBehaviour
     private float timer = 0f;
     private Vector3 startPosition;
 
+
     void Awake()
     {
         startPosition = transform.position;
+
+        Random instanceRandom = new Random((int)gameObject.GetInstanceID());
+
+        // Randomize starting phase
+        timer = (float)(instanceRandom.NextDouble() * moveDistance * 2.0);
+
+        // Randomize speed (±20% variation)
+        moveSpeed *= (float)(0.8 + instanceRandom.NextDouble() * 0.4);
     }
    
 
     void FixedUpdate()
     {
+        
         // Increase time properly
         timer += Time.deltaTime * moveSpeed;
 
@@ -32,9 +42,6 @@ public class VerticalPlatform : MonoBehaviour
             Physics.SetPosition((ulong)gameObject.GetInstanceID(), startPosition + new Vector3(0f, offset, 0f));
     }
     
-    
-    
-
     float PingPong(float value, float length)
     {
         float mod = value % (2 * length);

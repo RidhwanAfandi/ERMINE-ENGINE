@@ -23,6 +23,12 @@ uniform float u_Saturation = 1.0;
 uniform float u_Gamma = 2.2;
 uniform float u_VignetteIntensity = 0.3;
 uniform float u_VignetteRadius = 0.8;
+uniform float u_VignetteCoverage = 0.0;
+uniform float u_VignetteFalloff = 0.2;
+uniform float u_VignetteMapStrength = 1.0;
+uniform int u_HasVignetteMap = 0;
+uniform sampler2D u_VignetteMap;
+uniform vec3 u_VignetteMapRGBModifier = vec3(0.0, 0.0, 0.0);
 uniform float u_BloomStrength = 0.04;
 
 // Film grain and chromatic aberration
@@ -33,6 +39,10 @@ uniform sampler2D u_NoiseTexture;
 uniform vec2 u_NoiseOffset = vec2(0.0);
 uniform int u_ChromaticAberration = 0;
 uniform float u_ChromaticAmount = 0.003;
+uniform int u_RadialBlur = 0;
+uniform float u_RadialBlurStrength = 0.0;
+uniform int u_RadialBlurSamples = 12;
+uniform vec2 u_RadialBlurCenter = vec2(0.5, 0.5);
 
 // Post-processing outline
 uniform sampler2D u_OutlineMask;
@@ -71,10 +81,29 @@ vec3 gammaCorrection(vec3 color, float gamma)
 // Vignette effect
 vec3 applyVignette(vec3 color, vec2 texCoord)
 {
-    vec2 uv = texCoord * 2.0 - 1.0;
-    float vignette = 1.0 - dot(uv, uv) * u_VignetteIntensity;
-    vignette = smoothstep(0.0, u_VignetteRadius, vignette);
-    return color * vignette;
+    float vignetteMask = 0.0;
+
+    if (u_HasVignetteMap == 1)
+    {
+        // Texture map drives the vignette directly.
+        // UV coords (0-1) stretch the texture to fill the screen.
+        // Alpha channel controls transparency: 0 = no vignette, 1 = full vignette.
+        float alphaMask = texture(u_VignetteMap, texCoord).a;
+        vignetteMask = clamp(alphaMask * clamp(u_VignetteMapStrength, 0.0, 1.0), 0.0, 1.0);
+    }
+    else
+    {
+        // Procedural fallback when no texture map is assigned.
+        float falloff = max(u_VignetteFalloff, 0.0001);
+        vec2 procUV = texCoord * 2.0 - 1.0;
+        float dist = length(procUV);
+        float edgeMask = smoothstep(u_VignetteRadius, u_VignetteRadius + falloff, dist);
+        vignetteMask = clamp((1.0 - u_VignetteCoverage) * edgeMask + u_VignetteCoverage, 0.0, 1.0);
+    }
+
+    float darkness = clamp(u_VignetteIntensity * vignetteMask, 0.0, 1.0);
+    vec3 tint = clamp(u_VignetteMapRGBModifier, vec3(0.0), vec3(1.0));
+    return mix(color, tint, darkness);
 }
 
 // Color grading functions
@@ -87,6 +116,45 @@ vec3 adjustSaturation(vec3 color, float saturation)
 {
     float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
     return mix(vec3(luminance), color, saturation);
+}
+
+vec3 applyRadialBlur(vec2 uv, vec3 baseColor)
+{
+    if (u_RadialBlur == 0)
+    {
+        return baseColor;
+    }
+
+    int samples = clamp(u_RadialBlurSamples, 4, 24);
+    float strength = clamp(u_RadialBlurStrength, 0.0, 0.35);
+    if (strength <= 0.0001)
+    {
+        return baseColor;
+    }
+
+    vec2 dir = uv - u_RadialBlurCenter;
+    float dirLen = length(dir);
+    if (dirLen <= 0.00001)
+    {
+        return baseColor;
+    }
+
+    vec2 stepDir = dir / dirLen;
+    vec3 accum = baseColor;
+    float totalWeight = 1.0;
+
+    for (int i = 1; i < samples; ++i)
+    {
+        float t = float(i) / float(samples - 1);
+        float weight = 1.0 - t;
+        vec2 sampleUV = uv - stepDir * (t * strength * dirLen);
+        vec3 sampleColor = texture(u_LightingTexture, clamp(sampleUV, 0.0, 1.0)).rgb;
+
+        accum += sampleColor * weight;
+        totalWeight += weight;
+    }
+
+    return accum / max(totalWeight, 0.0001);
 }
 
 float sampleMask(vec2 uv)
@@ -128,6 +196,8 @@ void main()
         color = texture(u_LightingTexture, TexCoord).rgb;
     }
 
+    color = applyRadialBlur(TexCoord, color);
+
     sampler2D depthSampler = sampler2D(u_GBufferDepthHandle);
     float sceneDepth = texture(depthSampler, TexCoord).r;
     bool isSky = sceneDepth >= 1.0;
@@ -138,18 +208,17 @@ void main()
         color += bloomColor * u_BloomStrength;
     }
     
-    if(!isSky || u_SkyboxIsHDR == 1)
+    // Tone-map the fully composed scene once. At this point the buffer already
+    // contains deferred lighting, skybox, and forward transparency together.
+    if(u_ToneMapping == 1)
     {
-        if(u_ToneMapping == 1)
-        {
-            // Using ACES tone mapping for better results
-            color = acesToneMapping(color * u_Exposure);
-        }
-        
-        if(u_GammaCorrection == 1)
-        {
-            color = gammaCorrection(color, u_Gamma);
-        }
+        // Using ACES tone mapping for better results
+        color = acesToneMapping(color * u_Exposure);
+    }
+
+    if(u_GammaCorrection == 1)
+    {
+        color = gammaCorrection(color, u_Gamma);
     }
     
     if(u_Vignette == 1)

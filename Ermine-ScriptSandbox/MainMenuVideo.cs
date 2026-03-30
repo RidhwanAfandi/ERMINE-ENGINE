@@ -7,6 +7,8 @@ public class MainMenuVideo : MonoBehaviour
 
     void Start()
     {
+        Cursor.lockState = Cursor.CursorLockState.None;
+
         if (VideoManager.Load(VideoName, VideoPath, true))
         {
             VideoManager.SetCurrent(VideoName);

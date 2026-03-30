@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <unordered_map>
 #include "ECS.h"
 #include "Components.h"
+#include "EditorGUI.h"
 
 namespace Ermine
 {

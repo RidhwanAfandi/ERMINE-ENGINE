@@ -82,7 +82,9 @@
     <Compile Include="CoreModule\GlobalAudio.cs" />
     <Compile Include="CoreModule\Input.cs" />
     <Compile Include="CoreModule\Mathf.cs" />
+    <Compile Include="CoreModule\Material.cs" />
     <Compile Include="CoreModule\Matrix4x4.cs" />
+    <Compile Include="CoreModule\PostEffects.cs" />
     <Compile Include="CoreModule\Prefab.cs" />
     <Compile Include="CoreModule\Quaternion.cs" />
     <Compile Include="CoreModule\Rigidbody.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="CoreModule\Transform.cs" />
     <Compile Include="CoreModule\UIBookCounter.cs" />
     <Compile Include="CoreModule\UIHealthbar.cs" />
+    <Compile Include="CoreModule\UIImageComponent.cs" />
     <Compile Include="CoreModule\UISystem.cs" />
     <Compile Include="CoreModule\Vector2.cs" />
     <Compile Include="CoreModule\Vector3.cs" />

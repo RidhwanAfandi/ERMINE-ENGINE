@@ -91,7 +91,7 @@ void Skybox::CreateSkyboxGeometry()
     m_vbo->Unbind();
 }
 
-void Skybox::Render(const Mtx44& view, const Mtx44& projection, float exposure, float gamma)
+void Skybox::Render(const Mtx44& view, const Mtx44& projection)
 {
     if (!IsValid())
     {
@@ -113,8 +113,6 @@ void Skybox::Render(const Mtx44& view, const Mtx44& projection, float exposure, 
     
     m_shader->SetUniformMatrix4fv("view", skyboxView);
     m_shader->SetUniformMatrix4fv("projection", projection);
-    m_shader->SetUniform1f("exposure", exposure);
-    m_shader->SetUniform1f("gamma", gamma);
 
     // Bind cubemap
     m_cubemap->Bind(0);
